@@ -1,0 +1,127 @@
+{
+  "entities": {
+    "Item": {
+      "title": "Item",
+      "description": "Represents a lost or found item tracked by FindTrack",
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier of the item"
+        },
+        "userId": {
+          "type": "string",
+          "description": "The identifier of the user who registered the item"
+        },
+        "type": {
+          "type": "string",
+          "enum": ["lost", "found"],
+          "description": "Whether the item is lost or was found"
+        },
+        "title": {
+          "type": "string",
+          "description": "The name or brief title of the item"
+        },
+        "description": {
+          "type": "string",
+          "description": "Detailed description of the item"
+        },
+        "category": {
+          "type": "string",
+          "enum": ["electronics", "keys", "wallet", "documents", "clothing", "jewelry", "bags", "others"],
+          "description": "Category categorization of the item"
+        },
+        "location": {
+          "type": "string",
+          "description": "Where the item was lost or found"
+        },
+        "status": {
+          "type": "string",
+          "enum": ["active", "resolved"],
+          "description": "Status of the lost/found tracking"
+        },
+        "imageUrl": {
+          "type": "string",
+          "description": "Optional image URL or base64 representation of the item portrait"
+        },
+        "contactName": {
+          "type": "string",
+          "description": "Name of the key point of contact"
+        },
+        "contactInfo": {
+          "type": "string",
+          "description": "Phone number, email, or messaging handle for contact"
+        },
+        "date": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Date and time when the item was lost or found"
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Server timestamp when item was created"
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Server timestamp of last update"
+        }
+      },
+      "required": ["id", "userId", "type", "title", "description", "category", "location", "status", "contactName", "contactInfo", "date", "createdAt", "updatedAt"]
+    },
+    "Match": {
+      "title": "Match",
+      "description": "Represents a potential or confirmed match between a lost item and a found item",
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique match identifier"
+        },
+        "lostItemId": {
+          "type": "string",
+          "description": "Reference field to the lost item"
+        },
+        "foundItemId": {
+          "type": "string",
+          "description": "Reference field to the found item"
+        },
+        "confidenceScore": {
+          "type": "number",
+          "description": "The match score calculated by the AI engine or heuristic (0 to 100)"
+        },
+        "matchReason": {
+          "type": "string",
+          "description": "Descriptive reason why these two items are a match"
+        },
+        "status": {
+          "type": "string",
+          "enum": ["pending", "accepted", "rejected"],
+          "description": "Status of the match"
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Server timestamp of match creation"
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Server timestamp of last status update"
+        }
+      },
+      "required": ["id", "lostItemId", "foundItemId", "confidenceScore", "matchReason", "status", "createdAt", "updatedAt"]
+    }
+  },
+  "firestore": {
+    "/items/{itemId}": {
+      "schema": "Item",
+      "description": "Collection of all lost and found items"
+    },
+    "/matches/{matchId}": {
+      "schema": "Match",
+      "description": "Collection of tracked item matches between lost and found items"
+    }
+  }
+}
