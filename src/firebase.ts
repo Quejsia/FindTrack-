@@ -1,5 +1,13 @@
 import { initializeApp } from 'firebase/app';
-import { getAuth, GoogleAuthProvider, signInWithPopup, signOut } from 'firebase/auth';
+import { 
+  getAuth, 
+  GoogleAuthProvider, 
+  signInWithPopup, 
+  signOut,
+  signInWithEmailAndPassword,
+  createUserWithEmailAndPassword,
+  updateProfile
+} from 'firebase/auth';
 import { getFirestore, doc, getDocFromServer } from 'firebase/firestore';
 import appletConfig from '../firebase-applet-config.json';
 
@@ -38,6 +46,29 @@ export const loginWithGoogle = async () => {
     return result.user;
   } catch (error) {
     console.error('Core Sign In Error:', error);
+    throw error;
+  }
+};
+
+// Email/Password sign up helper
+export const registerWithEmail = async (email: string, password: string, displayName: string) => {
+  try {
+    const result = await createUserWithEmailAndPassword(auth, email, password);
+    await updateProfile(result.user, { displayName });
+    return result.user;
+  } catch (error) {
+    console.error('Email Registration Error:', error);
+    throw error;
+  }
+};
+
+// Email/Password login helper
+export const loginWithEmail = async (email: string, password: string) => {
+  try {
+    const result = await signInWithEmailAndPassword(auth, email, password);
+    return result.user;
+  } catch (error) {
+    console.error('Email Login Error:', error);
     throw error;
   }
 };

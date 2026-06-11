@@ -17,6 +17,7 @@ import Header from './components/Header';
 import ItemCard from './components/ItemCard';
 import ItemDetail from './components/ItemDetail';
 import SubmissionForm from './components/SubmissionForm';
+import AuthModal from './components/AuthModal';
 import { motion, AnimatePresence } from 'motion/react';
 import { 
   Search, 
@@ -63,6 +64,8 @@ export default function App() {
   // Modal / Selection overlays
   const [selectedItem, setSelectedItem] = useState<Item | null>(null);
   const [isNewItemModalOpen, setIsNewItemModalOpen] = useState<boolean>(false);
+  const [isAuthModalOpen, setIsAuthModalOpen] = useState<boolean>(false);
+  const [authModalMode, setAuthModalMode] = useState<'login' | 'signup'>('login');
 
   // Dynamic user matching stats (Live updates)
   const [seeding, setSeeding] = useState<boolean>(false);
@@ -330,7 +333,18 @@ export default function App() {
       <Header
         user={user}
         loadingAuth={loadingAuth}
-        onOpenNewItemModal={() => setIsNewItemModalOpen(true)}
+        onOpenNewItemModal={() => {
+          if (user) {
+            setIsNewItemModalOpen(true);
+          } else {
+            setAuthModalMode('login');
+            setIsAuthModalOpen(true);
+          }
+        }}
+        onOpenAuthModal={(mode) => {
+          setAuthModalMode(mode);
+          setIsAuthModalOpen(true);
+        }}
       />
 
       {/* Main Container */}
@@ -570,6 +584,18 @@ export default function App() {
               />
             </motion.div>
           </div>
+        )}
+
+        {/* Custom Login and Signup Modal Overlay (Representing login.html and signup.html designs) */}
+        {isAuthModalOpen && (
+          <AuthModal
+            isOpen={isAuthModalOpen}
+            onClose={() => setIsAuthModalOpen(false)}
+            onAuthSuccess={(authenticatedUser) => {
+              setUser(authenticatedUser);
+            }}
+            initialMode={authModalMode}
+          />
         )}
       </AnimatePresence>
     </div>
