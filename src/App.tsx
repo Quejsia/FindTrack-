@@ -1,603 +1,1772 @@
-import React, { useState, useEffect } from 'react';
-import { User, onAuthStateChanged } from 'firebase/auth';
+import React, { useState, useEffect, useRef, useMemo } from 'react';
+import { 
+  User, 
+  onAuthStateChanged,
+  createUserWithEmailAndPassword,
+  signInWithEmailAndPassword
+} from 'firebase/auth';
 import { 
   collection, 
   onSnapshot, 
   query, 
-  orderBy, 
-  setDoc, 
   doc, 
+  setDoc, 
   updateDoc, 
   deleteDoc,
-  where
+  serverTimestamp
 } from 'firebase/firestore';
-import { auth, db, handleFirestoreError, loginWithGoogle, OperationType } from './firebase';
-import { Item, ItemType, Category, ItemStatus } from './types';
-import Header from './components/Header';
-import ItemCard from './components/ItemCard';
-import ItemDetail from './components/ItemDetail';
-import SubmissionForm from './components/SubmissionForm';
-import AuthModal from './components/AuthModal';
-import { motion, AnimatePresence } from 'motion/react';
 import { 
-  Search, 
-  Filter, 
-  Sparkles, 
-  Radio, 
-  AlertCircle,
-  Database,
-  Grid,
-  Info
-} from 'lucide-react';
+  auth, 
+  db, 
+  handleFirestoreError, 
+  logOut, 
+  OperationType 
+} from './firebase';
 
-const CATEGORIES: { value: Category | 'all'; label: string }[] = [
-  { value: 'all', label: 'All Categories' },
-  { value: 'electronics', label: 'Electronics' },
-  { value: 'keys', label: 'Keys' },
-  { value: 'wallet', label: 'Wallets & Cash' },
-  { value: 'documents', label: 'Documents' },
-  { value: 'clothing', label: 'Clothing' },
-  { value: 'jewelry', label: 'Jewelry' },
-  { value: 'bags', label: 'Bags & Luggage' },
-  { value: 'others', label: 'Others' }
+interface ItemReport {
+  id: string;
+  userId: string;
+  title: string;
+  location: string;
+  desc?: string;
+  description?: string;
+  type: 'lost' | 'found';
+  image?: string;
+  imageUrl?: string;
+  createdAt: any;
+  claimed: boolean;
+}
+
+const ONBOARD_STEPS = [
+  {
+    icon: "🔎",
+    label: "Step 1 of 4",
+    title: "Welcome to FindTrack!",
+    desc: "Your campus lost & found platform. Report missing items, search for found ones, and get reunited with your belongings — fast."
+  },
+  {
+    icon: "📦",
+    label: "Step 2 of 4",
+    title: "Report Lost or Found Items",
+    desc: "Tap the Report tab to submit an item. Add a photo, title, and location for the best chance of recovery. The more detail, the better!"
+  },
+  {
+    icon: "🤖",
+    label: "Step 3 of 4",
+    title: "Smart Match Suggestions",
+    desc: "Our smart system automatically compares your reports against others and highlights possible matches — so you can claim your item faster."
+  },
+  {
+    icon: "📌",
+    label: "Step 4 of 4",
+    title: "Pin & Track Items",
+    desc: "Bookmark items you're watching with the pin button. Check Pinned Items in the menu for quick access anytime. You're all set — good luck! 🎉"
+  }
 ];
 
 export default function App() {
-  // Authentication & Session state
+  // Navigation layout state: 'landing' | 'login' | 'signup' | 'dashboard'
+  const [currentView, setCurrentView] = useState<'landing' | 'login' | 'signup' | 'dashboard'>('landing');
+  
+  // Dashboard panel selector
+  const [activeTab, setActiveTab] = useState<string>('home');
+  const [selectedItemId, setSelectedItemId] = useState<string | null>(null);
+
+  // Authentication & session state
   const [user, setUser] = useState<User | null>(null);
   const [loadingAuth, setLoadingAuth] = useState<boolean>(true);
+  
+  // Form input validations / fields
+  const [authEmail, setAuthEmail] = useState('');
+  const [authPassword, setAuthPass] = useState('');
+  const [signupFirst, setSignupFirst] = useState('');
+  const [signupLast, setSignupLast] = useState('');
+  const [signupContact, setSignupContact] = useState('');
+  
+  // App alerts, loading states & real-time sync list
+  const [items, setItems] = useState<ItemReport[]>([]);
+  const [toasts, setToasts] = useState<{ id: string; msg: string; type: 'success' | 'error' }[]>([]);
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [showPass, setShowPass] = useState(false);
+  const [showOnboarding, setShowOnboarding] = useState(false);
+  const [onboardStep, setOnboardStep] = useState(0);
+  const [zoomImg, setZoomImg] = useState<string | null>(null);
+  const [showGuestModal, setShowGuestModal] = useState(false);
 
-  // Firestore Sync item list
-  const [items, setItems] = useState<Item[]>([]);
-  const [loadingItems, setLoadingItems] = useState<boolean>(true);
-  const [firestoreError, setFirestoreError] = useState<string | null>(null);
-  const [showSkeleton, setShowSkeleton] = useState<boolean>(true);
+  // Dashboard inputs
+  const [reportTitle, setReportTitle] = useState('');
+  const [reportLocation, setReportLocation] = useState('');
+  const [reportDesc, setReportDesc] = useState('');
+  const [reportType, setReportType] = useState<'lost' | 'found'>('lost');
+  const [reportImage, setReportImage] = useState<string>('');
 
-  const hideSkeleton = () => setShowSkeleton(false);
+  // Dashboard Search state
+  const [sQuery, setSQuery] = useState('');
+  const [sFilter, setSFilter] = useState('all');
+  const [sLoc, setSLoc] = useState('');
+  const [sDate, setSDate] = useState('');
+  const [advancedFiltersOpen, setAdvancedFiltersOpen] = useState(false);
 
-  // Search & Filtering controls
-  const [searchTerm, setSearchTerm] = useState<string>('');
-  const [selectedType, setSelectedType] = useState<ItemType | 'all'>('all');
-  const [selectedCategory, setSelectedCategory] = useState<Category | 'all'>('all');
-  const [selectedStatus, setSelectedStatus] = useState<ItemStatus | 'all'>('active');
+  // Category browse keyword lists
+  const [categoryKeywords, setCategoryKeywords] = useState<string[] | null>(null);
 
-  // Modal / Selection overlays
-  const [selectedItem, setSelectedItem] = useState<Item | null>(null);
-  const [isNewItemModalOpen, setIsNewItemModalOpen] = useState<boolean>(false);
-  const [isAuthModalOpen, setIsAuthModalOpen] = useState<boolean>(false);
-  const [authModalMode, setAuthModalMode] = useState<'login' | 'signup'>('login');
+  // Profile data
+  const [profileName, setProfileName] = useState('Student');
+  const [profileEmail, setProfileEmail] = useState('');
+  const [profileContact, setProfileContact] = useState('');
+  const [profileAvatar, setProfileAvatar] = useState('https://api.dicebear.com/8.x/avataaars/svg?seed=default');
 
-  // Dynamic user matching stats (Live updates)
-  const [seeding, setSeeding] = useState<boolean>(false);
+  // Pinned item list IDs (local storage synchronization)
+  const [pinnedIds, setPinnedIds] = useState<string[]>([]);
+
+  // Shimmer skeleton state
+  const [homeShimmer, setHomeShimmer] = useState(true);
+
+  // Donut chart canvas reference
+  const canvasRef = useRef<HTMLCanvasElement | null>(null);
+
+  // Trigger custom toast notification
+  const triggerToast = (msg: string, type: 'success' | 'error' = 'success') => {
+    const id = Math.random().toString();
+    setToasts(prev => [...prev, { id, msg, type }]);
+    setTimeout(() => {
+      setToasts(prev => prev.filter(t => t.id !== id));
+    }, 3300);
+  };
+
+  // Check login session
+  const isLoggedIn = useMemo(() => {
+    return user !== null;
+  }, [user]);
 
   // 1. Listen to Authentication State Changes
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
       setUser(currentUser);
       setLoadingAuth(false);
+      
+      if (currentUser) {
+        // Automatically sync initial profile credentials
+        setProfileEmail(currentUser.email || "");
+        setProfileName(currentUser.displayName || "Dela Cruz");
+        
+        // Sync profile data from localStorage context if exists
+        try {
+          const lProfile = localStorage.getItem("userProfile");
+          if (lProfile) {
+            const parsed = JSON.parse(lProfile);
+            if (parsed.name) setProfileName(parsed.name);
+            if (parsed.contact) setProfileContact(parsed.contact);
+            if (parsed.avatar) setProfileAvatar(parsed.avatar);
+          }
+        } catch (e) {
+          console.error(e);
+        }
+        
+        // Switch view to dashboard on successful load
+        setCurrentView('dashboard');
+      } else {
+        // If guest is currently in session, direct to dashboard
+        try {
+          const guestSession = localStorage.getItem("sessionUser");
+          if (guestSession) {
+            const session = JSON.parse(guestSession);
+            if (session && session.email === "") {
+              setProfileName("Guest");
+              setProfileEmail("");
+              setCurrentView('dashboard');
+            }
+          }
+        } catch (e) {
+          console.error(e);
+        }
+      }
     });
+
+    // Sync Pinned Items
+    try {
+      const pins = localStorage.getItem("pinnedItems");
+      if (pins) {
+        setPinnedIds(JSON.parse(pins));
+      }
+    } catch (e) {
+      console.error(e);
+    }
+
     return unsubscribe;
   }, []);
 
-  // 2. Real-time Firestore Sync for tracking items
+  // 2. Real-time Firestore Sync of items / reports
   useEffect(() => {
-    if (!user) {
-      setItems([]);
-      setLoadingItems(false);
-      hideSkeleton();
+    const reportsCollection = collection(db, 'items'); // Rules define items matching
+    
+    // Listen to all public lost/found entries across the board to permit comprehensive lost and found search engine matching
+    const unsubscribe = onSnapshot(query(reportsCollection), (snapshot) => {
+      const list: ItemReport[] = [];
+      snapshot.forEach(docSnap => {
+        list.push({ id: docSnap.id, ...docSnap.data() } as ItemReport);
+      });
+      // Sort in-memory descending creation date
+      list.sort((a, b) => {
+        const aTime = a.createdAt?.seconds ? a.createdAt.seconds * 1000 : new Date(a.createdAt || 0).getTime();
+        const bTime = b.createdAt?.seconds ? b.createdAt.seconds * 1000 : new Date(b.createdAt || 0).getTime();
+        return bTime - aTime;
+      });
+      setItems(list);
+      setHomeShimmer(false);
+    }, (error) => {
+      console.error("Firestore sync error:", error);
+    });
+
+    return unsubscribe;
+  }, []);
+
+  // 3. Initiate Onboarding trigger
+  useEffect(() => {
+    if (currentView === 'dashboard') {
+      const isComplete = localStorage.getItem("ft_onboarded");
+      if (!isComplete) {
+        const timer = setTimeout(() => {
+          setShowOnboarding(true);
+        }, 1100);
+        return () => clearTimeout(timer);
+      }
+    }
+  }, [currentView]);
+
+  // Handle Firebase Sign In
+  const handleLoginSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!authEmail || !authPassword) {
+      triggerToast("❌ Please enter your email and password.", "error");
       return;
     }
 
-    const path = 'items';
-    setLoadingItems(true);
-    setFirestoreError(null);
-
-    let unsubscribe = () => {};
-
     try {
-      const itemsCollection = collection(db, path);
-      // Query securely filtered by current user's ID to respect Firestore security rules.
-      // We do NOT use orderBy('createdAt') in the Firestore query to prevent Firebase index restriction warnings,
-      // and instead perform highly efficient in-memory sorting of the results downstream.
-      const itemsQuery = query(itemsCollection, where('userId', '==', user.uid));
-
-      unsubscribe = onSnapshot(
-        itemsQuery,
-        (snapshot) => {
-          try {
-            const fetchedItems: Item[] = [];
-            snapshot.forEach((docSnap) => {
-              fetchedItems.push({ id: docSnap.id, ...docSnap.data() } as Item);
-            });
-            // Perform in-memory sorting securely and reliably
-            fetchedItems.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
-            setItems(fetchedItems);
-          } catch (err) {
-            console.error('Snapshot parsing error:', err);
-            setFirestoreError('Failed parsing registry entries.');
-          } finally {
-            setLoadingItems(false);
-            hideSkeleton();
-          }
-        },
-        (error) => {
-          console.error('Firestore real-time sync failure:', error);
-          setLoadingItems(false);
-          setFirestoreError('Access is restricted or Firebase rules denied the read index query.');
-          try {
-            handleFirestoreError(error, OperationType.LIST, path);
-          } catch (handlerErr) {
-            // Error logged and rethrown
-          } finally {
-            hideSkeleton();
-          }
-        }
-      );
-    } catch (error) {
-      console.error('Subscription setup failed:', error);
-      setFirestoreError('Failed to establish secure real-time listener.');
-      setLoadingItems(false);
-      hideSkeleton();
-    }
-
-    return () => {
-      unsubscribe();
-    };
-  }, [user]);
-
-  // 3. Database Write operation: Create Item
-  const handleCreateItem = async (itemData: {
-    type: ItemType;
-    title: string;
-    description: string;
-    category: Category;
-    location: string;
-    contactName: string;
-    contactInfo: string;
-    date: string;
-    imageUrl?: string;
-  }) => {
-    if (!user) {
-      throw new Error('You must be registered and signed in to publish items.');
-    }
-
-    const path = 'items';
-    const cleanId = doc(collection(db, path)).id; // Safe alphanumeric ID
-    const currentTimeString = new Date().toISOString();
-
-    const fullItemObj: Item = {
-      ...itemData,
-      id: cleanId,
-      userId: user.uid,
-      status: 'active',
-      createdAt: currentTimeString,
-      updatedAt: currentTimeString,
-    };
-
-    try {
-      await setDoc(doc(db, path, cleanId), fullItemObj);
-      console.log('Item created successfully:', cleanId);
-    } catch (error) {
-      handleFirestoreError(error, OperationType.CREATE, `${path}/${cleanId}`);
+      const credentials = await signInWithEmailAndPassword(auth, authEmail.trim(), authPassword);
+      localStorage.setItem('sessionUser', JSON.stringify({
+        id: credentials.user.uid,
+        email: credentials.user.email
+      }));
+      triggerToast("✅ Login successful! Redirecting...", "success");
+      setAuthEmail('');
+      setAuthPass('');
+      setCurrentView('dashboard');
+    } catch (err: any) {
+      console.error("SignIn error:", err);
+      triggerToast("❌ Invalid email or password. Please try again.", "error");
     }
   };
 
-  // 4. Database Write operation: Resolve items in matchmaker
-  const handleResolveItem = async (itemId: string, matchingItemId: string) => {
-    const path1 = `items/${itemId}`;
-    const path2 = `items/${matchingItemId}`;
-    const currentTimeString = new Date().toISOString();
+  // Handle Firebase Sign Up
+  const handleSignupSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!signupFirst.trim() || !signupLast.trim()) {
+      triggerToast("❌ First and Last names are required.", "error");
+      return;
+    }
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(authEmail.trim())) {
+      triggerToast("❌ Please enter a valid email address.", "error");
+      return;
+    }
+    if (authPassword.length < 6) {
+      triggerToast("❌ Password must be at least 6 characters.", "error");
+      return;
+    }
 
     try {
-      // Resolve caller item
-      await updateDoc(doc(db, 'items', itemId), {
-        status: 'resolved',
-        updatedAt: currentTimeString,
-      });
+      const credentials = await createUserWithEmailAndPassword(auth, authEmail.trim().toLowerCase(), authPassword);
+      const fullName = `${signupFirst.trim()} ${signupLast.trim()}`;
+      
+      localStorage.setItem('sessionUser', JSON.stringify({
+        id: credentials.user.uid,
+        name: fullName,
+        email: authEmail.trim().toLowerCase()
+      }));
 
-      // Resolve linked item
-      await updateDoc(doc(db, 'items', matchingItemId), {
-        status: 'resolved',
-        updatedAt: currentTimeString,
-      });
+      const prof = {
+        name: fullName,
+        email: authEmail.trim().toLowerCase(),
+        contact: signupContact.trim(),
+        avatar: profileAvatar
+      };
+      localStorage.setItem('userProfile', JSON.stringify(prof));
 
-      // If the selected item itself is currently being viewed, update its visual model too
-      if (selectedItem?.id === itemId) {
-        setSelectedItem((prev) => prev ? { ...prev, status: 'resolved' } : null);
+      setProfileName(fullName);
+      setProfileContact(signupContact);
+      setProfileEmail(authEmail.trim().toLowerCase());
+
+      triggerToast("✅ Account created successfully!", "success");
+      
+      setSignupFirst('');
+      setSignupLast('');
+      setSignupContact('');
+      setAuthEmail('');
+      setAuthPass('');
+      setCurrentView('dashboard');
+    } catch (err: any) {
+      console.error("SignUp error:", err);
+      if (err.code === 'auth/email-already-in-use') {
+        triggerToast("❌ Email already registered.", "error");
+      } else {
+        triggerToast("❌ Signup failed. Try again.", "error");
       }
-    } catch (error) {
-      handleFirestoreError(error, OperationType.UPDATE, path1);
     }
   };
 
-  // 5. Database Write operation: Delete listing
-  const handleDeleteItem = async (itemId: string) => {
-    const path = `items/${itemId}`;
+  // Handle Logout
+  const handleLogoutAction = async () => {
+    localStorage.removeItem('sessionUser');
+    localStorage.removeItem('userProfile');
+    try {
+      await logOut();
+    } catch (er) {}
+    setProfileName("Student");
+    setProfileEmail("");
+    setProfileContact("");
+    triggerToast("🚪 Logged out securely.", "success");
+    setCurrentView('landing');
+    setActiveTab('home');
+  };
+
+  // Browse as guest fallback trigger
+  const handleGuestBrowse = () => {
+    localStorage.removeItem('sessionUser');
+    const guestUser = {
+      name: 'Guest',
+      email: '',
+      contact: '',
+      avatar: 'https://api.dicebear.com/8.x/avataaars/svg?seed=guest'
+    };
+    localStorage.setItem('userProfile', JSON.stringify(guestUser));
+    localStorage.setItem('sessionUser', JSON.stringify({ id: 'guest_' + Date.now(), email: '' }));
+    setProfileName("Guest");
+    setProfileEmail("");
+    setProfileContact("");
+    setProfileAvatar(guestUser.avatar);
+    setCurrentView('dashboard');
+    setActiveTab('home');
+  };
+
+  // Save profile modifications
+  const handleSaveProfile = () => {
+    if (profileName === 'Guest') {
+      setShowGuestModal(true);
+      return;
+    }
+
+    const updated = {
+      name: profileName,
+      email: profileEmail,
+      contact: profileContact,
+      avatar: profileAvatar
+    };
+    localStorage.setItem('userProfile', JSON.stringify(updated));
+    triggerToast("✅ Profile saved successfully!", "success");
+  };
+
+  // Image upload reading state
+  const handleImageFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = () => {
+      if (reader.result) {
+        setReportImage(reader.result as string);
+      }
+    };
+    reader.readAsDataURL(file);
+  };
+
+  // Profile avatar trigger random
+  const handleRandomAvatar = () => {
+    if (profileName === 'Guest') {
+      setShowGuestModal(true);
+      return;
+    }
+    const seed = Math.random().toString(36).slice(2, 8);
+    const styles = ["avataaars", "bottts", "fun-emoji", "lorelei", "pixel-art"];
+    const style = styles[Math.floor(Math.random() * styles.length)];
+    setProfileAvatar(`https://api.dicebear.com/8.x/${style}/svg?seed=${seed}`);
+  };
+
+  // Submit Report to Firestore
+  const handleReportSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (profileName === 'Guest') {
+      setShowGuestModal(true);
+      return;
+    }
+
+    if (!reportTitle.trim()) {
+      triggerToast("❌ Item title is required.", "error");
+      return;
+    }
+
+    const payloadId = 'r_' + Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
+    
+    // Firestore Object Schema aligned with security rules constraints
+    const reportData = {
+      id: payloadId,
+      userId: auth.currentUser?.uid || 'anonymous_uid',
+      title: reportTitle.trim(),
+      description: reportDesc.trim() || 'No description provided.',
+      type: reportType,
+      category: 'others', // Supported standard selection
+      location: reportLocation.trim() || 'Unknown Location',
+      status: 'active',
+      contactName: profileName || 'Student',
+      contactInfo: profileContact || profileEmail || 'No contact provided',
+      date: new Date().toLocaleDateString(),
+      imageUrl: reportImage || '',
+      createdAt: serverTimestamp(),
+      updatedAt: serverTimestamp(),
+      claimed: false
+    };
+
+    try {
+      await setDoc(doc(db, 'items', payloadId), reportData);
+      triggerToast("✅ Report submitted successfully!", "success");
+      
+      // Reset form variables
+      setReportTitle('');
+      setReportLocation('');
+      setReportDesc('');
+      setReportType('lost');
+      setReportImage('');
+
+      // Auto redirect to Search to view entries
+      setActiveTab('search');
+    } catch (err) {
+      console.error("Firestore creation error:", err);
+      triggerToast("❌ Submission rejected by security parameters.", "error");
+      try {
+        handleFirestoreError(err, OperationType.CREATE, `items/${payloadId}`);
+      } catch (e) {}
+    }
+  };
+
+  // Toggle Pin Bookmark action
+  const togglePin = (itemId: string) => {
+    if (profileName === 'Guest') {
+      setShowGuestModal(true);
+      return;
+    }
+    let pins = [...pinnedIds];
+    const idx = pins.indexOf(itemId);
+    if (idx > -1) {
+      pins.splice(idx, 1);
+      triggerToast("📍 Item unpinned", "success");
+    } else {
+      pins.push(itemId);
+      triggerToast("📌 Item pinned!", "success");
+    }
+    setPinnedIds(pins);
+    localStorage.setItem("pinnedItems", JSON.stringify(pins));
+  };
+
+  // Flag Item as Claimed
+  const claimItem = async (itemId: string) => {
+    if (profileName === 'Guest') {
+      setShowGuestModal(true);
+      return;
+    }
+    if (!confirm("Are you sure you want to mark this item as claimed/recovered?")) return;
+    
+    try {
+      await updateDoc(doc(db, 'items', itemId), {
+        claimed: true,
+        status: 'resolved',
+        updatedAt: serverTimestamp()
+      });
+      triggerToast("✅ Item marked as claimed!", "success");
+    } catch (err) {
+      console.error(err);
+      triggerToast("❌ Action access is denied.", "error");
+    }
+  };
+
+  // Delete Listing report
+  const deleteItem = async (itemId: string) => {
+    if (profileName === 'Guest') {
+      setShowGuestModal(true);
+      return;
+    }
+    if (!confirm("Delete this report entry permanently? This cannot be undone.")) return;
+    
     try {
       await deleteDoc(doc(db, 'items', itemId));
-      console.log('Item deleted successfully:', itemId);
-    } catch (error) {
-      handleFirestoreError(error, OperationType.DELETE, path);
-    }
-  };
-
-  // 6. Quality-of-life Feature: Interactive sandbox populator
-  const seedPlaygroundData = async () => {
-    if (!user) {
-      alert('Please sign in first to seed records on your account.');
-      return;
-    }
-
-    setSeeding(true);
-    const mockItems = [
-      {
-        type: 'lost' as ItemType,
-        title: 'Leather Zipper Bi-fold Wallet',
-        category: 'wallet' as Category,
-        description: 'Brown distress leather wallet with a zipper containing a driver license under the name Carl Jayan, transit tokens, and family photocard. Incredibly important heirloom.',
-        location: 'Central Station Terminal Entrance near subway stairs',
-        contactName: 'Carl Jayan',
-        contactInfo: 'carl@example.com',
-        imageUrl: 'https://images.unsplash.com/photo-1627123424574-724758594e93?auto=format&fit=crop&q=80&w=200'
-      },
-      {
-        type: 'found' as ItemType,
-        title: 'Distressed Brown Zip Wallet',
-        category: 'wallet' as Category,
-        description: 'Found a luxury distressed brown leather wallet. Zippered enclosing, containing local transit card and personal ID inside. Handed over to Central Lost & Found help desk.',
-        location: 'Platform 3 Central Station Subway',
-        contactName: 'Help Desk Staff',
-        contactInfo: '+1 (555) 901-2104',
-        imageUrl: 'https://images.unsplash.com/photo-1549923366-c87ebb14585f?auto=format&fit=crop&q=80&w=200'
-      },
-      {
-        type: 'lost' as ItemType,
-        title: 'Space Gray Aluminum MacBook Air 13',
-        category: 'electronics' as Category,
-        description: 'MacBook Air with dual USB-C ports on left, stickers on back (Google developer logo and a green turtle stickers). Serial No starts with C50F. Lost inside a gray felt pouch.',
-        location: 'University Library East Wing 2nd Floor desk',
-        contactName: 'Marcus Hall',
-        contactInfo: 'marcus@example.com',
-        imageUrl: 'https://images.unsplash.com/photo-1517336714731-489689fd1ca8?auto=format&fit=crop&q=80&w=200'
-      },
-      {
-        type: 'found' as ItemType,
-        title: 'Apple MacBook Laptop inside felt bag',
-        category: 'electronics' as Category,
-        description: 'Found a sleek silver/space-gray Apple laptop left behind on quiet study cubicle. Contains programming stickers on back shell. Logged under security safe.',
-        location: 'Library Main Hall reception desk',
-        contactName: 'Security Desk',
-        contactInfo: '+1 (555) 700-1122'
-      },
-      {
-        type: 'lost' as ItemType,
-        title: 'Brass House Keys with Leather Strap',
-        category: 'keys' as Category,
-        description: 'Three metal keys: one gold brass house key, two Yale silver padlocks. Held together by a dark brown woven leather loop strap.',
-        location: 'Patterson Park walking sidewalk near playground',
-        contactName: 'Sara Vance',
-        contactInfo: 'sara.v@example.com'
-      }
-    ];
-
-    try {
-      for (const mock of mockItems) {
-        const fileId = doc(collection(db, 'items')).id;
-        const creationTime = new Date(Date.now() - Math.random() * 86400000).toISOString();
-        await setDoc(doc(db, 'items', fileId), {
-          ...mock,
-          id: fileId,
-          userId: user.uid,
-          status: 'active',
-          date: new Date().toISOString(),
-          createdAt: creationTime,
-          updatedAt: creationTime
-        });
-      }
+      setPinnedIds(prev => prev.filter(id => id !== itemId));
+      triggerToast("🗑️ Item deleted", "error");
+      setActiveTab('search');
     } catch (err) {
-      console.error('Core seeding error:', err);
-    } finally {
-      setSeeding(false);
+      console.error(err);
+      triggerToast("❌ Deletion rejected.", "error");
     }
   };
 
-  // 7. Filter items list dynamically based on criteria
-  const filteredItems = items.filter((item) => {
-    // 1. Text Search matching
-    const searchLow = searchTerm.toLowerCase();
-    const matchesSearch = 
-      item.title.toLowerCase().includes(searchLow) ||
-      item.description.toLowerCase().includes(searchLow) ||
-      item.location.toLowerCase().includes(searchLow) ||
-      item.contactName.toLowerCase().includes(searchLow);
+  // Active counter statistics dynamic
+  const stats = useMemo(() => {
+    return {
+      lost: items.filter(i => i.type === 'lost' && !i.claimed).length,
+      found: items.filter(i => i.type === 'found' && !i.claimed).length,
+      claimed: items.filter(i => i.claimed).length
+    };
+  }, [items]);
 
-    // 2. Type Filter (Lost, Found, All)
-    const matchesType = selectedType === 'all' || item.type === selectedType;
+  // In memory dynamic listing filter
+  const filteredSearchList = useMemo(() => {
+    return items.filter(r => {
+      const keywords = `${r.title} ${r.desc || r.description || ""} ${r.location}`.toLowerCase();
+      
+      // Keyword matching
+      if (sQuery.trim() && !keywords.includes(sQuery.toLowerCase())) {
+        return false;
+      }
+      
+      // Category keywords browsing bounds
+      if (categoryKeywords) {
+        const hasKeywordMatch = categoryKeywords.some(kw => keywords.includes(kw.toLowerCase()));
+        if (!hasKeywordMatch) return false;
+      }
 
-    // 3. Category Filter
-    const matchesCategory = selectedCategory === 'all' || item.category === selectedCategory;
+      // Status dropdown
+      if (sFilter === 'lost') {
+        if (r.type !== 'lost' || r.claimed) return false;
+      } else if (sFilter === 'found') {
+        if (r.type !== 'found' || r.claimed) return false;
+      } else if (sFilter === 'claimed') {
+        if (!r.claimed) return false;
+      }
 
-    // 4. Status Filter (Active, Resolved, All)
-    const matchesStatus = selectedStatus === 'all' || item.status === selectedStatus;
+      // Advanced filters bounds
+      if (sLoc.trim() && !(r.location || "").toLowerCase().includes(sLoc.toLowerCase())) {
+        return false;
+      }
+      
+      if (sDate.trim()) {
+        const itemDateStr = r.date || "";
+        if (!itemDateStr.includes(sDate)) return false;
+      }
 
-    return matchesSearch && matchesType && matchesCategory && matchesStatus;
-  });
+      return true;
+    });
+  }, [items, sQuery, sFilter, sLoc, sDate, categoryKeywords]);
 
-  // Calculate stats
-  const activeLostCount = items.filter(i => i.type === 'lost' && i.status === 'active').length;
-  const activeFoundCount = items.filter(i => i.type === 'found' && i.status === 'active').length;
+  // Compute matches scores for active queries
+  const smartMatches = useMemo(() => {
+    if (sQuery.trim().length < 3) return [];
+    
+    const fake = {
+      id: "fake_search",
+      title: sQuery,
+      desc: "",
+      location: "",
+      type: "lost",
+      createdAt: Date.now(),
+      claimed: false
+    };
 
+    return items
+      .filter(r => r.type === 'found' && !r.claimed)
+      .map(r => ({ report: r, score: computeMatchScore(fake, r) }))
+      .filter(x => x.score > 0.12)
+      .sort((a, b) => b.score - a.score)
+      .slice(0, 4);
+  }, [items, sQuery]);
+
+  // Complete clean JSX structure wrapping converted index.html tags
   return (
-    <div className="min-h-screen bg-slate-50 text-slate-800" id="main-workflow-app">
-      {/* Header component */}
-      <Header
-        user={user}
-        loadingAuth={loadingAuth}
-        onOpenNewItemModal={() => {
-          if (user) {
-            setIsNewItemModalOpen(true);
-          } else {
-            setAuthModalMode('login');
-            setIsAuthModalOpen(true);
-          }
-        }}
-        onOpenAuthModal={(mode) => {
-          setAuthModalMode(mode);
-          setIsAuthModalOpen(true);
-        }}
-      />
+    <div className="relative min-h-screen bg-[#f0f4f8]">
+      
+      {/* ── TOAST MESSAGES FLOATER ── */}
+      <div className="toast-container" id="toastContainer">
+        {toasts.map(t => (
+          <div key={t.id} className={`toast-msg ${t.type}`}>
+            {t.msg}
+          </div>
+        ))}
+      </div>
 
-      {/* Main Container */}
-      <main className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
-        
-        {/* Pitch Hero layout banner */}
-        <div className="mb-8 rounded-2xl bg-gradient-to-r from-indigo-900 via-indigo-950 to-slate-950 p-6 md:p-8 text-white relative overflow-hidden shadow-lg border border-indigo-900">
-          <div className="absolute top-0 right-0 p-8 opacity-10">
-            <Radio className="h-40 w-40 animate-pulse text-indigo-200" />
-          </div>
-          
-          <div className="relative z-10 max-w-2xl space-y-3">
-            <span className="inline-flex items-center gap-1.5 rounded-full bg-indigo-500/25 px-3 py-1 text-xs font-semibold text-indigo-300 border border-indigo-500/30">
-              <Sparkles className="h-3.5 w-3.5" />
-              <span>Enhanced with Gemini Flash AI Models</span>
-            </span>
-            <h2 className="font-sans text-2xl md:text-3xl font-extrabold tracking-tight">
-              Reuniting Belongings, Intelligently.
-            </h2>
-            <p className="font-sans text-xs md:text-sm text-slate-300 leading-relaxed max-w-xl">
-              FindTrack brings Zero-Trust Firestore database safety and Gemini's cognitive analysis together. 
-              Upload a snapshot of lost property to auto-extract details, and let our AI Matchmaker calculate exact overlap probabilities instantly!
-            </p>
-          </div>
+      {/* ── IMMERSIVE BACKGROUND GRID (Only on landing or auth views) ── */}
+      {(currentView === 'landing' || currentView === 'login' || currentView === 'signup') && (
+        <div className="bg-scene">
+          <div className="bg-orb"></div>
+          <div className="bg-orb"></div>
+          <div className="bg-orb"></div>
+          <div className="bg-grid"></div>
         </div>
+      )}
 
-        {/* Dashboard statistics counters bar */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
-          <div className="rounded-xl border border-rose-100 bg-rose-50/20 p-4 shrink-0">
-            <span className="font-sans text-[10px] uppercase tracking-wider font-extrabold text-rose-500">Active lost filings</span>
-            <p className="font-mono text-2xl font-bold text-rose-700 mt-1">{loadingItems ? '...' : activeLostCount}</p>
+      {/* ── VIEW 1: LANDING PAGE ── */}
+      {currentView === 'landing' && (
+        <div className="landing-page">
+          {/* Landing NAV */}
+          <nav className="landing-nav">
+            <div className="nav-logo">
+              <div className="nav-logo-icon">🔎</div>
+              <span>FindTrack</span>
+            </div>
+            <div className="nav-actions">
+              <button onClick={() => setCurrentView('login')} className="nav-btn nav-btn-ghost">Login</button>
+              <button onClick={() => setCurrentView('signup')} className="nav-btn nav-btn-solid">Sign Up</button>
+            </div>
+          </nav>
+
+          {/* Landing HERO */}
+          <div className="hero">
+            <div className="hero-badge">
+              <span className="badge-dot"></span>
+              FindTrack Lost &amp; Found Platform
+            </div>
+            <h1>Find What's<br /><span className="text-gradient">Lost, Fast.</span></h1>
+            <p>Report missing items, browse found belongings, and reunite with your stuff — all in one smart platform built for your Things.</p>
+
+            <div className="hero-actions">
+              <button onClick={() => setCurrentView('signup')} className="btn-hero-primary">📝 Get Started Free</button>
+              <button onClick={() => setCurrentView('login')} className="btn-hero-secondary">🔐 Sign In</button>
+            </div>
+            <button onClick={handleGuestBrowse} className="guest-link" id="guestBtn">
+              or <span>browse as guest →</span>
+            </button>
           </div>
-          <div className="rounded-xl border border-emerald-100 bg-emerald-50/15 p-4 shrink-0">
-            <span className="font-sans text-[10px] uppercase tracking-wider font-extrabold text-emerald-600">Active found logs</span>
-            <p className="font-mono text-2xl font-bold text-emerald-700 mt-1">{loadingItems ? '...' : activeFoundCount}</p>
+
+          {/* Landing STATS */}
+          <div className="stats-row">
+            <div className="stat-pill">
+              <div className="stat-num">{stats.claimed}</div>
+              <div className="stat-lbl">Items Recovered</div>
+            </div>
+            <div className="stat-divider"></div>
+            <div className="stat-pill">
+              <div className="stat-num">{items.length}</div>
+              <div className="stat-lbl">Active Listings</div>
+            </div>
+            <div className="stat-divider"></div>
+            <div className="stat-pill">
+              <div className="stat-num">Live</div>
+              <div className="stat-lbl">Platform Hub</div>
+            </div>
+            <div className="stat-divider"></div>
+            <div className="stat-pill">
+              <div className="stat-num">24h</div>
+              <div className="stat-lbl">Avg. Recovery</div>
+            </div>
           </div>
-          <div className="rounded-xl border border-indigo-150 bg-indigo-50/10 p-4 shrink-0">
-            <span className="font-sans text-[10px] uppercase tracking-wider font-extrabold text-indigo-600">Total item repository</span>
-            <p className="font-mono text-2xl font-bold text-indigo-900 mt-1">{loadingItems ? '...' : items.length}</p>
+
+          {/* Landing FEATURES */}
+          <div className="features">
+            <div className="feat-card">
+              <div className="feat-icon sky">📦</div>
+              <div className="feat-title">Easy Reporting</div>
+              <div className="feat-desc">Submit lost or found items in seconds with photo uploads and location details.</div>
+            </div>
+            <div className="feat-card">
+              <div className="feat-icon mint">🔍</div>
+              <div className="feat-title">Smart Search</div>
+              <div className="feat-desc">Advanced filters by category, date, and location to find exactly what you need.</div>
+            </div>
+            <div className="feat-card">
+              <div className="feat-icon indigo">📊</div>
+              <div className="feat-title">Live Analytics</div>
+              <div className="feat-desc">Visual dashboards tracking trends, recovery stats, and item history.</div>
+            </div>
+            <div className="feat-card">
+              <div className="feat-icon amber">⚡</div>
+              <div className="feat-title">Instant Alerts</div>
+              <div className="feat-desc">Get notified immediately when a potential match is found for your item.</div>
+            </div>
           </div>
-          <div className="rounded-xl border border-slate-200 bg-white p-4 shrink-0">
-            <span className="font-sans text-[10px] uppercase tracking-wider font-extrabold text-slate-500">Resolved Reunites</span>
-            <p className="font-mono text-2xl font-bold text-slate-800 mt-1">
-              {loadingItems ? '...' : items.filter(i => i.status === 'resolved').length}
-            </p>
-          </div>
+
+          <footer className="landing-footer">
+            <p>Built with ❤️ for Things · FindTrack v2.0</p>
+          </footer>
         </div>
+      )}
 
-        {/* Filtering & Listing Controls */}
-        <div className="flex flex-col lg:flex-row gap-8 items-start">
-          {/* Sidebar Filters */}
-          <aside className="w-full lg:w-64 space-y-5 flex-shrink-0" id="filters-panel">
-            <div className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm space-y-4">
-              <div className="flex items-center justify-between border-b border-slate-100 pb-2">
-                <span className="font-sans text-xs font-bold text-slate-900 uppercase tracking-wide flex items-center gap-1.5">
-                  <Filter className="h-4 w-4 text-slate-400" />
-                  <span>Search Filters</span>
-                </span>
-                <button 
-                  onClick={() => {
-                    setSearchTerm('');
-                    setSelectedType('all');
-                    setSelectedCategory('all');
-                    setSelectedStatus('active');
-                  }}
-                  className="font-sans text-[10px] font-bold text-indigo-600 hover:text-indigo-800"
-                >
-                  Clear All
-                </button>
+      {/* ── VIEW 2: LOGIN PAGE ── */}
+      {currentView === 'login' && (
+        <div className="landing-page flex items-center justify-center">
+          <div className="auth-wrap">
+            <div className="back-link">
+              <button onClick={() => setCurrentView('landing')} className="text-slate-400 hover:text-white transition">← Back to home</button>
+            </div>
+
+            <div className="auth-logo">
+              <div className="auth-logo-icon">🔎</div>
+              <h1>FindTrack</h1>
+              <p>Campus Lost &amp; Found System</p>
+            </div>
+
+            <div className="auth-card">
+              <div className="card-title">Welcome back 👋</div>
+              <div className="card-sub">Sign in to your account to continue</div>
+
+              <form onSubmit={handleLoginSubmit}>
+                <div className="field">
+                  <label>Email Address</label>
+                  <div className="field-wrap">
+                    <span className="field-icon">✉️</span>
+                    <input 
+                      type="email" 
+                      placeholder="you@example.com" 
+                      value={authEmail}
+                      onChange={(e) => setAuthEmail(e.target.value)}
+                      required 
+                    />
+                  </div>
+                </div>
+
+                <div className="field">
+                  <label>Password</label>
+                  <div className="field-wrap">
+                    <span className="field-icon">🔒</span>
+                    <input 
+                      type={showPass ? "text" : "password"} 
+                      placeholder="Enter your password" 
+                      value={authPassword}
+                      onChange={(e) => setAuthPass(e.target.value)}
+                      required 
+                    />
+                    <button 
+                      type="button" 
+                      onClick={() => setShowPass(!showPass)} 
+                      className={`eye-btn ${!showPass ? 'closed' : ''}`}
+                    >
+                      <span className="text-lg">👁️</span>
+                    </button>
+                  </div>
+                </div>
+
+                <button type="submit" className="btn-submit">🔐 Sign In</button>
+              </form>
+
+              <div className="auth-footer">
+                Don't have an account? <button onClick={() => setCurrentView('signup')} className="text-[#38bdf8] font-bold hover:underline">Create one →</button>
               </div>
+            </div>
+          </div>
+        </div>
+      )}
 
-              {/* Text Search Input */}
-              <div className="space-y-1">
-                <label className="font-sans text-[10px] font-bold text-slate-500 uppercase tracking-wider">Search Keywords</label>
-                <div className="relative">
-                  <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-slate-400" />
-                  <input
-                    type="text"
-                    value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
-                    placeholder="Title, description..."
-                    className="w-full rounded-lg border border-slate-200 bg-slate-50 pl-9 pr-3 py-2 font-sans text-xs text-slate-800 focus:border-indigo-500 focus:bg-white focus:outline-none"
+      {/* ── VIEW 3: SIGNUP PAGE ── */}
+      {currentView === 'signup' && (
+        <div className="landing-page flex items-center justify-center">
+          <div className="auth-wrap">
+            <div className="back-link">
+              <button onClick={() => setCurrentView('landing')} className="text-slate-400 hover:text-white transition">← Back to home</button>
+            </div>
+
+            <div className="auth-logo">
+              <div className="auth-logo-icon">🔎</div>
+              <h1>FindTrack</h1>
+              <p>Campus Lost &amp; Found System</p>
+            </div>
+
+            <div className="auth-card">
+              <div className="card-title">Create your account ✨</div>
+              <div className="card-sub">Be one of the first users of FindTrack</div>
+
+              <form onSubmit={handleSignupSubmit}>
+                <div className="fields-row">
+                  <div className="field">
+                    <label>First Name</label>
+                    <div className="field-wrap">
+                      <span className="field-icon">👤</span>
+                      <input 
+                        type="text" 
+                        placeholder="Juan" 
+                        value={signupFirst}
+                        onChange={(e) => setSignupFirst(e.target.value)}
+                        required 
+                      />
+                    </div>
+                  </div>
+                  <div className="field">
+                    <label>Last Name</label>
+                    <div className="field-wrap">
+                      <span className="field-icon">👤</span>
+                      <input 
+                        type="text" 
+                        placeholder="Dela Cruz" 
+                        value={signupLast}
+                        onChange={(e) => setSignupLast(e.target.value)}
+                        required 
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                <div className="field">
+                  <label>Email Address</label>
+                  <div className="field-wrap">
+                    <span className="field-icon">✉️</span>
+                    <input 
+                      type="email" 
+                      placeholder="you@example.com" 
+                      value={authEmail}
+                      onChange={(e) => setAuthEmail(e.target.value)}
+                      required 
+                    />
+                  </div>
+                </div>
+
+                <div className="field">
+                  <label>Phone Number <span style={{ opacity: 0.4, fontSize: '10px', textTransform: 'none' }}>(optional)</span></label>
+                  <div className="field-wrap">
+                    <span className="field-icon">📱</span>
+                    <input 
+                      type="tel" 
+                      placeholder="+63 912 345 6789" 
+                      value={signupContact}
+                      onChange={(e) => setSignupContact(e.target.value)}
+                    />
+                  </div>
+                </div>
+
+                <div className="field">
+                  <label>Password</label>
+                  <div className="field-wrap">
+                    <span className="field-icon">🔒</span>
+                    <input 
+                      type={showPass ? "text" : "password"} 
+                      placeholder="Min. 6 characters" 
+                      value={authPassword}
+                      onChange={(e) => setAuthPass(e.target.value)}
+                      required 
+                    />
+                    <button 
+                      type="button" 
+                      onClick={() => setShowPass(!showPass)} 
+                      className={`eye-btn ${!showPass ? 'closed' : ''}`}
+                    >
+                      <span className="text-lg">👁️</span>
+                    </button>
+                  </div>
+                </div>
+
+                <button type="submit" className="btn-submit">📝 Create Account</button>
+              </form>
+
+              <div className="auth-footer">
+                Already have an account? <button onClick={() => setCurrentView('login')} className="text-[#38bdf8] font-bold hover:underline">Sign in →</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ── VIEW 4: MAIN DASHBOARD PORTAL ── */}
+      {currentView === 'dashboard' && (
+        <div className="min-h-screen text-slate-800">
+          
+          {/* TOP BAR BRAND MODULE */}
+          <header className="topbar">
+            <div className="topbar-inner">
+              <button 
+                id="burgerBtn" 
+                onClick={() => setSidebarOpen(true)} 
+                className="burger-btn" 
+                aria-label="Menu"
+              >
+                ☰
+              </button>
+              
+              <div className="brand-wrap">
+                <div className="logo">🔎</div>
+                <div className="brand-text">
+                  <div className="brand-title">FindTrack</div>
+                  <div className="small-muted">Campus Lost &amp; Found</div>
+                </div>
+              </div>
+              <div style={{ width: '40px' }}></div>
+            </div>
+
+            {/* TAB SELECTORS SECTION */}
+            <nav className="tabs">
+              <button 
+                onClick={() => { setActiveTab('home'); setCategoryKeywords(null); }} 
+                className={`tab-btn ${activeTab === 'home' ? 'active' : ''}`}
+              >
+                🏠 Home
+              </button>
+              <button 
+                onClick={() => { 
+                  if (profileName === 'Guest') { setShowGuestModal(true); } 
+                  else { setActiveTab('report'); }
+                }} 
+                className={`tab-btn ${activeTab === 'report' ? 'active' : ''}`}
+              >
+                📦 Report
+              </button>
+              <button 
+                onClick={() => { setActiveTab('search'); setCategoryKeywords(null); }} 
+                className={`tab-btn ${activeTab === 'search' ? 'active' : ''}`}
+              >
+                🔍 Search
+              </button>
+              <button 
+                onClick={() => { 
+                  if (profileName === 'Guest') { setShowGuestModal(true); } 
+                  else { setActiveTab('notifications'); }
+                }} 
+                className={`tab-btn ${activeTab === 'notifications' ? 'active' : ''}`}
+              >
+                🔔 Alerts
+              </button>
+              <button 
+                onClick={() => { setActiveTab('profile'); }} 
+                className={`tab-btn ${activeTab === 'profile' ? 'active' : ''}`}
+              >
+                👤 Profile
+              </button>
+            </nav>
+          </header>
+
+          {/* SIDEBAR NAVIGATION DRAWERS */}
+          {sidebarOpen && (
+            <div 
+              id="sidebarOverlay" 
+              onClick={() => setSidebarOpen(false)} 
+              className="overlay"
+            ></div>
+          )}
+          <aside 
+            id="sidebarDrawer" 
+            className={`sidebar-drawer ${sidebarOpen ? 'show' : 'hidden'}`}
+          >
+            <div className="drawer-header">
+              <strong>FindTrack Menu</strong>
+              <button id="closeDrawer" onClick={() => setSidebarOpen(false)}>✕</button>
+            </div>
+            <ul className="drawer-menu">
+              <li 
+                onClick={() => { setActiveTab('home'); setCategoryKeywords(null); setSidebarOpen(false); }} 
+                className="drawer-item"
+              >
+                🏠 Home
+              </li>
+              <li 
+                onClick={() => { 
+                  setSidebarOpen(false); 
+                  if (profileName === 'Guest') { setShowGuestModal(true); } 
+                  else { setActiveTab('report'); }
+                }} 
+                className="drawer-item"
+              >
+                📦 Report Item
+              </li>
+              <li 
+                onClick={() => { setActiveTab('search'); setCategoryKeywords(null); setSidebarOpen(false); }} 
+                className="drawer-item"
+              >
+                🔍 Search
+              </li>
+              <li 
+                onClick={() => { 
+                  setSidebarOpen(false); 
+                  if (profileName === 'Guest') { setShowGuestModal(true); } 
+                  else { setActiveTab('notifications'); }
+                }} 
+                className="drawer-item"
+              >
+                🔔 Alerts
+              </li>
+              <li 
+                onClick={() => { setActiveTab('profile'); setSidebarOpen(false); }} 
+                className="drawer-item"
+              >
+                👤 Profile
+              </li>
+              <hr />
+              <li 
+                onClick={() => { 
+                  setSidebarOpen(false); 
+                  if (profileName === 'Guest') { setShowGuestModal(true); } 
+                  else { setActiveTab('myitems'); }
+                }} 
+                className="drawer-item"
+              >
+                📂 My Items
+              </li>
+              <li 
+                onClick={() => { 
+                  setSidebarOpen(false); 
+                  if (profileName === 'Guest') { setShowGuestModal(true); } 
+                  else { setActiveTab('pinned'); }
+                }} 
+                className="drawer-item"
+              >
+                📌 Pinned Items
+              </li>
+              <li 
+                onClick={() => { setActiveTab('categories'); setSidebarOpen(false); }} 
+                className="drawer-item"
+              >
+                🏷️ Categories
+              </li>
+              <li 
+                onClick={() => { setActiveTab('analytics'); setSidebarOpen(false); }} 
+                className="drawer-item"
+              >
+                📊 Analytics
+              </li>
+              <hr />
+              <li 
+                onClick={() => { setActiveTab('tips'); setSidebarOpen(false); }} 
+                className="drawer-item"
+              >
+                📚 Recovery Tips
+              </li>
+              <li 
+                onClick={() => { setActiveTab('packaging'); setSidebarOpen(false); }} 
+                className="drawer-item"
+              >
+                📦 Packaging Tips
+              </li>
+              <li 
+                onClick={() => { setActiveTab('about'); setSidebarOpen(false); }} 
+                className="drawer-item"
+              >
+                ℹ️ About / Help
+              </li>
+            </ul>
+          </aside>
+
+          {/* MAIN PANELS INJECTION DESK */}
+          <main>
+            
+            {/* PANEL: HOME */}
+            <section id="home" className={`panel ${activeTab === 'home' ? 'active' : ''}`}>
+              {/* Skeleton overlay shimmer */}
+              {homeShimmer ? (
+                <div id="homeSkeleton">
+                  <div className="skeleton skeleton-welcome"></div>
+                  <div style={{ background: 'white', borderRadius: '20px', border: '1px solid #e2e8f0', padding: '20px', marginBottom: '16px' }}>
+                    <div className="skeleton skeleton-title" style={{ width: '40%', height: '16px', margin: '0 0 16px' }}></div>
+                    <div className="skeleton skeleton-recent"></div>
+                    <div className="skeleton skeleton-recent"></div>
+                    <div className="skeleton skeleton-recent"></div>
+                  </div>
+                </div>
+              ) : (
+                <div id="homeContent">
+                  <div className="welcome-card">
+                    <div className="welcome-left">
+                      <p className="muted">Welcome back 👋</p>
+                      <h1 id="welcomeUser" className="welcome-title">Hello, {profileName.split(" ")[0]}!</h1>
+                      <p className="muted" style={{ fontSize: '13px' }}>Here's your activity summary</p>
+                    </div>
+                    <div className="stats-cards">
+                      <div className="stat-card">
+                        <div className="stat-icon">📍</div>
+                        <div className="stat-label">Lost</div>
+                        <div id="countLost" className="stat-value">{stats.lost}</div>
+                      </div>
+                      <div className="stat-card">
+                        <div className="stat-icon">🔍</div>
+                        <div className="stat-label">Found</div>
+                        <div id="countFound" className="stat-value">{stats.found}</div>
+                      </div>
+                      <div className="stat-card">
+                        <div className="stat-icon">✅</div>
+                        <div className="stat-label">Claimed</div>
+                        <div id="countClaimed" className="stat-value">{stats.claimed}</div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="recent-section">
+                    <div className="recent-header">
+                      <h3>📋 Recent Reports Feed</h3>
+                    </div>
+                    <div id="recentList" className="recent-list">
+                      {items.slice(0, 5).map(r => (
+                        <div key={r.id} onClick={() => { setSelectedItemId(r.id); setActiveTab('itemDetail'); }} className="recent-item">
+                          <div className="recent-thumb">
+                            {r.image || r.imageUrl ? (
+                              <img src={r.image || r.imageUrl} alt="" />
+                            ) : (
+                              r.type === 'lost' ? "📍" : "🔍"
+                            )}
+                          </div>
+                          <div className="recent-info">
+                            <div className="recent-title">{r.title}</div>
+                            <div className="recent-meta">{r.location || "Location unknown"} · {r.date || "Just now"}</div>
+                          </div>
+                          <div className={`badge ${r.claimed ? 'claimed' : r.type}`}>
+                            {r.claimed ? "CLAIMED" : r.type.toUpperCase()}
+                          </div>
+                        </div>
+                      ))}
+                      {items.length === 0 && (
+                        <div style={{ textAlign: 'center', padding: '24px', color: '#94a3b8', fontSize: '14px' }}>
+                          No reports yet — start by reporting an item! 📦
+                        </div>
+                      )}
+                    </div>
+                  </div>
+
+                  <div className="tip-banner">💡 Tip: Report lost items within 24 hours for the best chance of recovery!</div>
+                </div>
+              )}
+            </section>
+
+            {/* PANEL: REPORT SUBMISSION */}
+            <section id="report" className={`panel ${activeTab === 'report' ? 'active' : ''}`}>
+              <div className="section-title">📦 Report Lost / Found Item</div>
+              <p className="section-subtitle">Fill in the details below to submit a report. More detail = higher chance of recovery.</p>
+              <div className="report-form-wrap">
+                <form onSubmit={handleReportSubmit} id="reportForm">
+                  <div className="form-group">
+                    <label htmlFor="r_title">Item Title *</label>
+                    <input 
+                      id="r_title" 
+                      type="text" 
+                      placeholder="e.g., Blue Nike Backpack" 
+                      value={reportTitle}
+                      onChange={(e) => setReportTitle(e.target.value)}
+                      required 
+                    />
+                  </div>
+                  <div className="form-group">
+                    <label htmlFor="r_location">Location Where Lost/Found</label>
+                    <input 
+                      id="r_location" 
+                      type="text" 
+                      placeholder="e.g., Library 2nd Floor" 
+                      value={reportLocation}
+                      onChange={(e) => setReportLocation(e.target.value)}
+                    />
+                  </div>
+                  <div className="form-group">
+                    <label htmlFor="r_desc">Detailed Description</label>
+                    <textarea 
+                      id="r_desc" 
+                      rows={4} 
+                      placeholder="Add details like color, brand, identifying features..."
+                      value={reportDesc}
+                      onChange={(e) => setReportDesc(e.target.value)}
+                    ></textarea>
+                  </div>
+                  <div className="form-group">
+                    <label htmlFor="r_image">Upload Photo</label>
+                    <input 
+                      id="r_image" 
+                      type="file" 
+                      accept="image/*" 
+                      onChange={handleImageFileChange}
+                    />
+                    {reportImage && (
+                      <img 
+                        src={reportImage} 
+                        className="image-preview" 
+                        style={{ display: 'block' }} 
+                        alt="Preview" 
+                      />
+                    )}
+                  </div>
+                  <div className="form-group">
+                    <label htmlFor="r_type">Item Status *</label>
+                    <select 
+                      id="r_type"
+                      value={reportType}
+                      onChange={(e) => setReportType(e.target.value as 'lost' | 'found')}
+                    >
+                      <option value="lost">🔴 Lost Item — I lost this</option>
+                      <option value="found">🟢 Found Item — I found this</option>
+                    </select>
+                  </div>
+                  <button className="primary-btn" type="submit">📤 Submit Report</button>
+                </form>
+              </div>
+            </section>
+
+            {/* PANEL: SEARCH REGISTRY */}
+            <section id="search" className={`panel ${activeTab === 'search' ? 'active' : ''}`}>
+              <div className="section-title">🔍 Search Database</div>
+              
+              <div className="search-container">
+                <div className="search-bar">
+                  <div className="search-input-wrapper">
+                    <span className="search-icon">🔍</span>
+                    <input 
+                      id="s_query" 
+                      placeholder="Search by title, description or location..."
+                      value={sQuery}
+                      onChange={(e) => setSQuery(e.target.value)}
+                    />
+                  </div>
+                  <select 
+                    id="s_filter"
+                    value={sFilter}
+                    onChange={(e) => setSFilter(e.target.value)}
+                  >
+                    <option value="all">All Statuses</option>
+                    <option value="lost">Lost Only</option>
+                    <option value="found">Found Only</option>
+                    <option value="claimed">Claimed</option>
+                  </select>
+                  <button 
+                    onClick={() => setAdvancedFiltersOpen(!advancedFiltersOpen)} 
+                    className="filter-btn"
+                  >
+                    Filters ▾
+                  </button>
+                </div>
+
+                <div id="advancedFilters" className={`advanced-filters ${!advancedFiltersOpen ? 'hidden' : ''}`}>
+                  <input 
+                    id="filterLocation" 
+                    placeholder="📍 Filter by location"
+                    value={sLoc}
+                    onChange={(e) => setSLoc(e.target.value)}
+                  />
+                  <input 
+                    id="filterDate" 
+                    type="date"
+                    value={sDate}
+                    onChange={(e) => setSDate(e.target.value)}
                   />
                 </div>
               </div>
 
-              {/* Type Filter */}
-              <div className="space-y-1">
-                <label className="font-sans text-[10px] font-bold text-slate-500 uppercase tracking-wider">Type</label>
-                <div className="grid grid-cols-3 gap-1 p-1 bg-slate-100 rounded-lg">
-                  {(['all', 'lost', 'found'] as const).map((t) => (
-                    <button
-                      key={t}
-                      onClick={() => setSelectedType(t)}
-                      className={`py-1 rounded text-center font-sans text-[10px] font-semibold tracking-wide uppercase transition capitalize ${
-                        selectedType === t 
-                          ? 'bg-white text-slate-900 shadow-sm' 
-                          : 'text-slate-500 hover:text-slate-800'
-                      }`}
-                    >
-                      {t}
+              {/* Dynamic Categories highlight info bar */}
+              {categoryKeywords && (
+                <div className="mb-4 bg-indigo-50 border border-indigo-200 text-indigo-700 py-2 px-4 rounded-xl flex items-center justify-between text-xs">
+                  <span>Filtered: Category Mode Active</span>
+                  <button onClick={() => setCategoryKeywords(null)} className="font-bold underline">Show all files</button>
+                </div>
+              )}
+
+              {/* SMART SUGGESTION MATCH BANNER COGNITIVE extraction */}
+              {smartMatches.length > 0 && (
+                <div id="matchBanner" className="match-banner show">
+                  <div className="match-banner-title">🤖 Smart suggestions — Possible matches for your query</div>
+                  <div className="match-cards">
+                    {smartMatches.map(({ report, score }) => {
+                      const pct = Math.round(score * 100);
+                      return (
+                        <div key={report.id} onClick={() => { setSelectedItemId(report.id); setActiveTab('itemDetail'); }} className="match-chip">
+                          <div className="match-chip-title">{report.title}</div>
+                          <div className="match-chip-meta">📍 {report.location || "Unknown"}</div>
+                          <div className="match-score">🎯 {pct}% match</div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              )}
+
+              {/* SEARCH REGISTRY CARDS GRID */}
+              <div id="searchResults" className="cards-grid">
+                {filteredSearchList.map(r => {
+                  const pinned = pinnedIds.includes(r.id);
+                  return (
+                    <div key={r.id} onClick={() => { setSelectedItemId(r.id); setActiveTab('itemDetail'); }} className="card-item clickable">
+                      <div className="relative">
+                        <div className="card-media">
+                          {r.image || r.imageUrl ? (
+                            <img src={r.image || r.imageUrl} alt="" referrerPolicy="no-referrer" />
+                          ) : (
+                            <div style={{ fontSize: '52px', opacity: 0.35 }}>📷</div>
+                          )}
+                        </div>
+                        <button 
+                          onClick={(e) => { e.stopPropagation(); togglePin(r.id); }} 
+                          className={`pin-toggle ${pinned ? 'pinned' : ''}`}
+                        >
+                          {pinned ? "📌" : "📍"}
+                        </button>
+                      </div>
+                      <div className="card-title">{r.title}</div>
+                      <div className="card-desc">{r.desc || r.description || "No description provided."}</div>
+                      <div className="card-footer">
+                        <div>
+                          <small style={{ display: 'block', color: '#64748b' }}>{r.location || "Unknown location"}</small>
+                          <small style={{ color: '#94a3b8' }}>{r.date || "Just now"}</small>
+                        </div>
+                        <div className={`badge ${r.claimed ? 'claimed' : r.type}`}>
+                          {r.claimed ? "CLAIMED" : r.type.toUpperCase()}
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+
+              {filteredSearchList.length === 0 && (
+                <div id="noResults" className="empty">
+                  No items found matching the current criteria.
+                </div>
+              )}
+            </section>
+
+            {/* PANEL: ITEM DETAIL VIEW */}
+            <section id="itemDetail" className={`panel ${activeTab === 'itemDetail' ? 'active' : ''}`}>
+              <button onClick={() => setActiveTab('search')} className="back-btn">← Back to Search</button>
+              
+              <div id="detailContent" className="detail-container">
+                {(() => {
+                  const r = items.find(x => x.id === selectedItemId);
+                  if (!r) return <p className="p-6 text-slate-400">Please choose an item from search.</p>;
+                  const isOwner = r.userId === auth.currentUser?.uid;
+                  const pinned = pinnedIds.includes(r.id);
+
+                  return (
+                    <>
+                      {(r.image || r.imageUrl) ? (
+                        <img 
+                          src={r.image || r.imageUrl} 
+                          onClick={() => setZoomImg(r.image || r.imageUrl || null)} 
+                          className="detail-image zoomable-img" 
+                          alt="Zoom item zoom" 
+                        />
+                      ) : (
+                        <div className="detail-image" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '80px', opacity: 0.3 }}>
+                          📷
+                        </div>
+                      )}
+                      <div className="detail-body">
+                        <div className="detail-title">{r.title}</div>
+                        <div className="detail-meta">
+                          <span className="detail-meta-item">📍 {r.location || "Unknown location"}</span>
+                          <span className="detail-meta-item">🕐 {r.date || "Just now"}</span>
+                          <span className={`badge ${r.claimed ? 'claimed' : r.type}`} style={{ marginLeft: '4px' }}>
+                            {r.claimed ? "CLAIMED" : r.type.toUpperCase()}
+                          </span>
+                        </div>
+                        <div className="detail-desc">{r.desc || r.description || "No description provided."}</div>
+                        
+                        {/* Contact details */}
+                        <div className="my-4 p-4 bg-slate-50 border border-slate-200 rounded-xl text-xs">
+                          <p className="font-bold">Contact Representative:</p>
+                          <p className="mt-1">Name: {r.contactName || "Representative"}</p>
+                          <p>Contact Details: {r.contactInfo || "Direct helpdesk cataloged"}</p>
+                        </div>
+
+                        <div className="detail-actions">
+                          {!r.claimed && isOwner && (
+                            <button className="primary-btn" onClick={() => claimItem(r.id)}>✅ Mark as Claimed</button>
+                          )}
+                          <button className="secondary-btn" onClick={() => togglePin(r.id)}>{pinned ? "📌 Unpin" : "📍 Pin Item"}</button>
+                          {isOwner && (
+                            <button className="delete-btn" style={{ width: 'auto' }} onClick={() => deleteItem(r.id)}>🗑️ Delete</button>
+                          )}
+                        </div>
+                      </div>
+                    </>
+                  );
+                })()}
+              </div>
+            </section>
+
+            {/* PANEL: NOTIFICATIONS & ALERTS */}
+            <section id="notifications" className={`panel ${activeTab === 'notifications' ? 'active' : ''}`}>
+              <div className="section-title">🔔 Notifications &amp; Alerts</div>
+              <div id="alertsList">
+                <div className="alert-item">
+                  <strong>🎉 Welcome to FindTrack!</strong>
+                  <p>You'll receive notifications here when there are updates on your items.</p>
+                </div>
+                <div className="alert-item">
+                  <strong>💡 Pro Tip</strong>
+                  <p>Enable browser notifications to get instant alerts about your reported items!</p>
+                </div>
+              </div>
+            </section>
+
+            {/* PANEL: PROFILE */}
+            <section id="profile" className={`panel ${activeTab === 'profile' ? 'active' : ''}`}>
+              <div className="section-title">👤 My Profile</div>
+              <div className="profile-container">
+                <div className="profile-photo">
+                  <img id="pf_avatar" src={profileAvatar} alt="Profile" />
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', marginTop: '12px' }}>
+                    <button onClick={handleRandomAvatar} className="secondary-btn" style={{ width: '100%', justifyContent: 'center' }}>
+                      🎲 Random Avatar
                     </button>
-                  ))}
+                  </div>
+                </div>
+                
+                <div className="profile-fields">
+                  <div className="form-group">
+                    <label htmlFor="pf_name">Full Name</label>
+                    <input 
+                      id="pf_name" 
+                      placeholder="Enter your full name" 
+                      value={profileName}
+                      onChange={(e) => setProfileName(e.target.value)}
+                    />
+                  </div>
+                  <div className="form-group">
+                    <label htmlFor="pf_email">Email Address</label>
+                    <input 
+                      id="pf_email" 
+                      type="email" 
+                      placeholder="your.email@example.com" 
+                      value={profileEmail}
+                      disabled
+                    />
+                  </div>
+                  <div className="form-group">
+                    <label htmlFor="pf_contact">Contact Number</label>
+                    <input 
+                      id="pf_contact" 
+                      placeholder="+63 912 345 6789" 
+                      value={profileContact}
+                      onChange={(e) => setProfileContact(e.target.value)}
+                    />
+                  </div>
+                  <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap', alignItems: 'center', marginTop: '4px' }}>
+                    <button onClick={handleSaveProfile} className="primary-btn">💾 Save Profile</button>
+                    <button 
+                      onClick={handleLogoutAction} 
+                      style={{ fontSize: '13px', color: '#ef4444', background: 'none', border: 'none', cursor: 'pointer', fontWeight: 600 }}
+                    >
+                      🚪 Logout
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </section>
+
+            {/* PANEL: MY ITEMS */}
+            <section id="myitems" className={`panel ${activeTab === 'myitems' ? 'active' : ''}`}>
+              <div className="section-title">📂 My Items</div>
+              <p className="section-subtitle">All items you've reported — tab to view details</p>
+              
+              <div className="cards-grid">
+                {items.filter(item => item.userId === auth.currentUser?.uid).map(r => {
+                  const pinned = pinnedIds.includes(r.id);
+                  return (
+                    <div key={r.id} className="card-item">
+                      <div style={{ position: 'relative', cursor: 'pointer' }} onClick={() => { setSelectedItemId(r.id); setActiveTab('itemDetail'); }}>
+                        <div className="card-media">
+                          {r.image || r.imageUrl ? (
+                            <img src={r.image || r.imageUrl} alt="" referrerPolicy="no-referrer" />
+                          ) : (
+                            <div style={{ fontSize: '52px', opacity: 0.35 }}>📷</div>
+                          )}
+                        </div>
+                        <button 
+                          onClick={(e) => { e.stopPropagation(); togglePin(r.id); }} 
+                          className={`pin-toggle ${pinned ? 'pinned' : ''}`}
+                        >
+                          {pinned ? "📌" : "📍"}
+                        </button>
+                      </div>
+                      
+                      <div onClick={() => { setSelectedItemId(r.id); setActiveTab('itemDetail'); }} style={{ cursor: 'pointer' }}>
+                        <div className="card-title">{r.title}</div>
+                        <div className="card-desc">{r.location || "Unknown"}</div>
+                      </div>
+
+                      <div className="card-footer">
+                        <small style={{ color: '#94a3b8' }}>{r.date || "Just now"}</small>
+                        <div className={`badge ${r.claimed ? 'claimed' : r.type}`}>
+                          {r.claimed ? "CLAIMED" : r.type.toUpperCase()}
+                        </div>
+                      </div>
+                      <button className="delete-btn" onClick={() => deleteItem(r.id)}>🗑️ Delete</button>
+                    </div>
+                  );
+                })}
+              </div>
+
+              {items.filter(item => item.userId === auth.currentUser?.uid).length === 0 && (
+                <div className="empty">You haven't reported any items yet.</div>
+              )}
+            </section>
+
+            {/* PANEL: PINNED ITEMS */}
+            <section id="pinned" className={`panel ${activeTab === 'pinned' ? 'active' : ''}`}>
+              <div className="section-title">📌 Pinned Items</div>
+              <p className="section-subtitle">Quick access to items you've bookmarked</p>
+              
+              <div className="cards-grid">
+                {items.filter(item => pinnedIds.includes(item.id)).map(r => {
+                  const pinned = pinnedIds.includes(r.id);
+                  return (
+                    <div key={r.id} onClick={() => { setSelectedItemId(r.id); setActiveTab('itemDetail'); }} className="card-item clickable">
+                      <div className="relative">
+                        <div className="card-media">
+                          {r.image || r.imageUrl ? (
+                            <img src={r.image || r.imageUrl} alt="" />
+                          ) : (
+                            <div style={{ fontSize: '52px', opacity: 0.35 }}>📷</div>
+                          )}
+                        </div>
+                        <button 
+                          onClick={(e) => { e.stopPropagation(); togglePin(r.id); }} 
+                          className={`pin-toggle ${pinned ? 'pinned' : ''}`}
+                        >
+                          {pinned ? "📌" : "📍"}
+                        </button>
+                      </div>
+                      <div className="card-title">{r.title}</div>
+                      <div className="card-desc">{r.desc || r.description || "No description provided."}</div>
+                      <div className="card-footer">
+                        <div>
+                          <small style={{ display: 'block', color: '#64748b' }}>{r.location || "Unknown location"}</small>
+                          <small style={{ color: '#94a3b8' }}>{r.date || "Just now"}</small>
+                        </div>
+                        <div className={`badge ${r.claimed ? 'claimed' : r.type}`}>
+                          {r.claimed ? "CLAIMED" : r.type.toUpperCase()}
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+
+              {items.filter(item => pinnedIds.includes(item.id)).length === 0 && (
+                <div className="empty">No pinned items yet. Pin items from search!</div>
+              )}
+            </section>
+
+            {/* PANEL: CATEGORIES BROWSER */}
+            <section id="categories" className={`panel ${activeTab === 'categories' ? 'active' : ''}`}>
+              <div className="section-title">🏷️ Browse by Category</div>
+              <p className="section-subtitle">Tap a category to filter lost items</p>
+              <div className="cards-grid">
+                <div onClick={() => { setCategoryKeywords(["bag", "backpack", "purse", "wallet", "luggage", "suitcase", "handbag"]); setActiveTab('search'); }} className="card-item clickable">
+                  <div className="card-media" style={{ fontSize: '60px' }}>🎒</div>
+                  <div className="card-title">Bags &amp; Backpacks</div>
+                  <div className="card-desc">Backpacks, purses, wallets, luggage</div>
+                </div>
+                <div onClick={() => { setCategoryKeywords(["phone", "laptop", "tablet", "charger", "headphone", "earphone", "computer", "iphone", "samsung", "ipad", "macbook"]); setActiveTab('search'); }} className="card-item clickable">
+                  <div className="card-media" style={{ fontSize: '60px' }}>📱</div>
+                  <div className="card-title">Electronics</div>
+                  <div className="card-desc">Phones, laptops, tablets, chargers</div>
+                </div>
+                <div onClick={() => { setCategoryKeywords(["book", "notebook", "textbook", "pen", "pencil", "id", "card", "stationery", "notes"]); setActiveTab('search'); }} className="card-item clickable">
+                  <div className="card-media" style={{ fontSize: '60px' }}>📚</div>
+                  <div className="card-title">Books &amp; Stationery</div>
+                  <div className="card-desc">Textbooks, notebooks, IDs, pens</div>
+                </div>
+                <div onClick={() => { setCategoryKeywords(["jacket", "shirt", "pants", "uniform", "glasses", "watch", "coat", "shoes", "hat", "scarf"]); setActiveTab('search'); }} className="card-item clickable">
+                  <div className="card-media" style={{ fontSize: '60px' }}>👕</div>
+                  <div className="card-title">Clothing &amp; Accessories</div>
+                  <div className="card-desc">Jackets, uniforms, glasses, watches</div>
+                </div>
+              </div>
+            </section>
+
+            {/* PANEL: ANALYTICS DESK */}
+            <section id="analytics" className={`panel ${activeTab === 'analytics' ? 'active' : ''}`}>
+              <div className="section-title">📊 Analytics Dashboard</div>
+              <p className="section-subtitle">Visual overview of all reported items</p>
+              
+              <div className="analytics-grid" id="analyticsGrid">
+                <div className="analytics-card">
+                  <div className="big-num" style={{ color: '#ef4444' }}>{stats.lost}</div>
+                  <div className="big-label">Active Lost</div>
+                </div>
+                <div className="analytics-card">
+                  <div className="big-num" style={{ color: '#0ea5e9' }}>{stats.found}</div>
+                  <div className="big-label">Found Items</div>
+                </div>
+                <div className="analytics-card">
+                  <div className="big-num" style={{ color: '#10b981' }}>{stats.claimed}</div>
+                  <div className="big-label">Claimed</div>
+                </div>
+                <div className="analytics-card">
+                  <div className="big-num" style={{ color: '#8b5cf6' }}>{items.length}</div>
+                  <div className="big-label">Total Reports</div>
                 </div>
               </div>
 
-              {/* Category selector */}
-              <div className="space-y-1">
-                <label className="font-sans text-[10px] font-bold text-slate-500 uppercase tracking-wider font-semibold">Category</label>
-                <select
-                  value={selectedCategory}
-                  onChange={(e) => setSelectedCategory(e.target.value as Category | 'all')}
-                  className="w-full rounded-lg border border-slate-200 bg-slate-50 px-2 py-1.5 font-sans text-xs text-slate-800 focus:outline-none capitalize"
-                >
-                  {CATEGORIES.map((cat) => (
-                    <option key={cat.value} value={cat.value}>
-                      {cat.label}
-                    </option>
-                  ))}
-                </select>
+              <div style={{ background: 'white', padding: '24px', borderRadius: '20px', boxShadow: 'var(--shadow-sm)', border: '1px solid var(--border)' }}>
+                <canvas ref={canvasRef} id="chartCanvas" width={400} height={220} style={{ maxWidth: '100%', display: 'block', margin: '0 auto' }}></canvas>
+                <p style={{ textAlign: 'center', color: 'var(--muted)', fontSize: '13px', marginTop: '14px' }}>Item distribution by status</p>
               </div>
+            </section>
 
-              {/* Status Selector active vs resolved */}
-              <div className="space-y-1">
-                <label className="font-sans text-[10px] font-bold text-slate-500 uppercase tracking-wider">Status</label>
-                <select
-                  value={selectedStatus}
-                  onChange={(e) => setSelectedStatus(e.target.value as ItemStatus | 'all')}
-                  className="w-full rounded-lg border border-slate-200 bg-slate-50 px-2 py-1.5 font-sans text-xs text-slate-800 focus:outline-none capitalize"
-                >
-                  <option value="active">Active Trackings</option>
-                  <option value="resolved">Resolved items</option>
-                  <option value="all">All listings</option>
-                </select>
+            {/* PANEL: GENERAL LIST OF INFORMATION GUIDES */}
+            <section id="tips" className={`panel ${activeTab === 'tips' ? 'active' : ''}`}>
+              <div className="section-title">📚 Lost Item Recovery Guide</div>
+              <p className="section-subtitle">Helpful tips to increase your chances of finding lost items</p>
+              <div className="tips-grid">
+                <div className="tip-card">🔍 <strong>Retrace Recent Locations</strong><br /><br />Carefully revisit the places you recently visited to help locate missing items.</div>
+                <div className="tip-card">📍 <strong>Check Nearby Areas</strong><br /><br />Inspect public spaces, offices, transportation stops, shops, and common areas.</div>
+                <div className="tip-card">📱 <strong>Use Digital Tools</strong><br /><br />Post on forums, use FindTrack, check social media groups.</div>
+                <div className="tip-card">🕒 <strong>Act Quickly</strong><br /><br />Report and search within 2 hours for best results.</div>
+                <div className="tip-card">📸 <strong>Add Photos</strong><br /><br />Upload a photo of your item for much faster identification.</div>
+                <div className="tip-card">🔔 <strong>Stay Updated</strong><br /><br />Receive updates and notifications about matched or recovered items.</div>
+                <div className="tip-card">📝 <strong>Submit Detailed Reports</strong><br /><br />Provide accurate descriptions and item details for easier identification.</div>
+              </div>
+            </section>
+
+            <section id="packaging" className={`panel ${activeTab === 'packaging' ? 'active' : ''}`}>
+              <div className="section-title">📦 Packaging &amp; Handling Tips</div>
+              <p className="section-subtitle">Best practices for securing found items</p>
+              <div className="tips-grid">
+                <div className="tip-card">🧴 <strong>Protect Fragile Items</strong><br /><br />Use bubble wrap or padding for delicate objects.</div>
+                <div className="tip-card">🎁 <strong>Seal Securely</strong><br /><br />Ensure items are properly contained before storage.</div>
+                <div className="tip-card">🏢 <strong>Classify Correctly</strong><br /><br />Hand keys and sensitive IDs straight to the Library security safe desk.</div>
+                <div className="tip-card">🕒 <strong>Update Status</strong><br /><br />Mark items as claimed once they've been recovered.</div>
+              </div>
+            </section>
+
+            <section id="about" className={`panel ${activeTab === 'about' ? 'active' : ''}`}>
+              <div className="section-title">ℹ️ About FindTrack</div>
+              <div className="report-form-wrap" style={{ maxWidth: '600px' }}>
+                <p style={{ marginBottom: '16px', lineHeight: 1.7 }}>
+                  <strong>FindTrack</strong> helps simplify lost and found reporting with fast search tools, organized listings, and a modern recovery system.
+                </p>
+                <div className="section-title" style={{ fontSize: '16px', marginTop: '8px' }}>📖 How to Use</div>
+                <div className="tips-grid" style={{ gridTemplateColumns: '1fr' }}>
+                  <div className="tip-card">📦 <strong>Report</strong> — Submit details about lost or found items with photos and location</div>
+                  <div className="tip-card">🔍 <strong>Search</strong> — Browse all reported items with advanced filters and category browsing</div>
+                  <div className="tip-card">✅ <strong>Claim</strong> — Mark items as found once recovered, or delete your own reports</div>
+                  <div className="tip-card">📌 <strong>Pin</strong> — Bookmark items you want quick access to</div>
+                </div>
+                <div className="tip-banner" style={{ marginTop: '16px' }}>💡 Pro Tip: The more detail you add to reports, the faster items get matched!</div>
+              </div>
+            </section>
+
+          </main>
+
+          {/* MOBILE HUD BOTTOM NAV */}
+          <nav className="bottom-nav" id="bottomNav">
+            <button onClick={() => { setActiveTab('home'); setCategoryKeywords(null); }} className={`bnav-btn ${activeTab === 'home' ? 'active' : ''}`}>
+              <span className="bnav-icon">🏠</span>Home
+            </button>
+            <button onClick={() => { setActiveTab('search'); setCategoryKeywords(null); }} className={`bnav-btn ${activeTab === 'search' ? 'active' : ''}`}>
+              <span className="bnav-icon">🔍</span>Search
+            </button>
+            <button onClick={() => { if (profileName === 'Guest') { setShowGuestModal(true); } else { setActiveTab('notifications'); } }} className={`bnav-btn ${activeTab === 'notifications' ? 'active' : ''}`}>
+              <span className="bnav-icon">🔔</span>Alerts
+            </button>
+            <button onClick={() => { setActiveTab('profile'); }} className={`bnav-btn ${activeTab === 'profile' ? 'active' : ''}`}>
+              <span className="bnav-icon">👤</span>Profile
+            </button>
+          </nav>
+
+          {/* MOBILE REPORT INSTANT FAB */}
+          <button 
+            onClick={() => { if (profileName === 'Guest') { setShowGuestModal(true); } else { setActiveTab('report'); } }} 
+            className="report-fab" 
+            title="Report Item"
+          >
+            📦
+          </button>
+
+        </div>
+      )}
+
+      {/* ── ONBOARDING LIGHT OVERLAY DRAWER ── */}
+      {showOnboarding && (
+        <div className="onboard-overlay">
+          <div className="onboard-card" id="onboardCard">
+            <div className="onboard-progress" id="onboardProgress">
+              {ONBOARD_STEPS.map((_, idx) => (
+                <div 
+                  key={idx} 
+                  className={`onboard-pip ${idx < onboardStep ? 'done' : idx === onboardStep ? 'active' : ''}`}
+                ></div>
+              ))}
+            </div>
+            
+            <div className="onboard-visual">
+              <div className="onboard-icon-wrap" id="onboardIcon">
+                {ONBOARD_STEPS[onboardStep].icon}
               </div>
             </div>
 
-            {/* Sandbox Seeding Panel (Appears when database has no listings) */}
-            {items.length === 0 && !loadingItems && user && (
-              <div className="rounded-xl border border-slate-200 bg-white p-4 text-center space-y-3">
-                <div className="inline-flex h-8 w-8 items-center justify-center rounded-full bg-indigo-50 border border-indigo-100 text-indigo-600">
-                  <Database className="h-4 w-4" />
-                </div>
-                <div>
-                  <h4 className="font-sans text-xs font-bold text-slate-900">Seed Sandbox Dataset</h4>
-                  <p className="font-sans text-[10px] text-slate-500 leading-normal mt-0.5">
-                    Your database is currently empty. Seed sandbox records directly to explore dynamic matching!
-                  </p>
-                </div>
-                <button
-                  onClick={seedPlaygroundData}
-                  disabled={seeding}
-                  className="w-full rounded-lg bg-slate-900 hover:bg-slate-800 text-white font-sans text-[10px] font-bold py-1.5 flex items-center justify-center space-x-1 border shadow-sm transition disabled:opacity-40"
+            <div className="onboard-body">
+              <div className="onboard-step-label" id="onboardLabel">{ONBOARD_STEPS[onboardStep].label}</div>
+              <div className="onboard-title" id="onboardTitle">{ONBOARD_STEPS[onboardStep].title}</div>
+              <div className="onboard-desc" id="onboardDesc">{ONBOARD_STEPS[onboardStep].desc}</div>
+              
+              <div className="onboard-actions">
+                <button 
+                  onClick={() => {
+                    if (onboardStep < ONBOARD_STEPS.length - 1) {
+                      setOnboardStep(prev => prev + 1);
+                    } else {
+                      setShowOnboarding(false);
+                      localStorage.setItem("ft_onboarded", "1");
+                    }
+                  }} 
+                  className="onboard-next" 
+                  id="onboardNext"
                 >
-                  {seeding ? 'Syncing...' : 'Provision Samples'}
+                  {onboardStep === ONBOARD_STEPS.length - 1 ? "Get Started 🚀" : "Next →"}
+                </button>
+                <button 
+                  onClick={() => {
+                    setShowOnboarding(false);
+                    localStorage.setItem("ft_onboarded", "1");
+                  }} 
+                  className="onboard-skip" 
+                  id="onboardSkip"
+                >
+                  Skip tour
                 </button>
               </div>
-            )}
-          </aside>
-
-          {/* Grid list block */}
-          <section className="flex-1 w-full" id="items-grid-section">
-            <div className="flex items-center justify-between mb-4">
-              <h3 className="font-sans text-xs font-bold text-slate-500 uppercase tracking-wider flex items-center space-x-1">
-                <Grid className="h-4 w-4 text-slate-400" />
-                <span>Found Registry Results ({filteredItems.length})</span>
-              </h3>
             </div>
-
-            {firestoreError && (
-              <div className="flex items-start bg-rose-50 border border-rose-100 rounded-lg p-4 font-sans text-xs text-rose-800 space-x-2.5 mb-5 shadow-sm">
-                <AlertCircle className="h-5 w-5 text-rose-500 shrink-0" />
-                <div>
-                  <p className="font-bold">Sync warning</p>
-                  <p className="leading-relaxed mt-0.5">{firestoreError}</p>
-                </div>
-              </div>
-            )}
-
-            {loadingItems || showSkeleton ? (
-              <div className="flex flex-col items-center justify-center py-20 space-y-3" id="skeleton-loader">
-                <Database className="h-8 w-8 text-indigo-500 animate-bounce" />
-                <p className="font-sans text-xs font-medium text-slate-400">Synchronizing database indices...</p>
-              </div>
-            ) : filteredItems.length === 0 ? (
-              <div className="flex flex-col items-center justify-center py-20 border border-slate-200 rounded-2xl bg-white border-dashed">
-                <Search className="h-9 w-9 text-slate-300 mb-2" />
-                <p className="font-sans text-sm font-bold text-slate-800">No Registry Entries Found</p>
-                <p className="font-sans text-xs text-slate-400 max-w-xs text-center mt-1">
-                  We couldn't locate any matching records. Try modifying search keywords, categories, or sign in to submit a new entry.
-                </p>
-              </div>
-            ) : (
-              <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
-                <AnimatePresence mode="popLayout">
-                  {filteredItems.map((item) => (
-                    <ItemCard
-                      key={item.id}
-                      item={item}
-                      onSelect={(clicked) => setSelectedItem(clicked)}
-                    />
-                  ))}
-                </AnimatePresence>
-              </div>
-            )}
-          </section>
-        </div>
-      </main>
-
-      {/* --- Overlay Modals --- */}
-      <AnimatePresence>
-        {/* Item Detail View Modular Overlay */}
-        {selectedItem && (
-          <ItemDetail
-            item={selectedItem}
-            currentUserUid={user?.uid}
-            onClose={() => setSelectedItem(null)}
-            allOppositeItems={items.filter((i) => i.type !== selectedItem.type && i.id !== selectedItem.id)}
-            onResolveItem={handleResolveItem}
-            onDeleteItem={handleDeleteItem}
-          />
-        )}
-
-        {/* New Item Submission Form Modal Overlay */}
-        {isNewItemModalOpen && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm overflow-y-auto">
-            <motion.div
-              initial={{ opacity: 0, y: 30 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: 30 }}
-              className="w-full max-w-2xl bg-white rounded-2xl overflow-hidden shadow-2xl my-8"
-            >
-              <SubmissionForm
-                onSubmit={handleCreateItem}
-                onClose={() => setIsNewItemModalOpen(false)}
-                defaultContactName={user?.displayName || ''}
-              />
-            </motion.div>
           </div>
-        )}
+        </div>
+      )}
 
-        {/* Custom Login and Signup Modal Overlay (Representing login.html and signup.html designs) */}
-        {isAuthModalOpen && (
-          <AuthModal
-            isOpen={isAuthModalOpen}
-            onClose={() => setIsAuthModalOpen(false)}
-            onAuthSuccess={(authenticatedUser) => {
-              setUser(authenticatedUser);
-            }}
-            initialMode={authModalMode}
-          />
-        )}
-      </AnimatePresence>
+      {/* ── IMAGE ZOOM SYSTEM MODAL ── */}
+      {zoomImg && (
+        <div className="zoom-overlay" onClick={() => setZoomImg(null)}>
+          <button className="zoom-close" onClick={() => setZoomImg(null)}>✕</button>
+          <img src={zoomImg} className="zoom-img" alt="Zoom view" />
+          <div className="zoom-hint">Tap anywhere to close</div>
+        </div>
+      )}
+
+      {/* ── GUEST ACCESS LOCK LOGIN REQUIRED MODAL ── */}
+      {showGuestModal && (
+        <div id="guestModal" className="modal" onClick={(e) => { if ((e.target as HTMLElement).id === 'guestModal') setShowGuestModal(false); }}>
+          <div className="modal-content">
+            <div className="modal-icon">🔒</div>
+            <h2>Login Required</h2>
+            <p>Please login or sign up to unlock the full features of FindTrack!</p>
+            <div className="modal-buttons">
+              <button onClick={() => { setShowGuestModal(false); setCurrentView('login'); }} className="modal-btn primary">🔐 Login</button>
+              <button onClick={() => { setShowGuestModal(false); setCurrentView('signup'); }} className="modal-btn secondary">📝 Sign Up</button>
+            </div>
+            <button onClick={() => setShowGuestModal(false)} className="modal-close">Maybe later</button>
+          </div>
+        </div>
+      )}
+
     </div>
   );
+}
+
+// Cognitive calculation helper utility for similarity matching metrics
+function computeMatchScore(a: any, b: any) {
+  if (a.type === b.type) return 0;
+  if (a.claimed || b.claimed) return 0;
+
+  const textA = `${a.title} ${a.desc || a.description || ""} ${a.location}`.toLowerCase();
+  const textB = `${b.title} ${b.desc || b.description || ""} ${b.location}`.toLowerCase();
+
+  const stopWords = new Set(["a", "an", "the", "my", "i", "is", "at", "in", "on", "of", "and", "or", "was", "it", "this", "that", "with", "for", "to"]);
+  const tokenise = (t: string) => t.replace(/[^a-z0-9\s]/g, "").split(/\s+/).filter(w => w.length > 2 && !stopWords.has(w));
+
+  const tA = new Set(tokenise(textA));
+  const tB = new Set(tokenise(textB));
+  if (tA.size === 0 || tB.size === 0) return 0;
+
+  let shared = 0;
+  tA.forEach(w => { if (tB.has(w)) shared++; });
+
+  // Jaccard similarity
+  const union = new Set([...Array.from(tA), ...Array.from(tB)]).size;
+  const jaccard = shared / union;
+
+  // Location bonus
+  const locA = (a.location || "").toLowerCase();
+  const locB = (b.location || "").toLowerCase();
+  const locBonus = (locA && locB && (locA.includes(locB.slice(0, 5)) || locB.includes(locA.slice(0, 5)))) ? 0.15 : 0;
+
+  return Math.min(1, jaccard + locBonus);
 }
