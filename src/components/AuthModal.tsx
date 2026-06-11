@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Mail, Lock, User, ArrowRight, Sparkles, Radio, Eye, EyeOff, X, ShieldCheck, AlertCircle } from 'lucide-react';
-import { loginWithGoogle, loginWithEmail, registerWithEmail } from '../firebase';
+import { auth, loginWithGoogle, loginWithEmail, registerWithEmail } from '../firebase';
 import { motion } from 'motion/react';
 
 interface AuthModalProps {
@@ -155,7 +155,7 @@ export default function AuthModal({ isOpen, onClose, onAuthSuccess, initialMode 
               <p className="font-sans text-xs text-slate-500">
                 {mode === 'login' 
                   ? 'Access your items, matching suggestions, and open directories securely' 
-                  : 'Register a permanent secure account to catalog lost or found items'
+                  : 'Be one of the first users of Lost & Found System'
                 }
               </p>
             </div>

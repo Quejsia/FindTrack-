@@ -22,15 +22,15 @@ export default function Header({ user, loadingAuth, onOpenNewItemModal, onOpenAu
         <div className="flex h-16 items-center justify-between">
           
           {/* Left Brand Area (Custom original style.css layout & branding logo tags) */}
-          <div className="flex items-center space-x-3">
-            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-tr from-indigo-600 to-indigo-500 text-white shadow-md shadow-indigo-100">
-              <Radio className="h-6 w-6 animate-pulse" />
+            <div className="flex items-center space-x-3">
+              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-tr from-indigo-600 to-indigo-500 text-white shadow-md shadow-indigo-100">
+                <Radio className="h-6 w-6 animate-pulse" />
+              </div>
+              <div className="text-left">
+                <h1 className="font-sans text-lg font-bold tracking-tight text-slate-950">Lost & Found System</h1>
+                <p className="font-mono text-[8px] tracking-wider text-indigo-600 font-bold uppercase leading-tight">AI-Matched Search & Reunite</p>
+              </div>
             </div>
-            <div className="text-left">
-              <h1 className="font-sans text-xl font-bold tracking-tight text-slate-950">FindTrack</h1>
-              <p className="font-mono text-[9px] tracking-wider text-indigo-600 font-bold uppercase leading-tight">AI-MATCHED LOST & FOUND</p>
-            </div>
-          </div>
 
           {/* Center / Navigation Links for Desktop (Original Custom index.html Navigation Items) */}
           <nav className="hidden md:flex items-center space-x-6 text-xs font-semibold text-slate-650" id="desktop-nav-links">

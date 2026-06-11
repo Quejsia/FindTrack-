@@ -11,20 +11,26 @@ import {
 import { getFirestore, doc, getDocFromServer } from 'firebase/firestore';
 import appletConfig from '../firebase-applet-config.json';
 
-// User keys configuration template - keeping this placeholder block ready for user keys!
+// Read configuration from Vite environment variables (or fall back to placeholder templates)
 const firebaseConfig = {
-  apiKey: "PASTE_YOUR_API_KEY_HERE",
-  authDomain: "PASTE_YOUR_AUTH_DOMAIN_HERE",
-  projectId: "PASTE_YOUR_PROJECT_ID_HERE",
-  storageBucket: "PASTE_YOUR_STORAGE_BUCKET_HERE",
-  messagingSenderId: "PASTE_YOUR_MESSAGING_SENDER_ID_HERE",
-  appId: "PASTE_YOUR_APP_ID_HERE"
+  apiKey: (import.meta as any).env.VITE_FIREBASE_API_KEY || "PASTE_YOUR_API_KEY_HERE",
+  authDomain: (import.meta as any).env.VITE_FIREBASE_AUTH_DOMAIN || "PASTE_YOUR_AUTH_DOMAIN_HERE",
+  projectId: (import.meta as any).env.VITE_FIREBASE_PROJECT_ID || "PASTE_YOUR_PROJECT_ID_HERE",
+  storageBucket: (import.meta as any).env.VITE_FIREBASE_STORAGE_BUCKET || "PASTE_YOUR_STORAGE_BUCKET_HERE",
+  messagingSenderId: (import.meta as any).env.VITE_FIREBASE_MESSAGING_SENDER_ID || "PASTE_YOUR_MESSAGING_SENDER_ID_HERE",
+  appId: (import.meta as any).env.VITE_FIREBASE_APP_ID || "PASTE_YOUR_APP_ID_HERE"
 };
 
 // For optimal preview experience in AI Studio without blocking local runs, fallback to applet configuration when keys are placeholders:
 const activeConfig = firebaseConfig.apiKey === "PASTE_YOUR_API_KEY_HERE"
-  ? appletConfig
-  : firebaseConfig;
+  ? {
+      ...appletConfig,
+      firestoreDatabaseId: (import.meta as any).env.VITE_FIREBASE_FIRESTORE_DATABASE_ID || appletConfig.firestoreDatabaseId
+    }
+  : {
+      ...firebaseConfig,
+      firestoreDatabaseId: (import.meta as any).env.VITE_FIREBASE_FIRESTORE_DATABASE_ID || ""
+    };
 
 // Initialize Firebase App
 const app = initializeApp(activeConfig);
