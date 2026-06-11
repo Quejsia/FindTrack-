@@ -232,10 +232,17 @@ export default function AuthModal({ isOpen, onClose, onAuthSuccess, initialMode 
                   <button
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-3 top-2 p-1 text-slate-400 hover:text-slate-600 rounded"
+                    className="absolute right-3 top-2 p-1 text-slate-400 hover:text-indigo-600 rounded transition-all duration-200 ease-out hover:scale-115 active:scale-90 active:rotate-3 cursor-pointer"
+                    style={{ transition: 'all 0.2s ease' }}
                     title={showPassword ? 'Hide password' : 'Show password'}
                   >
-                    {showPassword ? <EyeOff className="h-3.5 w-3.5" /> : <Eye className="h-3.5 w-3.5" />}
+                    <div className="transition-all duration-200" style={{ transition: 'all 0.2s ease' }}>
+                      {showPassword ? (
+                        <EyeOff className="h-4 w-4 text-indigo-600" />
+                      ) : (
+                        <Eye className="h-4 w-4" />
+                      )}
+                    </div>
                   </button>
                 </div>
               </div>

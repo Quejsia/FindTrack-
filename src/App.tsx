@@ -42,7 +42,7 @@ const ONBOARD_STEPS = [
     icon: "🔎",
     label: "Step 1 of 4",
     title: "Welcome to FindTrack!",
-    desc: "Your campus lost & found platform. Report missing items, search for found ones, and get reunited with your belongings — fast."
+    desc: "Your lost & found platform. Report missing items, search for found ones, and get reunited with your belongings — fast."
   },
   {
     icon: "📦",
@@ -696,7 +696,7 @@ export default function App() {
             <div className="auth-logo">
               <div className="auth-logo-icon">🔎</div>
               <h1>FindTrack</h1>
-              <p>Campus Lost &amp; Found System</p>
+              <p>Lost &amp; Found System</p>
             </div>
 
             <div className="auth-card">
@@ -761,7 +761,7 @@ export default function App() {
             <div className="auth-logo">
               <div className="auth-logo-icon">🔎</div>
               <h1>FindTrack</h1>
-              <p>Campus Lost &amp; Found System</p>
+              <p>Lost &amp; Found System</p>
             </div>
 
             <div className="auth-card">
@@ -877,7 +877,7 @@ export default function App() {
                 <div className="logo">🔎</div>
                 <div className="brand-text">
                   <div className="brand-title">FindTrack</div>
-                  <div className="small-muted">Campus Lost &amp; Found</div>
+                  <div className="small-muted">Lost &amp; Found System</div>
                 </div>
               </div>
               <div style={{ width: '40px' }}></div>
