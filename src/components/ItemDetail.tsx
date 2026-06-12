@@ -192,6 +192,13 @@ export default function ItemDetail({
       >
         {activeView === 'details' ? (
           <>
+            <button
+              onClick={onClose}
+              className="flex items-center gap-2 text-teal-600 font-semibold text-sm px-4 py-3"
+            >
+              ← Back to Results
+            </button>
+
             {/* Header Ribbon */}
             <div className={`p-4 flex items-center justify-between border-b ${
               item.type === 'lost' 
