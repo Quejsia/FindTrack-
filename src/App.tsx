@@ -1502,9 +1502,9 @@ export default function App() {
                   
                   {/* 🛡️ "PROVE IT" LANDING CLAIMS FOR OWNER ITEMS (Item 3) */}
                   <div className="p-5 bg-slate-50/50 border border-slate-200/60 rounded-3xl space-y-4" id="finder-claims-review-panel">
-                    <div className="block flex items-center justify-between">
-                      <span className="text-sm font-bold text-slate-800 font-sans flex items-center gap-1.5">🔑 Incoming Ownership Claims ({incomingClaims.filter(c => c.status === 'pending').length} pending)</span>
-                      <span className="font-mono text-[9px] bg-indigo-50 border border-indigo-100 text-indigo-700 font-bold uppercase rounded-full px-2 py-0.5">Prove-it Verification Layer</span>
+                    <div className="flex flex-col gap-2 items-start justify-between sm:flex-row sm:items-center">
+                      <span className="text-sm font-bold text-slate-800 font-sans flex items-center gap-1.5 flex-wrap">🔑 Incoming Ownership Claims ({incomingClaims.filter(c => c.status === 'pending').length} pending)</span>
+                      <span className="font-mono text-[9px] bg-indigo-50 border border-indigo-100 text-indigo-700 font-bold uppercase rounded-full px-2 py-0.5 whitespace-nowrap shrink-0">Prove-it Verification Layer</span>
                     </div>
 
                     {incomingClaims.length === 0 ? (
@@ -1532,7 +1532,7 @@ export default function App() {
                               }`}
                               id={`claim-review-card-${claim.id}`}
                             >
-                              <div className="flex items-start justify-between gap-4 mb-2">
+                              <div className="flex flex-col gap-2 items-start justify-between sm:flex-row sm:items-center w-full mb-2">
                                 <div className="space-y-0.5">
                                   <h4 className="font-sans text-xs font-bold text-slate-900 flex items-center gap-1.5">
                                     <span>Claim on:</span>
@@ -1546,7 +1546,7 @@ export default function App() {
                                 <span className={`inline-flex items-center gap-1 text-[9px] font-mono font-bold px-2 py-0.5 rounded-full uppercase shrink-0 ${
                                   claim.status === 'approved' ? 'bg-emerald-100 text-emerald-800' :
                                   claim.status === 'rejected' ? 'bg-rose-100 text-rose-800' :
-                                  'bg-amber-100 text-amber-805'
+                                  'bg-amber-105 text-amber-805'
                                 }`}>
                                   {claim.status}
                                 </span>

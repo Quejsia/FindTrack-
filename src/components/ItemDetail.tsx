@@ -327,7 +327,7 @@ export default function ItemDetail({
                               "{existingClaim.securityQuestion}"
                             </p>
                             
-                            <p className="text-[11px] text-slate-600 font-semibold">
+                            <p className="text-[11px] text-slate-600 font-semibold font-sans">
                               🔑 Your submitted answer: <span className="font-normal font-sans italic text-slate-500">"{existingClaim.providedAnswer}"</span>
                             </p>
 
@@ -340,21 +340,21 @@ export default function ItemDetail({
                               </p>
                             </div>
                             
-                            <div className="grid grid-cols-2 gap-2 pt-1">
+                            <div className="h-auto space-y-2.5 pt-1">
                               <button
                                 onClick={() => onStartChat && onStartChat(item.userId, item.id)}
-                                className="flex items-center justify-center space-x-1 py-1.5 px-3 rounded-lg border border-slate-200 font-sans text-[11px] font-bold text-slate-700 hover:bg-slate-50 transition"
+                                className="w-full flex items-center justify-center space-x-1.5 py-3 px-4 rounded-xl border border-slate-205 font-sans text-xs font-bold text-slate-700 bg-slate-50 hover:bg-slate-100 transition active:scale-95 duration-200 cursor-pointer"
                               >
-                                <MessageSquare className="h-3.5 w-3.5" />
+                                <MessageSquare className="h-4 w-4 shrink-0 text-slate-500" />
                                 <span>Message Finder</span>
                               </button>
                               
                               {existingClaim.status === 'rejected' && (
                                 <button
                                   onClick={() => setOpenClaimModal(true)}
-                                  className="flex items-center justify-center space-x-1 py-1.5 px-3 rounded-lg bg-slate-900 text-white font-sans text-[11px] font-bold hover:bg-slate-800 transition"
+                                  className="w-full flex items-center justify-center space-x-1.5 py-3 px-4 rounded-xl bg-slate-900 font-sans text-xs font-bold text-white hover:bg-slate-800 transition active:scale-95 duration-200 cursor-pointer"
                                 >
-                                  <ShieldQuestion className="h-3.5 w-3.5 text-emerald-400" />
+                                  <ShieldQuestion className="h-4 w-4 text-emerald-400 shrink-0" />
                                   <span>Submit Custom Proof</span>
                                 </button>
                               )}
@@ -362,10 +362,10 @@ export default function ItemDetail({
                           </div>
                         ) : (
                           /* Open submit claim trigger buttons */
-                          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                          <div className="h-auto space-y-3.5 pt-2">
                             <button
                               onClick={() => onStartChat && onStartChat(item.userId, item.id)}
-                              className="w-full flex items-center justify-center space-x-1.5 bg-slate-100 hover:bg-slate-200 border border-slate-200 text-slate-800 font-sans text-xs font-bold py-2.5 px-4 rounded-xl shadow-sm cursor-pointer transition-all active:scale-95 duration-200"
+                              className="w-full flex items-center justify-center space-x-1.5 bg-slate-100 hover:bg-slate-202 border border-slate-200 text-slate-800 font-sans text-xs font-bold py-3 px-4 rounded-xl shadow-sm cursor-pointer transition-all active:scale-95 duration-200"
                             >
                               <MessageSquare className="h-4 w-4 shrink-0 text-slate-500" />
                               <span>Message Finder</span>
@@ -373,7 +373,7 @@ export default function ItemDetail({
                             
                             <button
                               onClick={() => setOpenClaimModal(true)}
-                              className="w-full flex items-center justify-center space-x-1.5 bg-gradient-to-tr from-teal-850 to-indigo-900 hover:from-teal-900 hover:to-indigo-850 text-white font-sans text-xs font-bold py-2.5 px-4 rounded-xl shadow-md cursor-pointer transition-all active:scale-95 duration-200"
+                              className="w-full flex items-center justify-center space-x-1.5 bg-gradient-to-tr from-teal-850 to-indigo-900 hover:from-teal-900 hover:to-indigo-850 text-white font-sans text-xs font-bold py-3 px-4 rounded-xl shadow-md cursor-pointer transition-all active:scale-95 duration-200"
                             >
                               <CheckCircle2 className="h-4 w-4 shrink-0 text-teal-300" />
                               <span>Prove Ownership & Claim</span>
@@ -415,10 +415,10 @@ export default function ItemDetail({
                           </div>
                         )}
 
-                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                        <div className="h-auto space-y-3.5 pt-2">
                           <button
                             onClick={() => onStartChat && onStartChat(item.userId, item.id)}
-                            className="w-full flex items-center justify-center space-x-1.5 bg-gradient-to-tr from-teal-850 to-indigo-950 text-white font-sans text-xs font-bold py-2.5 px-4 rounded-xl shadow-md cursor-pointer transition-all active:scale-95 duration-200"
+                            className="w-full flex items-center justify-center space-x-1.5 bg-gradient-to-tr from-teal-850 to-indigo-950 text-white font-sans text-xs font-bold py-3 px-4 rounded-xl shadow-md cursor-pointer transition-all active:scale-95 duration-200"
                           >
                             <MessageSquare className="h-4 w-4 shrink-0" />
                             <span>Direct Chat Room</span>
@@ -428,7 +428,7 @@ export default function ItemDetail({
                           {!existingClaim && (
                             <button
                               onClick={() => setOpenClaimModal(true)}
-                              className="w-full flex items-center justify-center space-x-1.5 bg-slate-100 hover:bg-slate-205 border border-slate-200 text-slate-700 font-sans text-xs font-semibold py-2.5 px-4 rounded-xl cursor-pointer transition-all active:scale-95 duration-200"
+                              className="w-full flex items-center justify-center space-x-1.5 bg-slate-100 hover:bg-slate-205 border border-slate-200 text-slate-700 font-sans text-xs font-semibold py-3 px-4 rounded-xl cursor-pointer transition-all active:scale-95 duration-200"
                             >
                               <CheckCircle2 className="h-4 w-4 shrink-0 text-slate-500" />
                               <span>Log Ownership Claim</span>
@@ -436,7 +436,7 @@ export default function ItemDetail({
                           )}
                           
                           {existingClaim && existingClaim.status !== 'approved' && (
-                            <div className="col-span-full py-1 text-center font-sans text-[10px] font-bold text-emerald-600 bg-emerald-50 rounded">
+                            <div className="py-2 text-center font-sans text-[10px] font-bold text-emerald-650 bg-emerald-50 rounded-xl border border-emerald-100">
                               ✓ Claim Status: {existingClaim.status.toUpperCase()}
                             </div>
                           )}
@@ -500,7 +500,7 @@ export default function ItemDetail({
       {/* ── CLAIMS VERIFICATION MODAL COHESIVE WITH OUR STYLE (Item 2) ── */}
       <AnimatePresence>
         {openClaimModal && (
-          <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-900/80 backdrop-blur-sm" id="claims-verification-modal">
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/70 backdrop-blur-md p-4" id="claims-verification-modal">
             <motion.div
               initial={{ opacity: 0, y: 15, scale: 0.95 }}
               animate={{ opacity: 1, y: 0, scale: 1 }}

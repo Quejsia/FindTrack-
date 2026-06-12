@@ -169,27 +169,34 @@ export default function ChatInterface({
           animate={{ x: 0 }}
           exit={{ x: '100%' }}
           transition={{ type: 'spring', damping: 25, stiffness: 220 }}
-          className="relative flex h-full w-full max-w-md flex-col bg-white shadow-2xl border-l border-slate-100"
+          className="relative flex h-[calc(100vh-135px)] w-full max-w-md flex-col bg-white shadow-2xl border-l border-slate-100 justify-between self-center md:h-screen"
         >
           {/* Header element matching the signature FindTrack drawer headers with teal gradient background */}
-          <div className="flex items-center justify-between bg-gradient-to-tr from-teal-850 to-slate-900 px-5 py-4 text-white shadow-md">
-            <div className="flex items-center space-x-3">
-              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-teal-500/20 text-teal-300 ring-1 ring-teal-400/30">
-                <Radio className="h-5 w-5 animate-pulse" />
-              </div>
-              <div className="text-left">
-                <h3 className="font-sans text-sm font-bold tracking-tight">
+          <div className="flex items-center justify-between bg-gradient-to-tr from-teal-805 to-slate-900 px-5 py-4 text-white shadow-md shrink-0">
+            <button
+              onClick={onClose}
+              className="flex items-center gap-1 bg-white/10 px-3 py-2 rounded-xl text-xs font-bold text-white/95 hover:bg-white/20 transition cursor-pointer active:scale-95"
+            >
+              <span>← Back</span>
+            </button>
+
+            <div className="flex items-center space-x-2.5 flex-1 justify-end mr-2">
+              <div className="text-right">
+                <h3 className="font-sans text-xs font-bold tracking-tight truncate max-w-[200px]">
                   {chatInfo?.itemTitle ? `Listing: ${chatInfo?.itemTitle}` : 'Item Conversation'}
                 </h3>
-                <p className="font-mono text-[9px] tracking-wider text-teal-400 font-bold uppercase">
+                <p className="font-mono text-[8px] tracking-wider text-teal-400 font-bold uppercase">
                   AI-Secured Direct Chat
                 </p>
+              </div>
+              <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-teal-500/20 text-teal-300 ring-1 ring-teal-400/30 shrink-0">
+                <Radio className="h-4 w-4 animate-pulse" />
               </div>
             </div>
 
             <button
               onClick={onClose}
-              className="rounded-lg bg-white/10 p-1.5 text-white/80 hover:bg-white/20 hover:text-white transition cursor-pointer"
+              className="rounded-lg bg-white/10 p-2 text-white/80 hover:bg-white/20 hover:text-white transition cursor-pointer"
             >
               <X className="h-4 w-4" />
             </button>
@@ -252,7 +259,7 @@ export default function ChatInterface({
           {/* Chat text input footer block */}
           <form 
             onSubmit={handleSendMessage}
-            className="border-t border-slate-100 bg-white p-3 flex items-center space-x-2"
+            className="border-t border-slate-100 bg-white p-3 flex items-center space-x-2 shrink-0"
           >
             <input
               type="text"
