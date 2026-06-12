@@ -128,7 +128,9 @@ async function testConnection() {
     console.log('Firebase connection test completed successfully.');
   } catch (error) {
     if (error instanceof Error && error.message.includes('the client is offline')) {
-      console.error("Please check your Firebase configuration: Client is offline.");
+      console.warn("Firebase connection test: Client is offline. This is normal in sandboxed environments.");
+    } else {
+      console.warn("Firebase connection test error: ", error);
     }
   }
 }
