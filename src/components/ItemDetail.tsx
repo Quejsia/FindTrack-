@@ -534,6 +534,7 @@ export default function ItemDetail({
                 currentUserUid={currentUserUid}
                 itemTitle={item.title}
                 otherUserId={item.userId}
+                reporterName={item.contactName}
                 onBack={() => setActiveView('details')}
               />
             </div>
@@ -653,10 +654,11 @@ interface ChatViewProps {
   currentUserUid: string;
   itemTitle: string;
   otherUserId: string;
+  reporterName: string;
   onBack: () => void;
 }
 
-function ChatView({ chatId, currentUserUid, itemTitle, otherUserId, onBack }: ChatViewProps) {
+function ChatView({ chatId, currentUserUid, itemTitle, otherUserId, reporterName, onBack }: ChatViewProps) {
   const [messages, setMessages] = useState<any[]>([]);
   const [inputText, setInputText] = useState('');
   const [loading, setLoading] = useState(true);
@@ -740,22 +742,21 @@ function ChatView({ chatId, currentUserUid, itemTitle, otherUserId, onBack }: Ch
   return (
     <div className="h-full flex flex-col justify-between bg-white text-slate-800 overflow-hidden" id="item-conversation-container">
       {/* 1. Rigid Header Box shrink-0 */}
-      <div className="flex items-center justify-between bg-gradient-to-tr from-teal-800 to-slate-900 px-5 py-4 text-white shadow-md shrink-0">
+      <div className="w-full bg-gradient-to-r from-teal-800 to-slate-900 p-4 flex items-center gap-4 text-white shrink-0">
         <button
           onClick={onBack}
-          type="button"
-          className="flex items-center gap-1.5 bg-white/10 px-3 py-2 rounded-xl text-xs font-bold text-white/95 hover:bg-white/20 transition cursor-pointer active:scale-95 duration-150"
+          className="px-3 py-1.5 rounded-xl bg-white/10 text-xs font-bold hover:bg-white/20 active:scale-95 transition cursor-pointer"
         >
-          <span>← Back</span>
+          ← Back
         </button>
 
-        <div className="flex flex-col items-end text-right flex-1 min-w-0 px-2">
-          <h3 className="font-sans text-xs font-bold tracking-tight truncate w-full max-w-[180px]">
-            {itemTitle}
-          </h3>
-          <p className="font-mono text-[8px] tracking-wider text-teal-400 font-bold uppercase">
-            Secured Finder Channel
-          </p>
+        <div className="flex flex-col items-start justify-center flex-1 min-w-0">
+          <span className="text-sm font-bold truncate block w-full">
+            {reporterName}
+          </span>
+          <span className="text-[10px] text-teal-300 font-medium block">
+            Direct Message Stream
+          </span>
         </div>
 
         <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-teal-500/20 text-teal-300 ring-1 ring-teal-400/30 shrink-0">
