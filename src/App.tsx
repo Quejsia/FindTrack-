@@ -14,7 +14,8 @@ import {
   setDoc, 
   updateDoc, 
   deleteDoc,
-  serverTimestamp
+  serverTimestamp,
+  where
 } from 'firebase/firestore';
 import { 
   auth, 
@@ -25,7 +26,8 @@ import {
 } from './firebase';
 import ChatInterface, { ChatInboxList } from './components/ChatInterface';
 import ItemDetail from './components/ItemDetail';
-import { Item } from './types';
+import { Item, Claim } from './types';
+import { ShieldCheck } from 'lucide-react';
 
 interface ItemReport {
   id: string;
@@ -104,6 +106,8 @@ export default function App() {
   const [reportDesc, setReportDesc] = useState('');
   const [reportType, setReportType] = useState<'lost' | 'found'>('lost');
   const [reportImage, setReportImage] = useState<string>('');
+  const [reportSecurityQuestion, setReportSecurityQuestion] = useState('');
+  const [incomingClaims, setIncomingClaims] = useState<Claim[]>([]);
 
   // Dashboard Search state
   const [sQuery, setSQuery] = useState('');
@@ -225,6 +229,36 @@ export default function App() {
 
     return unsubscribe;
   }, []);
+
+  // 2.2. Real-time Claims Sync for Finder Review Panel
+  useEffect(() => {
+    if (!user?.uid) {
+      setIncomingClaims([]);
+      return;
+    }
+    const claimsCollection = collection(db, 'claims');
+    const q = query(claimsCollection, where('finderId', '==', user.uid));
+    
+    const unsubscribe = onSnapshot(q, (snapshot) => {
+      const list: Claim[] = [];
+      snapshot.forEach(docSnap => {
+        list.push({ id: docSnap.id, ...docSnap.data() } as Claim);
+      });
+      // Place pending claims at the top, then sort by newest first
+      list.sort((a, b) => {
+        if (a.status === 'pending' && b.status !== 'pending') return -1;
+        if (a.status !== 'pending' && b.status === 'pending') return 1;
+        const aTime = a.createdAt?.seconds ? a.createdAt.seconds * 1000 : new Date(a.createdAt || 0).getTime();
+        const bTime = b.createdAt?.seconds ? b.createdAt.seconds * 1000 : new Date(b.createdAt || 0).getTime();
+        return bTime - aTime;
+      });
+      setIncomingClaims(list);
+    }, (error) => {
+      console.error("Claims snapshot read failed:", error);
+    });
+
+    return unsubscribe;
+  }, [user]);
 
   // 3. Initiate Onboarding trigger
   useEffect(() => {
@@ -427,7 +461,8 @@ export default function App() {
       imageUrl: reportImage || '',
       createdAt: serverTimestamp(),
       updatedAt: serverTimestamp(),
-      claimed: false
+      claimed: false,
+      securityQuestion: reportSecurityQuestion.trim()
     };
 
     try {
@@ -440,6 +475,7 @@ export default function App() {
       setReportDesc('');
       setReportType('lost');
       setReportImage('');
+      setReportSecurityQuestion('');
 
       // Auto redirect to Search to view entries
       setActiveTab('search');
@@ -508,6 +544,33 @@ export default function App() {
     } catch (err) {
       console.error(err);
       triggerToast("❌ Deletion rejected.", "error");
+    }
+  };
+
+  // Helper actions to approve / reject claims
+  const handleApproveClaim = async (claimId: string, itemId: string) => {
+    try {
+      await updateDoc(doc(db, 'claims', claimId), {
+        status: 'approved',
+        updatedAt: serverTimestamp()
+      });
+      triggerToast("✅ Ownership claim approved! Access credentials unlocked.", "success");
+    } catch (err) {
+      console.error("Error approving claim:", err);
+      triggerToast("❌ Action failed or unauthorized.", "error");
+    }
+  };
+
+  const handleRejectClaim = async (claimId: string) => {
+    try {
+      await updateDoc(doc(db, 'claims', claimId), {
+        status: 'rejected',
+        updatedAt: serverTimestamp()
+      });
+      triggerToast("❌ Claim response declined.", "error");
+    } catch (err) {
+      console.error("Error rejecting claim:", err);
+      triggerToast("❌ Action failed or unauthorized.", "error");
     }
   };
 
@@ -1227,6 +1290,22 @@ export default function App() {
                       <option value="found">🟢 Found Item — I found this</option>
                     </select>
                   </div>
+
+                  <div className="form-group bg-slate-50 border border-slate-205 rounded-xl p-4 my-2" style={{ backgroundColor: '#f8fafc', border: '1px solid #e2e8f0', borderRadius: '12px', padding: '16px', margin: '8px 0' }}>
+                    <label htmlFor="r_securityQuestion" className="text-slate-800 font-bold" style={{ fontWeight: 'bold', color: '#1e293b' }}>🔑 Prove It! Verification Question (Optional)</label>
+                    <input 
+                      id="r_securityQuestion" 
+                      type="text" 
+                      placeholder="e.g., What color sticker is on the back? / What's the keychain brand?" 
+                      value={reportSecurityQuestion}
+                      onChange={(e) => setReportSecurityQuestion(e.target.value)}
+                      style={{ marginTop: '4px' }}
+                    />
+                    <p className="text-[10px] text-slate-500 mt-1" style={{ fontSize: '10px', color: '#64748b', marginTop: '4px', lineHeight: '1.4' }}>
+                      Add an optional verification question to protect this item. To claim it, other users will be requested to provide a matching answer.
+                    </p>
+                  </div>
+
                   <button className="primary-btn" type="submit">📤 Submit Report</button>
                 </form>
               </div>
@@ -1419,7 +1498,103 @@ export default function App() {
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                 
                 {/* Real-time Chats Inbox Column */}
-                <div className="md:col-span-2 space-y-4">
+                <div className="md:col-span-2 space-y-6">
+                  
+                  {/* 🛡️ "PROVE IT" LANDING CLAIMS FOR OWNER ITEMS (Item 3) */}
+                  <div className="p-5 bg-slate-50/50 border border-slate-200/60 rounded-3xl space-y-4" id="finder-claims-review-panel">
+                    <div className="block flex items-center justify-between">
+                      <span className="text-sm font-bold text-slate-800 font-sans flex items-center gap-1.5">🔑 Incoming Ownership Claims ({incomingClaims.filter(c => c.status === 'pending').length} pending)</span>
+                      <span className="font-mono text-[9px] bg-indigo-50 border border-indigo-100 text-indigo-700 font-bold uppercase rounded-full px-2 py-0.5">Prove-it Verification Layer</span>
+                    </div>
+
+                    {incomingClaims.length === 0 ? (
+                      <div className="text-center py-10 bg-white border border-slate-200 border-dashed rounded-3xl flex flex-col items-center justify-center text-slate-450 p-6 shadow-sm">
+                        <div className="h-10 w-10 bg-indigo-50 border border-indigo-100 rounded-full flex items-center justify-center text-indigo-500 mb-2">
+                          <ShieldCheck className="h-5 w-5" />
+                        </div>
+                        <p className="font-sans text-xs font-extrabold text-slate-700">No claims registered yet.</p>
+                        <p className="font-sans text-[10.5px] text-slate-400 max-w-xs mt-1 leading-relaxed">
+                          Your active listings verification answers from claiming searchers will update here automatically in real-time.
+                        </p>
+                      </div>
+                    ) : (
+                      <div className="space-y-3.5">
+                        {incomingClaims.map((claim) => {
+                          const isPending = claim.status === 'pending';
+                          
+                          return (
+                            <div 
+                              key={claim.id} 
+                              className={`bg-white border rounded-2xl p-4 shadow-sm relative transition hover:shadow-md ${
+                                claim.status === 'approved' ? 'border-emerald-200 bg-emerald-50/5' :
+                                claim.status === 'rejected' ? 'border-rose-200 bg-rose-50/5' :
+                                'border-slate-200/80 hover:border-indigo-200'
+                              }`}
+                              id={`claim-review-card-${claim.id}`}
+                            >
+                              <div className="flex items-start justify-between gap-4 mb-2">
+                                <div className="space-y-0.5">
+                                  <h4 className="font-sans text-xs font-bold text-slate-900 flex items-center gap-1.5">
+                                    <span>Claim on:</span>
+                                    <span className="text-indigo-600 font-extrabold">{claim.itemTitle}</span>
+                                  </h4>
+                                  <span className="font-mono text-[9px] text-slate-400 block mt-0.5">
+                                    Claimer: <strong className="text-slate-600 font-bold">{claim.claimerName}</strong> ({claim.claimerEmail || 'anonymous_email'})
+                                  </span>
+                                </div>
+
+                                <span className={`inline-flex items-center gap-1 text-[9px] font-mono font-bold px-2 py-0.5 rounded-full uppercase shrink-0 ${
+                                  claim.status === 'approved' ? 'bg-emerald-100 text-emerald-800' :
+                                  claim.status === 'rejected' ? 'bg-rose-100 text-rose-800' :
+                                  'bg-amber-100 text-amber-805'
+                                }`}>
+                                  {claim.status}
+                                </span>
+                              </div>
+
+                              <div className="space-y-2 bg-slate-50 border border-slate-205/60 rounded-xl p-3 text-xs mt-2.5">
+                                <div>
+                                  <p className="font-mono text-[8.5px] text-slate-400 uppercase tracking-widest font-bold">Verification Question:</p>
+                                  <p className="font-sans text-slate-700 font-semibold leading-relaxed">"{claim.securityQuestion}"</p>
+                                </div>
+                                <div className="pt-2 border-t border-slate-200/50 mt-2">
+                                  <p className="font-mono text-[8.5px] text-slate-400 uppercase tracking-widest font-bold">Claimer's Answer / Proof details:</p>
+                                  <p className="font-sans text-slate-900 font-extrabold leading-relaxed bg-white p-2.5 rounded-lg border border-slate-200 mt-1 italic">
+                                    "{claim.providedAnswer}"
+                                  </p>
+                                </div>
+                              </div>
+
+                              {isPending ? (
+                                <div className="flex items-center space-x-2 mt-3.5 justify-end">
+                                  <button
+                                    onClick={() => handleRejectClaim(claim.id)}
+                                    className="px-3 py-1.5 rounded-lg border border-slate-200 text-slate-700 font-sans text-[11px] font-bold hover:bg-slate-50 cursor-pointer transition active:scale-95"
+                                  >
+                                    Decline Claim
+                                  </button>
+                                  <button
+                                    onClick={() => handleApproveClaim(claim.id, claim.itemId)}
+                                    className="px-3.5 py-1.5 rounded-lg bg-gradient-to-tr from-teal-850 to-indigo-950 text-white font-sans text-[11px] font-bold cursor-pointer transition hover:from-teal-900 hover:to-indigo-900 active:scale-95 flex items-center gap-1 shadow-sm"
+                                  >
+                                    <ShieldCheck className="h-3.5 w-3.5 text-teal-300" />
+                                    <span>Approve & Unlock PII</span>
+                                  </button>
+                                </div>
+                              ) : (
+                                <p className="text-right text-[10px] text-slate-400 mt-2.5 font-sans font-medium">
+                                  {claim.status === 'approved' 
+                                    ? '✓ Approved: Private coordinates are now fully shared.' 
+                                    : '✗ Declined claim.'}
+                                </p>
+                              )}
+                            </div>
+                          );
+                        })}
+                      </div>
+                    )}
+                  </div>
+
                   <div className="section-title flex items-center justify-between">
                     <span className="flex items-center gap-1.5">💬 Active Chats Inbox</span>
                     <span className="font-mono text-[9px] bg-teal-100 text-teal-850 font-bold uppercase rounded-full px-2 py-0.5 animate-pulse">Live Messaging</span>

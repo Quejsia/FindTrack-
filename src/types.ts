@@ -18,6 +18,24 @@ export interface Item {
   date: string; // ISO DateTime string
   createdAt: string; // Date or Firestore sub-timestamp
   updatedAt: string;
+  securityQuestion?: string; // Prove it question
+}
+
+export interface Claim {
+  id: string;
+  itemId: string;
+  itemTitle: string;
+  imageUrl?: string;
+  claimerId: string;
+  claimerName: string;
+  claimerEmail?: string;
+  claimerContact?: string;
+  finderId: string;
+  securityQuestion: string;
+  providedAnswer: string;
+  status: 'pending' | 'approved' | 'rejected';
+  createdAt: any;
+  updatedAt: any;
 }
 
 export interface Match {

@@ -13,6 +13,7 @@ interface SubmissionFormProps {
     contactInfo: string;
     date: string;
     imageUrl?: string;
+    securityQuestion?: string;
   }) => Promise<void>;
   onClose: () => void;
   defaultContactName?: string;
@@ -31,6 +32,7 @@ export default function SubmissionForm({ onSubmit, onClose, defaultContactName =
   const [contactInfo, setContactInfo] = useState('');
   const [date, setDate] = useState(new Date().toISOString().substring(0, 16)); // local datetime-local format format
   const [imageUrl, setImageUrl] = useState<string | undefined>(undefined);
+  const [securityQuestion, setSecurityQuestion] = useState('');
 
   // System States
   const [scanningImage, setScanningImage] = useState(false);
@@ -128,6 +130,7 @@ export default function SubmissionForm({ onSubmit, onClose, defaultContactName =
         contactInfo,
         date: new Date(date).toISOString(),
         imageUrl: imageUrl, // Holds base64 photo structure
+        securityQuestion: securityQuestion.trim(),
       });
       onClose();
     } catch (err) {
@@ -310,7 +313,7 @@ export default function SubmissionForm({ onSubmit, onClose, defaultContactName =
         </div>
 
         <div id="form-field-description">
-          <label className="block text-xs font-bold font-sans text-slate-750 uppercase tracking-wider mb-1.5">
+          <label className="block text-xs font-bold font-sans text-slate-755 uppercase tracking-wider mb-1.5">
             Detailed Description <span className="text-red-500">*</span>
           </label>
           <textarea
@@ -321,6 +324,22 @@ export default function SubmissionForm({ onSubmit, onClose, defaultContactName =
             className="w-full rounded-lg border border-slate-250 bg-white px-3.5 py-2 font-sans text-xs font-medium text-slate-900 focus:border-indigo-500 focus:outline-none leading-relaxed"
             required
           />
+        </div>
+
+        <div id="form-field-security-question" className="bg-slate-50 border border-slate-200/60 rounded-xl p-4">
+          <label className="block text-xs font-bold font-sans text-slate-750 uppercase tracking-wider mb-1.5 flex items-center gap-1">
+            <span>🔑 "Prove It" Security Verification Question (Optional)</span>
+          </label>
+          <input
+            type="text"
+            value={securityQuestion}
+            onChange={(e) => setSecurityQuestion(e.target.value)}
+            placeholder="e.g. What color sticker is on the back? / Can you name the keychain brand?"
+            className="w-full rounded-lg border border-slate-250 bg-white px-3.5 py-2 font-sans text-xs font-medium text-slate-900 focus:border-indigo-500 focus:outline-none"
+          />
+          <p className="font-sans text-[10px] text-slate-500 mt-1.5 leading-relaxed">
+            Prevent fraudulent claims. If another user claims this item, they will be prompted to answer this verification question first.
+          </p>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
