@@ -59,6 +59,7 @@ export default function ChatInterface({
   const [inputText, setInputText] = useState('');
   const [loading, setLoading] = useState(false);
   const [sending, setSending] = useState(false);
+  const [reporterName, setReporterName] = useState('Item Finder');
   const messageEndRef = useRef<HTMLDivElement>(null);
 
   // 1. Fetch Chat details and configure real-time messages listener
@@ -66,6 +67,7 @@ export default function ChatInterface({
     if (!activeChatId || !currentUserUid) {
       setMessages([]);
       setChatInfo(null);
+      setReporterName('Item Finder');
       return;
     }
 
@@ -73,9 +75,33 @@ export default function ChatInterface({
 
     // Fetch parent chat metadata once
     const chatDocRef = doc(db, 'chats', activeChatId);
-    getDoc(chatDocRef).then((snap) => {
+    getDoc(chatDocRef).then(async (snap) => {
       if (snap.exists()) {
-        setChatInfo({ chatId: snap.id, ...snap.data() } as Chat);
+        const data = { chatId: snap.id, ...snap.data() } as Chat;
+        setChatInfo(data);
+
+        // Fetch original item to get the reporter's contact name
+        if (data.itemId) {
+          try {
+            const itemRef = doc(db, 'items', data.itemId);
+            const itemSnap = await getDoc(itemRef);
+            if (itemSnap.exists()) {
+              const itemData = itemSnap.data();
+              if (itemData.contactName) {
+                setReporterName(itemData.contactName);
+              } else if (itemData.title) {
+                setReporterName(itemData.title);
+              }
+            } else if (data.itemTitle) {
+              setReporterName(data.itemTitle);
+            }
+          } catch (itemErr) {
+            console.error("Error fetching item for chat contact name:", itemErr);
+            if (data.itemTitle) {
+              setReporterName(data.itemTitle);
+            }
+          }
+        }
       }
     }).catch(err => {
       console.error("Error fetching chat meta:", err);
@@ -169,37 +195,29 @@ export default function ChatInterface({
           animate={{ x: 0 }}
           exit={{ x: '100%' }}
           transition={{ type: 'spring', damping: 25, stiffness: 220 }}
-          className="relative flex h-[calc(100vh-135px)] w-full max-w-md flex-col bg-white shadow-2xl border-l border-slate-100 justify-between self-center md:h-screen"
+          className="relative flex h-full w-full max-w-md flex-col bg-white shadow-2xl border-l border-slate-100 justify-between self-stretch"
         >
-          {/* Header element matching the signature FindTrack drawer headers with teal gradient background */}
-          <div className="flex items-center justify-between bg-gradient-to-tr from-teal-805 to-slate-900 px-5 py-4 text-white shadow-md shrink-0">
+          {/* Header element styled with brand identity gradient */}
+          <div className="w-full bg-gradient-to-r from-teal-800 to-slate-900 p-4 flex items-center gap-4 text-white shrink-0">
             <button
               onClick={onClose}
-              className="flex items-center gap-1 bg-white/10 px-3 py-2 rounded-xl text-xs font-bold text-white/95 hover:bg-white/20 transition cursor-pointer active:scale-95"
+              className="px-3 py-1.5 rounded-xl bg-white/10 text-xs font-bold hover:bg-white/20 active:scale-95 transition cursor-pointer"
             >
-              <span>← Back</span>
+              ← Back
             </button>
 
-            <div className="flex items-center space-x-2.5 flex-1 justify-end mr-2">
-              <div className="text-right">
-                <h3 className="font-sans text-xs font-bold tracking-tight truncate max-w-[200px]">
-                  {chatInfo?.itemTitle ? `Listing: ${chatInfo?.itemTitle}` : 'Item Conversation'}
-                </h3>
-                <p className="font-mono text-[8px] tracking-wider text-teal-400 font-bold uppercase">
-                  AI-Secured Direct Chat
-                </p>
-              </div>
-              <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-teal-500/20 text-teal-300 ring-1 ring-teal-400/30 shrink-0">
-                <Radio className="h-4 w-4 animate-pulse" />
-              </div>
+            <div className="flex flex-col items-start justify-center flex-1 min-w-0">
+              <span className="text-sm font-bold truncate block w-full text-left">
+                {reporterName}
+              </span>
+              <span className="text-[10px] text-teal-300 font-medium block text-left">
+                Direct Message Stream
+              </span>
             </div>
 
-            <button
-              onClick={onClose}
-              className="rounded-lg bg-white/10 p-2 text-white/80 hover:bg-white/20 hover:text-white transition cursor-pointer"
-            >
-              <X className="h-4 w-4" />
-            </button>
+            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-teal-500/20 text-teal-300 ring-1 ring-teal-400/30 shrink-0">
+              <Radio className="h-4 w-4 animate-pulse" />
+            </div>
           </div>
 
           {/* Active Conversation Feed */}
@@ -256,16 +274,16 @@ export default function ChatInterface({
             <div ref={messageEndRef} />
           </div>
 
-          {/* Chat text input footer block */}
+          {/* Chat text input footer block with relative bottom gap padding for mobile navigation overlay */}
           <form 
             onSubmit={handleSendMessage}
-            className="border-t border-slate-100 bg-white p-3 flex items-center space-x-2 shrink-0"
+            className="border-t border-slate-100 bg-white p-3 pb-[76px] sm:pb-3 flex items-center space-x-2 shrink-0 animate-fade-in"
           >
             <input
               type="text"
               value={inputText}
               onChange={(e) => setInputText(e.target.value)}
-              placeholder="Type your secure message here..."
+              placeholder="Type secure handoff messages..."
               className="flex-1 rounded-xl border border-slate-200 bg-slate-50 px-4 py-2.5 text-xs font-sans text-slate-800 focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-600 focus:bg-white transition"
             />
             <button
