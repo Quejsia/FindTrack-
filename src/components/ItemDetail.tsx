@@ -13,7 +13,8 @@ import {
   FileClock, 
   Lock, 
   Trash2, 
-  Loader2 
+  Loader2,
+  MessageSquare
 } from 'lucide-react';
 
 interface ItemDetailProps {
@@ -23,6 +24,7 @@ interface ItemDetailProps {
   onResolveItem: (itemId: string, matchingItemId: string) => Promise<void>;
   onDeleteItem: (itemId: string) => Promise<void>;
   currentUserUid?: string;
+  onStartChat?: (otherUserUid: string, itemId: string) => void;
 }
 
 export default function ItemDetail({
@@ -32,6 +34,7 @@ export default function ItemDetail({
   onResolveItem,
   onDeleteItem,
   currentUserUid,
+  onStartChat,
 }: ItemDetailProps) {
   const [deleting, setDeleting] = React.useState(false);
   
@@ -165,7 +168,7 @@ export default function ItemDetail({
             </h4>
 
             {currentUserUid ? (
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 items-center">
                 <div className="flex items-center space-x-2">
                   <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-indigo-50 border border-indigo-100 text-indigo-600 font-bold text-sm shrink-0">
                     {item.contactName.charAt(0).toUpperCase()}
@@ -176,15 +179,28 @@ export default function ItemDetail({
                   </div>
                 </div>
 
-                <div className="flex items-center space-x-2">
-                  <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-emerald-50 border border-emerald-100 text-emerald-600 shrink-0">
-                    <PhoneCall className="h-4 w-4" />
+                {isOwner ? (
+                  <div className="flex items-center space-x-2">
+                    <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-emerald-50 border border-emerald-100 text-emerald-600 shrink-0">
+                      <PhoneCall className="h-4 w-4" />
+                    </div>
+                    <div>
+                      <p className="font-sans text-[10px] text-slate-400">Method of contact (Your Listing)</p>
+                      <p className="font-sans text-xs text-slate-800 font-bold truncate">{item.contactInfo}</p>
+                    </div>
                   </div>
+                ) : (
                   <div>
-                    <p className="font-sans text-[10px] text-slate-400">Method of contact</p>
-                    <p className="font-sans text-xs text-slate-800 font-bold truncate">{item.contactInfo}</p>
+                    <button
+                      onClick={() => onStartChat && onStartChat(item.userId, item.id)}
+                      className="w-full flex items-center justify-center space-x-2 bg-gradient-to-tr from-teal-800 to-indigo-900 border border-teal-705 hover:from-teal-850 hover:to-indigo-850 text-white font-sans text-xs font-bold py-2.5 px-4 rounded-xl shadow-md cursor-pointer transition-all active:scale-95 duration-200"
+                      style={{ transition: 'all 0.2s ease' }}
+                    >
+                      <MessageSquare className="h-4 w-4 shrink-0" />
+                      <span>Message Finder</span>
+                    </button>
                   </div>
-                </div>
+                )}
               </div>
             ) : (
               <div className="text-center py-2 text-slate-500 font-sans text-xs space-y-1.5">

@@ -10,6 +10,7 @@ import {
   onSnapshot, 
   query, 
   doc, 
+  getDoc,
   setDoc, 
   updateDoc, 
   deleteDoc,
@@ -22,6 +23,9 @@ import {
   logOut, 
   OperationType 
 } from './firebase';
+import ChatInterface, { ChatInboxList } from './components/ChatInterface';
+import ItemDetail from './components/ItemDetail';
+import { Item } from './types';
 
 interface ItemReport {
   id: string;
@@ -92,6 +96,7 @@ export default function App() {
   const [onboardStep, setOnboardStep] = useState(0);
   const [zoomImg, setZoomImg] = useState<string | null>(null);
   const [showGuestModal, setShowGuestModal] = useState(false);
+  const [activeChatId, setActiveChatId] = useState<string | null>(null);
 
   // Dashboard inputs
   const [reportTitle, setReportTitle] = useState('');
@@ -503,6 +508,50 @@ export default function App() {
     } catch (err) {
       console.error(err);
       triggerToast("❌ Deletion rejected.", "error");
+    }
+  };
+
+  // Initiate direct chat about item
+  const handleStartChat = async (otherUserUid: string, itemId: string) => {
+    if (!user) {
+      if (profileName === 'Guest') {
+        setShowGuestModal(true);
+      } else {
+        setCurrentView('login');
+      }
+      return;
+    }
+
+    if (user.uid === otherUserUid) {
+      triggerToast("💡 This is your own listing!", "success");
+      return;
+    }
+
+    try {
+      // Deterministic chat ID
+      const chatId = [user.uid, otherUserUid, itemId].sort().join("_");
+      const chatRef = doc(db, 'chats', chatId);
+      const chatSnap = await getDoc(chatRef);
+
+      if (!chatSnap.exists()) {
+        const itemRef = doc(db, 'items', itemId);
+        const itemSnap = await getDoc(itemRef);
+        const itemTitle = itemSnap.exists() ? itemSnap.data().title : "Lost/Found Item";
+
+        await setDoc(chatRef, {
+          chatId,
+          participants: [user.uid, otherUserUid],
+          itemId,
+          itemTitle,
+          lastMessage: `Convo initiated about "${itemTitle}"`,
+          timestamp: serverTimestamp()
+        });
+      }
+
+      setActiveChatId(chatId);
+    } catch (err) {
+      console.error("Error creating chat:", err);
+      triggerToast("❌ Failed to initiate chat room.", "error");
     }
   };
 
@@ -1307,56 +1356,59 @@ export default function App() {
             <section id="itemDetail" className={`panel ${activeTab === 'itemDetail' ? 'active' : ''}`}>
               <button onClick={() => setActiveTab('search')} className="back-btn">← Back to Search</button>
               
-              <div id="detailContent" className="detail-container">
+              <div id="detailContent">
                 {(() => {
                   const r = items.find(x => x.id === selectedItemId);
-                  if (!r) return <p className="p-6 text-slate-400">Please choose an item from search.</p>;
-                  const isOwner = r.userId === auth.currentUser?.uid;
-                  const pinned = pinnedIds.includes(r.id);
+                  if (!r) return <p className="p-6 text-slate-400 font-sans text-xs">Please choose an item from search.</p>;
+                  
+                  const mappedItem: Item = {
+                    id: r.id,
+                    userId: r.userId,
+                    type: r.type,
+                    title: r.title,
+                    description: r.desc || r.description || "No description provided.",
+                    category: (r as any).category || 'others',
+                    location: r.location,
+                    status: r.claimed ? 'resolved' : 'active',
+                    imageUrl: r.image || r.imageUrl || '',
+                    contactName: r.contactName || 'Representative',
+                    contactInfo: r.contactInfo || 'No contact info provided',
+                    date: r.date || new Date().toLocaleDateString(),
+                    createdAt: r.createdAt ? (r.createdAt.seconds ? new Date(r.createdAt.seconds * 1000).toISOString() : String(r.createdAt)) : new Date().toISOString(),
+                    updatedAt: r.createdAt ? (r.createdAt.seconds ? new Date(r.createdAt.seconds * 1000).toISOString() : String(r.createdAt)) : new Date().toISOString(),
+                  };
+
+                  const oppositeItemsMapped = items.filter(x => x.type !== r.type).map(x => ({
+                    id: x.id,
+                    userId: x.userId,
+                    type: x.type,
+                    title: x.title,
+                    description: x.desc || x.description || '',
+                    category: (x as any).category || 'others',
+                    location: x.location,
+                    status: x.claimed ? 'resolved' : 'active',
+                    imageUrl: x.image || x.imageUrl || '',
+                    contactName: x.contactName || 'Representative',
+                    contactInfo: x.contactInfo || 'No contact info provided',
+                    date: x.date || new Date().toLocaleDateString(),
+                    createdAt: x.createdAt ? (x.createdAt.seconds ? new Date(x.createdAt.seconds * 1000).toISOString() : String(x.createdAt)) : new Date().toISOString(),
+                    updatedAt: x.createdAt ? (x.createdAt.seconds ? new Date(x.createdAt.seconds * 1000).toISOString() : String(x.createdAt)) : new Date().toISOString(),
+                  } as any));
 
                   return (
-                    <>
-                      {(r.image || r.imageUrl) ? (
-                        <img 
-                          src={r.image || r.imageUrl} 
-                          onClick={() => setZoomImg(r.image || r.imageUrl || null)} 
-                          className="detail-image zoomable-img" 
-                          alt="Zoom item zoom" 
-                        />
-                      ) : (
-                        <div className="detail-image" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '80px', opacity: 0.3 }}>
-                          📷
-                        </div>
-                      )}
-                      <div className="detail-body">
-                        <div className="detail-title">{r.title}</div>
-                        <div className="detail-meta">
-                          <span className="detail-meta-item">📍 {r.location || "Unknown location"}</span>
-                          <span className="detail-meta-item">🕐 {r.date || "Just now"}</span>
-                          <span className={`badge ${r.claimed ? 'claimed' : r.type}`} style={{ marginLeft: '4px' }}>
-                            {r.claimed ? "CLAIMED" : r.type.toUpperCase()}
-                          </span>
-                        </div>
-                        <div className="detail-desc">{r.desc || r.description || "No description provided."}</div>
-                        
-                        {/* Contact details */}
-                        <div className="my-4 p-4 bg-slate-50 border border-slate-200 rounded-xl text-xs">
-                          <p className="font-bold">Contact Representative:</p>
-                          <p className="mt-1">Name: {r.contactName || "Representative"}</p>
-                          <p>Contact Details: {r.contactInfo || "Direct helpdesk cataloged"}</p>
-                        </div>
-
-                        <div className="detail-actions">
-                          {!r.claimed && isOwner && (
-                            <button className="primary-btn" onClick={() => claimItem(r.id)}>✅ Mark as Claimed</button>
-                          )}
-                          <button className="secondary-btn" onClick={() => togglePin(r.id)}>{pinned ? "📌 Unpin" : "📍 Pin Item"}</button>
-                          {isOwner && (
-                            <button className="delete-btn" style={{ width: 'auto' }} onClick={() => deleteItem(r.id)}>🗑️ Delete</button>
-                          )}
-                        </div>
-                      </div>
-                    </>
+                    <ItemDetail
+                      item={mappedItem}
+                      onClose={() => setActiveTab('search')}
+                      allOppositeItems={oppositeItemsMapped}
+                      onResolveItem={async () => {
+                        await claimItem(r.id);
+                      }}
+                      onDeleteItem={async () => {
+                        await deleteItem(r.id);
+                      }}
+                      currentUserUid={user?.uid}
+                      onStartChat={handleStartChat}
+                    />
                   );
                 })()}
               </div>
@@ -1364,16 +1416,36 @@ export default function App() {
 
             {/* PANEL: NOTIFICATIONS & ALERTS */}
             <section id="notifications" className={`panel ${activeTab === 'notifications' ? 'active' : ''}`}>
-              <div className="section-title">🔔 Notifications &amp; Alerts</div>
-              <div id="alertsList">
-                <div className="alert-item">
-                  <strong>🎉 Welcome to FindTrack!</strong>
-                  <p>You'll receive notifications here when there are updates on your items.</p>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                
+                {/* Real-time Chats Inbox Column */}
+                <div className="md:col-span-2 space-y-4">
+                  <div className="section-title flex items-center justify-between">
+                    <span className="flex items-center gap-1.5">💬 Active Chats Inbox</span>
+                    <span className="font-mono text-[9px] bg-teal-100 text-teal-850 font-bold uppercase rounded-full px-2 py-0.5 animate-pulse">Live Messaging</span>
+                  </div>
+                  <ChatInboxList 
+                    currentUserUid={user ? user.uid : null}
+                    onSelectChat={(id) => setActiveChatId(id)}
+                    activeChatId={activeChatId}
+                  />
                 </div>
-                <div className="alert-item">
-                  <strong>💡 Pro Tip</strong>
-                  <p>Enable browser notifications to get instant alerts about your reported items!</p>
+
+                {/* Static System Alerts Column */}
+                <div className="md:col-span-1 space-y-4">
+                  <div className="section-title">🔔 Platform Alerts</div>
+                  <div id="alertsList" className="space-y-3">
+                    <div className="alert-item m-0">
+                      <strong>🎉 Welcome to Lost &amp; Found!</strong>
+                      <p>You'll receive secure notifications and match recommendations here.</p>
+                    </div>
+                    <div className="alert-item m-0">
+                      <strong>💡 Pro Tip</strong>
+                      <p>Tap "Message Finder" on other users' listings to contact them safely.</p>
+                    </div>
+                  </div>
                 </div>
+
               </div>
             </section>
 
@@ -1735,6 +1807,16 @@ export default function App() {
             <button onClick={() => setShowGuestModal(false)} className="modal-close">Maybe later</button>
           </div>
         </div>
+      )}
+
+      {/* ── REAL-TIME DIRECT MESSAGING DRAWER OVERLAY ── */}
+      {activeChatId && (
+        <ChatInterface
+          activeChatId={activeChatId}
+          currentUserUid={user ? user.uid : null}
+          onClose={() => setActiveChatId(null)}
+          onSelectChat={(id) => setActiveChatId(id)}
+        />
       )}
 
     </div>

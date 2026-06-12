@@ -112,6 +112,56 @@
         }
       },
       "required": ["id", "lostItemId", "foundItemId", "confidenceScore", "matchReason", "status", "createdAt", "updatedAt"]
+    },
+    "Chat": {
+      "title": "Chat",
+      "description": "Represents an interactive chat conversation between users",
+      "type": "object",
+      "properties": {
+        "chatId": {
+          "type": "string",
+          "description": "Unique chat session identifier"
+        },
+        "participants": {
+          "type": "array",
+          "description": "List of user UIDs participating in this convo"
+        },
+        "itemId": {
+          "type": "string",
+          "description": "Reference field to the lost or found item"
+        },
+        "lastMessage": {
+          "type": "string",
+          "description": "The text of the last sent message"
+        },
+        "timestamp": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Server timestamp of the last message update"
+        }
+      },
+      "required": ["chatId", "participants", "itemId", "timestamp"]
+    },
+    "Message": {
+      "title": "Message",
+      "description": "Represents a message sent within a chat session",
+      "type": "object",
+      "properties": {
+        "senderId": {
+          "type": "string",
+          "description": "The UID of the user sending the message"
+        },
+        "text": {
+          "type": "string",
+          "description": "The textual body of the message"
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Server timestamp when the message was sent"
+        }
+      },
+      "required": ["senderId", "text", "createdAt"]
     }
   },
   "firestore": {
@@ -122,6 +172,14 @@
     "/matches/{matchId}": {
       "schema": "Match",
       "description": "Collection of tracked item matches between lost and found items"
+    },
+    "/chats/{chatId}": {
+      "schema": "Chat",
+      "description": "Collection of all direct message chats between users"
+    },
+    "/chats/{chatId}/messages/{messageId}": {
+      "schema": "Message",
+      "description": "Subcollection of all messages within a specific chat session"
     }
   }
 }

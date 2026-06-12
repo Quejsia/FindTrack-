@@ -12,6 +12,7 @@ service cloud.firestore {
       return request.auth != null;
     }
 
+    // Checking email verification helper (only verified users can write items and transact)
     function isEmailVerified() {
       return request.auth.token.email_verified == true;
     }
@@ -31,7 +32,7 @@ service cloud.firestore {
     // Validates item properties, checking types, boundaries, and formats
     function isValidItem(data) {
       return data.id is string && isValidId(data.id)
-        && data.userId is string && data.userId == request.auth.uid
+        && data.userId is string
         && (data.type == 'lost' || data.type == 'found')
         && data.title is string && data.title.size() <= 100
         && data.description is string && data.description.size() <= 1000
@@ -55,18 +56,33 @@ service cloud.firestore {
         && (data.status == 'pending' || data.status == 'accepted' || data.status == 'rejected');
     }
 
+    // Validates chat metadata structures
+    function isValidChat(data) {
+      return data.chatId is string && isValidId(data.chatId)
+        && data.participants is list
+        && data.participants.size() >= 2 && data.participants.size() <= 10
+        && data.participants[0] is string
+        && data.itemId is string && isValidId(data.itemId)
+        && (data.get('lastMessage', '') is string && data.get('lastMessage', '').size() <= 2000);
+    }
+
+    // Validates individual message content
+    function isValidMessage(data) {
+      return data.senderId is string && data.senderId == request.auth.uid
+        && data.text is string && data.text.size() <= 2000;
+    }
+
     // --- Items Collection Rules ---
     match /items/{itemId} {
-      // Enforce strict user data isolation on read/list
-      allow read, list: if isSignedIn()
-        && isEmailVerified()
-        && existing().userId == request.auth.uid;
+      // Allow all registered active users to view listings to find matches
+      allow read, list: if isSignedIn() && isEmailVerified();
 
       // Creating a new item
       allow create: if isSignedIn()
         && isEmailVerified()
         && isValidId(itemId)
         && itemId == incoming().id
+        && incoming().userId == request.auth.uid
         && isValidItem(incoming())
         && incoming().createdAt == request.time
         && incoming().updatedAt == request.time;
@@ -93,7 +109,6 @@ service cloud.firestore {
 
     // --- Matches Collection Rules ---
     match /matches/{matchId} {
-      // Disallow broad list queries globally to prevent data scraping or cost-attacks
       allow list: if false;
 
       // Single match retrieval
@@ -136,6 +151,46 @@ service cloud.firestore {
           get(/databases/$(database)/documents/items/$(existing().lostItemId)).data.userId == request.auth.uid ||
           get(/databases/$(database)/documents/items/$(existing().foundItemId)).data.userId == request.auth.uid
         );
+    }
+
+    // --- Chats Collection Rules ---
+    match /chats/{chatId} {
+      allow read, list: if isSignedIn()
+        && isEmailVerified()
+        && request.auth.uid in existing().participants;
+
+      allow create: if isSignedIn()
+        && isEmailVerified()
+        && isValidId(chatId)
+        && chatId == incoming().chatId
+        && request.auth.uid in incoming().participants
+        && isValidChat(incoming())
+        && incoming().timestamp == request.time;
+
+      allow update: if isSignedIn()
+        && isEmailVerified()
+        && isValidId(chatId)
+        && request.auth.uid in existing().participants
+        && incoming().chatId == existing().chatId
+        && incoming().itemId == existing().itemId
+        && incoming().participants == existing().participants
+        && incoming().timestamp == request.time
+        && isValidChat(incoming())
+        && incoming().diff(existing()).affectedKeys().hasOnly(['lastMessage', 'timestamp']);
+    }
+
+    // --- Messages Subcollection Rules ---
+    match /chats/{chatId}/messages/{messageId} {
+      allow read, list: if isSignedIn()
+        && isEmailVerified()
+        && request.auth.uid in get(/databases/$(database)/documents/chats/$(chatId)).data.participants;
+
+      allow create: if isSignedIn()
+        && isEmailVerified()
+        && isValidId(messageId)
+        && request.auth.uid in get(/databases/$(database)/documents/chats/$(chatId)).data.participants
+        && isValidMessage(incoming())
+        && incoming().createdAt == request.time;
     }
   }
 }
