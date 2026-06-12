@@ -974,7 +974,7 @@ export default function App() {
         <div className="min-h-screen text-slate-800">
           
           {/* TOP BAR BRAND MODULE */}
-          <header className={`topbar ${activeChatId ? 'hidden' : ''}`}>
+          <header className="topbar">
             <div className="topbar-inner">
               <button 
                 id="burgerBtn" 
@@ -1147,7 +1147,7 @@ export default function App() {
           </aside>
 
           {/* MAIN PANELS INJECTION DESK */}
-          <main className={activeChatId ? 'hidden' : ''}>
+          <main>
             
             {/* PANEL: HOME */}
             <section id="home" className={`panel ${activeTab === 'home' ? 'active' : ''}`}>
@@ -1893,15 +1893,13 @@ export default function App() {
           </nav>
 
           {/* MOBILE REPORT INSTANT FAB */}
-          {!activeChatId && (
-            <button 
-              onClick={() => { if (profileName === 'Guest') { setShowGuestModal(true); } else { setActiveTab('report'); } }} 
-              className="report-fab" 
-              title="Report Item"
-            >
-              📦
-            </button>
-          )}
+          <button 
+            onClick={() => { if (profileName === 'Guest') { setShowGuestModal(true); } else { setActiveTab('report'); } }} 
+            className="report-fab" 
+            title="Report Item"
+          >
+            📦
+          </button>
 
         </div>
       )}

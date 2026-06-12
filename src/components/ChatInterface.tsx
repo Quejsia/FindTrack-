@@ -179,127 +179,116 @@ export default function ChatInterface({
 
   return (
     <AnimatePresence>
-      <div className="fixed inset-0 z-50 flex justify-end" id="chat-system-overlay">
-        {/* Soft dark background under the chat drawer */}
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 0.5 }}
-          exit={{ opacity: 0 }}
-          onClick={onClose}
-          className="absolute inset-0 bg-slate-950/60"
-        />
-
-        {/* Messaging Side/Bottom Drawer container */}
-        <motion.div
-          initial={{ x: '100%' }}
-          animate={{ x: 0 }}
-          exit={{ x: '100%' }}
-          transition={{ type: 'spring', damping: 25, stiffness: 220 }}
-          className="relative flex h-full w-full max-w-md flex-col bg-white shadow-2xl border-l border-slate-100 justify-between self-stretch"
-        >
-          {/* Header element styled with brand identity gradient */}
-          <div className="w-full bg-gradient-to-r from-teal-800 to-slate-900 p-4 flex items-center gap-4 text-white shrink-0">
-            <button
-              onClick={onClose}
-              className="px-3 py-1.5 rounded-xl bg-white/10 text-xs font-bold hover:bg-white/20 active:scale-95 transition cursor-pointer"
-            >
-              ← Back
-            </button>
-
-            <div className="flex flex-col items-start justify-center flex-1 min-w-0">
-              <span className="text-sm font-bold truncate block w-full text-left">
-                {reporterName}
-              </span>
-              <span className="text-[10px] text-teal-300 font-medium block text-left">
-                Direct Message Stream
-              </span>
-            </div>
-
-            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-teal-500/20 text-teal-300 ring-1 ring-teal-400/30 shrink-0">
-              <Radio className="h-4 w-4 animate-pulse" />
-            </div>
-          </div>
-
-          {/* Active Conversation Feed */}
-          <div className="flex-1 overflow-y-auto bg-slate-50/50 p-4 space-y-4">
-            {loading ? (
-              <div className="flex h-full flex-col items-center justify-center space-y-2 text-slate-400">
-                <Loader2 className="h-8 w-8 animate-spin text-teal-600" />
-                <span className="font-sans text-xs">Loading secure message logs...</span>
-              </div>
-            ) : messages.length === 0 ? (
-              <div className="flex h-full flex-col items-center justify-center text-center p-6 space-y-3">
-                <div className="flex h-12 w-12 items-center justify-center rounded-full bg-teal-50 text-teal-600">
-                  <MessageSquare className="h-6 w-6" />
-                </div>
-                <div>
-                  <h4 className="font-sans font-bold text-slate-800 text-sm">No Messages Yet</h4>
-                  <p className="font-sans text-xs text-slate-500 max-w-xs mt-1">
-                    Introduce yourself! Mention how or where you can sync up to return this item.
-                  </p>
-                </div>
-              </div>
-            ) : (
-              messages.map((msgRef) => {
-                const isMe = msgRef.senderId === currentUserUid;
-                return (
-                  <div 
-                    key={msgRef.id} 
-                    className={`flex ${isMe ? 'justify-end' : 'justify-start'}`}
-                  >
-                    <div className="max-w-[80%] flex flex-col space-y-1">
-                      {/* Message Bubble */}
-                      <div 
-                        className={`px-4 py-2.5 rounded-2xl text-xs font-sans shadow-sm break-words ${
-                          isMe 
-                            ? 'bg-gradient-to-tr from-teal-800 to-indigo-900 text-white rounded-tr-none' 
-                            : 'bg-white border border-slate-200 text-slate-800 rounded-tl-none'
-                        }`}
-                      >
-                        {msgRef.text}
-                      </div>
-                      
-                      {/* Time indicators */}
-                      <span className={`font-mono text-[9px] text-slate-400 flex items-center space-x-1 ${
-                        isMe ? 'justify-end' : 'justify-start'
-                      }`}>
-                        <Clock className="h-2.5 w-2.5 opacity-60" />
-                        <span>{formatTime(msgRef.createdAt)}</span>
-                      </span>
-                    </div>
-                  </div>
-                );
-              })
-            )}
-            <div ref={messageEndRef} />
-          </div>
-
-          {/* Chat text input footer block with relative bottom gap padding for mobile navigation overlay */}
-          <form 
-            onSubmit={handleSendMessage}
-            className="border-t border-slate-100 bg-white p-3 pb-[76px] sm:pb-3 flex items-center space-x-2 shrink-0 animate-fade-in"
+      <motion.div
+        initial={{ opacity: 0, y: 15 }}
+        animate={{ opacity: 1, y: 0 }}
+        exit={{ opacity: 0, y: 15 }}
+        transition={{ duration: 0.2 }}
+        className="fixed inset-0 z-50 bg-white flex flex-col h-screen w-full"
+        id="chat-system-overlay"
+      >
+        {/* Header element styled with brand identity gradient */}
+        <div className="w-full bg-gradient-to-r from-teal-800 to-slate-900 p-4 flex items-center gap-4 text-white shrink-0">
+          <button
+            onClick={onClose}
+            className="px-3 py-1.5 rounded-xl bg-white/10 text-xs font-bold hover:bg-white/20 active:scale-95 transition cursor-pointer"
           >
-            <input
-              type="text"
-              value={inputText}
-              onChange={(e) => setInputText(e.target.value)}
-              placeholder="Type secure handoff messages..."
-              className="flex-1 rounded-xl border border-slate-200 bg-slate-50 px-4 py-2.5 text-xs font-sans text-slate-800 focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-600 focus:bg-white transition"
-            />
-            <button
-              type="submit"
-              disabled={!inputText.trim() || sending}
-              className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-gradient-to-tr from-teal-850 to-indigo-900 text-white shadow-md shadow-indigo-100 ring-1 ring-teal-700 hover:from-teal-800 hover:to-indigo-850 transition disabled:opacity-40 disabled:pointer-events-none cursor-pointer"
-            >
-              {sending ? (
-                <Loader2 className="h-4 w-4 animate-spin text-white" />
-              ) : (
-                <Send className="h-4 w-4" />
-              )}
-            </button>
-          </form>
-        </motion.div>
-      </div>
+            ← Back
+          </button>
+
+          <div className="flex flex-col items-start justify-center flex-1 min-w-0">
+            <span className="text-sm font-bold truncate block w-full text-left">
+              {reporterName}
+            </span>
+            <span className="text-[10px] text-teal-300 font-medium block text-left">
+              Direct Message Stream
+            </span>
+          </div>
+
+          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-teal-500/20 text-teal-300 ring-1 ring-teal-400/30 shrink-0">
+            <Radio className="h-4 w-4 animate-pulse" />
+          </div>
+        </div>
+
+        {/* Active Conversation Feed */}
+        <div className="flex-1 overflow-y-auto bg-slate-50/50 p-4 space-y-4">
+          {loading ? (
+            <div className="flex h-full flex-col items-center justify-center space-y-2 text-slate-400">
+              <Loader2 className="h-8 w-8 animate-spin text-teal-600" />
+              <span className="font-sans text-xs">Loading secure message logs...</span>
+            </div>
+          ) : messages.length === 0 ? (
+            <div className="flex h-full flex-col items-center justify-center text-center p-6 space-y-3">
+              <div className="flex h-12 w-12 items-center justify-center rounded-full bg-teal-50 text-teal-600">
+                <MessageSquare className="h-6 w-6" />
+              </div>
+              <div>
+                <h4 className="font-sans font-bold text-slate-800 text-sm">No Messages Yet</h4>
+                <p className="font-sans text-xs text-slate-500 max-w-xs mt-1">
+                  Introduce yourself! Mention how or where you can sync up to return this item.
+                </p>
+              </div>
+            </div>
+          ) : (
+            messages.map((msgRef) => {
+              const isMe = msgRef.senderId === currentUserUid;
+              return (
+                <div 
+                  key={msgRef.id} 
+                  className={`flex ${isMe ? 'justify-end' : 'justify-start'}`}
+                >
+                  <div className="max-w-[80%] flex flex-col space-y-1">
+                    {/* Message Bubble */}
+                    <div 
+                      className={`px-4 py-2.5 rounded-2xl text-xs font-sans shadow-sm break-words ${
+                        isMe 
+                          ? 'bg-gradient-to-tr from-teal-800 to-indigo-900 text-white rounded-tr-none' 
+                          : 'bg-white border border-slate-200 text-slate-800 rounded-tl-none'
+                      }`}
+                    >
+                      {msgRef.text}
+                    </div>
+                    
+                    {/* Time indicators */}
+                    <span className={`font-mono text-[9px] text-slate-400 flex items-center space-x-1 ${
+                      isMe ? 'justify-end' : 'justify-start'
+                    }`}>
+                      <Clock className="h-2.5 w-2.5 opacity-60" />
+                      <span>{formatTime(msgRef.createdAt)}</span>
+                    </span>
+                  </div>
+                </div>
+              );
+            })
+          )}
+          <div ref={messageEndRef} />
+        </div>
+
+        {/* Chat text input footer block with relative bottom gap padding for mobile navigation overlay */}
+        <form 
+          onSubmit={handleSendMessage}
+          className="border-t border-slate-100 bg-white p-3 pb-[76px] sm:pb-3 flex items-center space-x-2 shrink-0 animate-fade-in"
+        >
+          <input
+            type="text"
+            value={inputText}
+            onChange={(e) => setInputText(e.target.value)}
+            placeholder="Type secure handoff messages..."
+            className="flex-1 rounded-xl border border-slate-200 bg-slate-50 px-4 py-2.5 text-xs font-sans text-slate-800 focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-600 focus:bg-white transition"
+          />
+          <button
+            type="submit"
+            disabled={!inputText.trim() || sending}
+            className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-gradient-to-tr from-teal-850 to-indigo-900 text-white shadow-md shadow-indigo-100 ring-1 ring-teal-700 hover:from-teal-800 hover:to-indigo-850 transition disabled:opacity-40 disabled:pointer-events-none cursor-pointer"
+          >
+            {sending ? (
+              <Loader2 className="h-4 w-4 animate-spin text-white" />
+            ) : (
+              <Send className="h-4 w-4" />
+            )}
+          </button>
+        </form>
+      </motion.div>
     </AnimatePresence>
   );
 }
