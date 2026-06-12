@@ -65,7 +65,7 @@ export default function ItemDetail({
   // Real-time Claims tracking
   const [existingClaim, setExistingClaim] = useState<Claim | null>(null);
   const [fetchingClaim, setFetchingClaim] = useState(false);
-  const [isChatActive, setIsChatActive] = useState(false);
+  const [activeView, setActiveView] = useState<'details' | 'chat'>('details');
 
   const isOwner = item.userId === currentUserUid;
   const isResolved = item.status === 'resolved';
@@ -151,7 +151,7 @@ export default function ItemDetail({
         securityQuestion: item.securityQuestion || 'Please verify physical details for item ownership confirmation.',
         providedAnswer: claimAnswer.trim(),
         status: 'pending',
-        createdAt: new Date().toISOString(), // Standardizing string ISO for cross consistency
+        createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString()
       };
 
@@ -184,307 +184,310 @@ export default function ItemDetail({
         initial={{ opacity: 0, scale: 0.95 }}
         animate={{ opacity: 1, scale: 1 }}
         exit={{ opacity: 0, scale: 0.95 }}
-        className="relative w-full max-w-2xl h-auto pb-6 overflow-hidden rounded-2xl bg-white shadow-2xl"
+        className={`relative w-full max-w-2xl overflow-hidden rounded-3xl bg-white shadow-2xl transition-all duration-300 ${
+          activeView === 'chat' 
+            ? 'h-[85vh] sm:h-[600px] flex flex-col justify-between' 
+            : 'h-auto pb-6'
+        }`}
       >
-        {/* Header Ribbon */}
-        <div className={`p-4 flex items-center justify-between border-b ${
-          item.type === 'lost' 
-            ? 'bg-rose-50/50 border-rose-100 text-rose-800' 
-            : 'bg-emerald-50/50 border-emerald-100 text-emerald-900'
-        }`}>
-          <div className="flex items-center space-x-2">
-            <span className={`inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-xs font-bold font-sans uppercase ${
-              item.type === 'lost' ? 'bg-rose-100' : 'bg-emerald-100'
+        {activeView === 'details' ? (
+          <>
+            {/* Header Ribbon */}
+            <div className={`p-4 flex items-center justify-between border-b ${
+              item.type === 'lost' 
+                ? 'bg-rose-50/50 border-rose-100 text-rose-800' 
+                : 'bg-emerald-50/50 border-emerald-100 text-emerald-900'
             }`}>
-              {item.type}
-            </span>
-            <span className="font-mono text-xs text-slate-500 font-semibold tracking-wide capitalize">
-              {item.category} Registry Item
-            </span>
-          </div>
-
-          <button
-            onClick={onClose}
-            className="rounded-full p-1 text-slate-400 hover:bg-slate-100 hover:text-slate-600 transition"
-          >
-            <X className="h-5 w-5" />
-          </button>
-        </div>
-
-        {/* Content Body */}
-        <div className="max-h-[80vh] overflow-y-auto p-6 space-y-6">
-          
-          {/* Hero Banner Grid */}
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
-            {/* Left side: Photo or placeholder */}
-            <div className="sm:col-span-1">
-              {item.imageUrl ? (
-                <div className="relative aspect-square w-full rounded-xl border border-slate-200 overflow-hidden bg-slate-50">
-                  <img
-                    src={item.imageUrl}
-                    alt={item.title}
-                    className="h-full w-full object-cover"
-                    referrerPolicy="no-referrer"
-                  />
-                </div>
-              ) : (
-                <div className={`aspect-square w-full rounded-xl border flex flex-col items-center justify-center ${
-                  item.type === 'lost' 
-                    ? 'bg-rose-50/50 border-rose-100 text-rose-500' 
-                    : 'bg-emerald-50/50 border-emerald-100 text-emerald-600'
+              <div className="flex items-center space-x-2">
+                <span className={`inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-xs font-bold font-sans uppercase ${
+                  item.type === 'lost' ? 'bg-rose-100' : 'bg-emerald-100'
                 }`}>
-                  {getCategoryIcon(item.category, "h-12 w-12")}
-                  <span className="font-mono text-[9px] font-bold text-slate-400 mt-2 uppercase">{item.category}</span>
-                </div>
-              )}
-            </div>
-
-            {/* Right side: Summary Details */}
-            <div className="sm:col-span-2 flex flex-col justify-between space-y-3">
-              <div className="space-y-1">
-                <h3 className="font-sans text-xl font-bold text-slate-900">{item.title}</h3>
-                <p className="font-sans text-xs text-slate-500 leading-relaxed">{item.description}</p>
+                  {item.type}
+                </span>
+                <span className="font-mono text-xs text-slate-500 font-semibold tracking-wide capitalize">
+                  {item.category} Registry Item
+                </span>
               </div>
 
-              {/* Status and metadata tags */}
-              <div className="grid grid-cols-2 gap-3 text-slate-600 font-sans text-xs">
-                <div className="flex items-center space-x-2 bg-slate-50 p-2 rounded-lg border border-slate-100">
-                  <MapPin className="h-4 w-4 text-slate-400 shrink-0" />
-                  <div className="min-w-0">
-                    <p className="font-sans text-[10px] text-slate-400 uppercase font-semibold">Location</p>
-                    <p className="font-sans font-medium text-slate-800 truncate">{item.location}</p>
-                  </div>
+              <button
+                onClick={onClose}
+                className="rounded-full p-1 text-slate-400 hover:bg-slate-100 hover:text-slate-600 transition"
+              >
+                <X className="h-5 w-5" />
+              </button>
+            </div>
+
+            {/* Content Body */}
+            <div className="max-h-[80vh] overflow-y-auto p-6 space-y-6">
+              
+              {/* Hero Banner Grid */}
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
+                {/* Left side: Photo or placeholder */}
+                <div className="sm:col-span-1">
+                  {item.imageUrl ? (
+                    <div className="relative aspect-square w-full rounded-xl border border-slate-200 overflow-hidden bg-slate-50">
+                      <img
+                        src={item.imageUrl}
+                        alt={item.title}
+                        className="h-full w-full object-cover"
+                        referrerPolicy="no-referrer"
+                      />
+                    </div>
+                  ) : (
+                    <div className={`aspect-square w-full rounded-xl border flex flex-col items-center justify-center ${
+                      item.type === 'lost' 
+                        ? 'bg-rose-50/50 border-rose-100 text-rose-500' 
+                        : 'bg-emerald-50/50 border-emerald-100 text-emerald-600'
+                    }`}>
+                      {getCategoryIcon(item.category, "h-12 w-12")}
+                      <span className="font-mono text-[9px] font-bold text-slate-400 mt-2 uppercase">{item.category}</span>
+                    </div>
+                  )}
                 </div>
 
-                <div className="flex items-center space-x-2 bg-slate-50 p-2 rounded-lg border border-slate-100">
-                  <Calendar className="h-4 w-4 text-slate-400 shrink-0" />
-                  <div>
-                    <p className="font-sans text-[10px] text-slate-400 uppercase font-semibold">Date Logged</p>
-                    <p className="font-sans font-medium text-slate-800">{formattedDate}</p>
+                {/* Right side: Summary Details */}
+                <div className="sm:col-span-2 flex flex-col justify-between space-y-3">
+                  <div className="space-y-1">
+                    <h3 className="font-sans text-xl font-bold text-slate-900">{item.title}</h3>
+                    <p className="font-sans text-xs text-slate-500 leading-relaxed">{item.description}</p>
+                  </div>
+
+                  {/* Status and metadata tags */}
+                  <div className="grid grid-cols-2 gap-3 text-slate-600 font-sans text-xs">
+                    <div className="flex items-center space-x-2 bg-slate-50 p-2 rounded-lg border border-slate-100">
+                      <MapPin className="h-4 w-4 text-slate-400 shrink-0" />
+                      <div className="min-w-0">
+                        <p className="font-sans text-[10px] text-slate-400 uppercase font-semibold">Location</p>
+                        <p className="font-sans font-medium text-slate-800 truncate">{item.location}</p>
+                      </div>
+                    </div>
+
+                    <div className="flex items-center space-x-2 bg-slate-50 p-2 rounded-lg border border-slate-100">
+                      <Calendar className="h-4 w-4 text-slate-400 shrink-0" />
+                      <div>
+                        <p className="font-sans text-[10px] text-slate-400 uppercase font-semibold">Date Logged</p>
+                        <p className="font-sans font-medium text-slate-800">{formattedDate}</p>
+                      </div>
+                    </div>
                   </div>
                 </div>
               </div>
-            </div>
-          </div>
 
-          {!isChatActive ? (
-            <>
               {/* Contact Details (PII Privacy-first protection) */}
               <div className="border border-slate-200 rounded-xl p-4 bg-slate-50" id="contact-credentials">
                 <h4 className="font-sans text-xs font-bold text-slate-700 tracking-wider uppercase mb-3 flex items-center space-x-1">
-              <User className="h-3.5 w-3.5" />
-              <span>Contact Credentials</span>
-            </h4>
+                  <User className="h-3.5 w-3.5" />
+                  <span>Contact Credentials</span>
+                </h4>
 
-            {currentUserUid ? (
-              <div>
-                {isOwner ? (
-                  /* OWNER VIEW */
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 items-center">
-                    <div className="flex items-center space-x-2">
-                      <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-indigo-50 border border-indigo-100 text-indigo-600 font-bold text-sm shrink-0">
-                        {item.contactName.charAt(0).toUpperCase()}
-                      </div>
-                      <div>
-                        <p className="font-sans text-[10px] text-slate-400 font-medium">Reporter (Your Listing)</p>
-                        <p className="font-sans text-xs text-slate-800 font-bold">{item.contactName}</p>
-                      </div>
-                    </div>
-                    <div className="flex items-center space-x-2">
-                      <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-emerald-50 border border-emerald-100 text-emerald-600 shrink-0">
-                        <PhoneCall className="h-4 w-4" />
-                      </div>
-                      <div>
-                        <p className="font-sans text-[10px] text-slate-400 font-medium">Method of contact</p>
-                        <p className="font-sans text-xs text-slate-800 font-bold truncate">{item.contactInfo}</p>
-                      </div>
-                    </div>
-                  </div>
-                ) : (
-                  /* NON-OWNER VIEW (ZERO TRUST SHIELD) */
+                {currentUserUid ? (
                   <div>
-                    {isCredentialsLocked ? (
-                      /* Mask PII Details behind claims block */
-                      <div className="space-y-4">
-                        <div className="flex items-start space-x-3 bg-white p-3.5 rounded-xl border border-slate-200/60 shadow-sm">
-                          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-indigo-50 text-indigo-600 shrink-0 border border-indigo-100">
-                            <Lock className="h-4 w-4" />
+                    {isOwner ? (
+                      /* OWNER VIEW */
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 items-center">
+                        <div className="flex items-center space-x-2">
+                          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-indigo-50 border border-indigo-100 text-indigo-600 font-bold text-sm shrink-0">
+                            {item.contactName.charAt(0).toUpperCase()}
                           </div>
-                          <div className="flex-1">
-                            <p className="font-sans text-xs font-bold text-slate-800">PII Privacy Lock Active</p>
-                            <p className="text-[11px] text-slate-500 font-medium mt-0.5 leading-relaxed">
-                              This listing requires answering a verification question. Submit a claim demonstrating you are the true owner to unlock contact credentials.
-                            </p>
+                          <div>
+                            <p className="font-sans text-[10px] text-slate-400 font-medium">Reporter (Your Listing)</p>
+                            <p className="font-sans text-xs text-slate-800 font-bold">{item.contactName}</p>
                           </div>
                         </div>
-
-                        {/* Claims progress or claim submission button */}
-                        {existingClaim ? (
-                          <div className="p-4 bg-white border border-slate-200/80 rounded-xl shadow-sm space-y-3">
-                            <div className="flex items-center justify-between">
-                              <span className="text-[10px] uppercase font-bold text-slate-400 font-sans tracking-wide">
-                                Claim Response History
-                              </span>
-                              <span className={`inline-flex items-center gap-1 text-[9px] font-bold px-2 py-0.5 rounded-full uppercase ${
-                                existingClaim.status === 'pending' ? 'bg-amber-100 text-amber-805' : 'bg-rose-100 text-rose-800'
-                              }`}>
-                                {existingClaim.status}
-                              </span>
+                        <div className="flex items-center space-x-2">
+                          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-emerald-50 border border-emerald-100 text-emerald-600 shrink-0">
+                            <PhoneCall className="h-4 w-4" />
+                          </div>
+                          <div>
+                            <p className="font-sans text-[10px] text-slate-400 font-medium">Method of contact</p>
+                            <p className="font-sans text-xs text-slate-800 font-bold truncate">{item.contactInfo}</p>
+                          </div>
+                        </div>
+                      </div>
+                    ) : (
+                      /* NON-OWNER VIEW (ZERO TRUST SHIELD) */
+                      <div>
+                        {isCredentialsLocked ? (
+                          /* Mask PII Details behind claims block */
+                          <div className="space-y-4">
+                            <div className="flex items-start space-x-3 bg-white p-3.5 rounded-xl border border-slate-200/60 shadow-sm">
+                              <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-indigo-50 text-indigo-600 shrink-0 border border-indigo-100">
+                                <Lock className="h-4 w-4" />
+                              </div>
+                              <div className="flex-1">
+                                <p className="font-sans text-xs font-bold text-slate-800">PII Privacy Lock Active</p>
+                                <p className="text-[11px] text-slate-500 font-medium mt-0.5 leading-relaxed">
+                                  This listing requires answering a verification question. Submit a claim demonstrating you are the true owner to unlock contact credentials.
+                                </p>
+                              </div>
                             </div>
 
-                            <p className="font-sans text-xs font-semibold text-slate-700 bg-slate-50 p-2.5 rounded-lg border border-slate-100 leading-relaxed italic">
-                              "{existingClaim.securityQuestion}"
-                            </p>
-                            
-                            <p className="text-[11px] text-slate-600 font-semibold font-sans">
-                              🔑 Your submitted answer: <span className="font-normal font-sans italic text-slate-500">"{existingClaim.providedAnswer}"</span>
-                            </p>
+                            {/* Claims progress or claim submission button */}
+                            {existingClaim ? (
+                              <div className="p-4 bg-white border border-slate-200/80 rounded-xl shadow-sm space-y-3">
+                                <div className="flex items-center justify-between">
+                                  <span className="text-[10px] uppercase font-bold text-slate-400 font-sans tracking-wide">
+                                    Claim Response History
+                                  </span>
+                                  <span className={`inline-flex items-center gap-1 text-[9px] font-bold px-2 py-0.5 rounded-full uppercase ${
+                                    existingClaim.status === 'pending' ? 'bg-amber-100 text-amber-805' : 'bg-rose-100 text-rose-800'
+                                  }`}>
+                                    {existingClaim.status}
+                                  </span>
+                                </div>
 
-                            <div className="flex items-center space-x-2 pt-1 border-t border-slate-100">
-                              <div className="h-1.5 w-1.5 rounded-full bg-amber-500 animate-ping" />
-                              <p className="text-[10px] text-slate-500 font-medium">
-                                {existingClaim.status === 'pending' 
-                                  ? 'Under review by the reporter. You can message them to expedite verification.' 
-                                  : 'Declined by reporter. Double check your details and try re-submitting if needed.'}
-                              </p>
+                                <p className="font-sans text-xs font-semibold text-slate-700 bg-slate-50 p-2.5 rounded-lg border border-slate-100 leading-relaxed italic">
+                                  "{existingClaim.securityQuestion}"
+                                </p>
+                                
+                                <p className="text-[11px] text-slate-600 font-semibold font-sans">
+                                  🔑 Your submitted answer: <span className="font-normal font-sans italic text-slate-500">"{existingClaim.providedAnswer}"</span>
+                                </p>
+
+                                <div className="flex items-center space-x-2 pt-1 border-t border-slate-100">
+                                  <div className="h-1.5 w-1.5 rounded-full bg-amber-500 animate-ping" />
+                                  <p className="text-[10px] text-slate-500 font-medium">
+                                    {existingClaim.status === 'pending' 
+                                      ? 'Under review by the reporter. You can message them to expedite verification.' 
+                                      : 'Declined by reporter. Double check your details and try re-submitting if needed.'}
+                                  </p>
+                                </div>
+                                
+                                <div className="flex flex-col space-y-3 w-full pt-1">
+                                  <button
+                                    onClick={() => {
+                                      if (currentUserUid) {
+                                        setActiveView('chat');
+                                      } else if (onStartChat) {
+                                        onStartChat(item.userId, item.id);
+                                      }
+                                    }}
+                                    className="w-full flex items-center justify-center space-x-1.5 bg-teal-850 hover:bg-teal-900 border border-teal-800 text-white font-sans text-xs font-bold py-3.5 px-4 rounded-xl shadow-md cursor-pointer transition active:scale-95 duration-200"
+                                  >
+                                    <MessageSquare className="h-4 w-4 shrink-0 text-white/90" />
+                                    <span>Message Finder</span>
+                                  </button>
+                                  
+                                  {existingClaim.status === 'rejected' && (
+                                    <button
+                                      onClick={() => setOpenClaimModal(true)}
+                                      className="w-full flex items-center justify-center space-x-1.5 py-3.5 px-4 rounded-xl bg-slate-900 text-white font-sans text-xs font-bold hover:bg-slate-800 transition active:scale-95 duration-200 cursor-pointer shadow-md"
+                                    >
+                                      <ShieldQuestion className="h-4 w-4 text-emerald-400 shrink-0" />
+                                      <span>Submit Custom Proof</span>
+                                    </button>
+                                  )}
+                                </div>
+                              </div>
+                            ) : (
+                              /* Open submit claim trigger buttons */
+                              <div className="flex flex-col space-y-3.5 w-full pt-2">
+                                <button
+                                  onClick={() => {
+                                    if (currentUserUid) {
+                                      setActiveView('chat');
+                                    } else if (onStartChat) {
+                                      onStartChat(item.userId, item.id);
+                                    }
+                                  }}
+                                  className="w-full flex items-center justify-center space-x-1.5 bg-teal-850 hover:bg-teal-900 border border-teal-800 text-white font-sans text-xs font-bold py-3.5 px-4 rounded-xl shadow-md cursor-pointer transition active:scale-95 duration-200"
+                                >
+                                  <MessageSquare className="h-4 w-4 shrink-0 text-white/90" />
+                                  <span>Message Finder</span>
+                                </button>
+                                
+                                <button
+                                  onClick={() => setOpenClaimModal(true)}
+                                  className="w-full flex items-center justify-center space-x-1.5 bg-white border border-slate-300 hover:bg-slate-50/50 text-slate-700 font-sans text-xs font-bold py-3.5 px-4 rounded-xl shadow-sm cursor-pointer transition active:scale-95 duration-200"
+                                >
+                                  <CheckCircle2 className="h-4 w-4 shrink-0 text-teal-600" />
+                                  <span>Prove Ownership & Claim</span>
+                                </button>
+                              </div>
+                            )}
+                          </div>
+                        ) : (
+                          /* UNLOCKED VIEW (Approved Claim or No Questions registered) */
+                          <div className="space-y-4">
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 items-center">
+                              <div className="flex items-center space-x-2">
+                                <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-indigo-50 border border-indigo-100 text-indigo-600 font-bold text-sm shrink-0">
+                                  {item.contactName.charAt(0).toUpperCase()}
+                                </div>
+                                <div>
+                                  <p className="font-sans text-[10px] text-slate-400 font-medium">Reporter</p>
+                                  <p className="font-sans text-xs text-slate-800 font-bold">{item.contactName}</p>
+                                </div>
+                              </div>
+                              
+                              <div className="flex items-center space-x-2">
+                                <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-emerald-50 border border-emerald-100 text-emerald-600 shrink-0">
+                                  <PhoneCall className="h-4 w-4" />
+                                </div>
+                                <div className="min-w-0 flex-1">
+                                  <p className="font-sans text-[10px] text-slate-400 font-medium">Contact Coordinates</p>
+                                  <p className="font-sans text-xs text-slate-800 font-bold truncate">{item.contactInfo}</p>
+                                </div>
+                              </div>
                             </div>
-                            
-                            <div className="space-y-4 pt-1">
+
+                            {existingClaim?.status === 'approved' && (
+                              <div className="flex items-center gap-2 bg-emerald-50 border border-emerald-100 rounded-xl p-3 text-emerald-800 font-sans text-xs">
+                                <ShieldCheck className="h-4.5 w-4.5 text-emerald-500 shrink-0" />
+                                <p className="font-medium text-[11px] leading-snug">
+                                  <strong>Proof Approved:</strong> The reporter authenticated your answer. Safe transactions are unlocked!
+                                </p>
+                              </div>
+                            )}
+
+                            <div className="flex flex-col space-y-3 w-full pt-2">
                               <button
                                 onClick={() => {
                                   if (currentUserUid) {
-                                    setIsChatActive(true);
+                                    setActiveView('chat');
                                   } else if (onStartChat) {
                                     onStartChat(item.userId, item.id);
                                   }
                                 }}
                                 className="w-full flex items-center justify-center space-x-1.5 bg-teal-850 hover:bg-teal-900 border border-teal-800 text-white font-sans text-xs font-bold py-3.5 px-4 rounded-xl shadow-md cursor-pointer transition active:scale-95 duration-200"
                               >
-                                <MessageSquare className="h-4 w-4 shrink-0 text-white/90" />
-                                <span>Message Finder</span>
+                                <MessageSquare className="h-4 w-4 shrink-0 text-white/95" />
+                                <span>Direct Chat Room</span>
                               </button>
-                              
-                              {existingClaim.status === 'rejected' && (
+
+                              {!existingClaim && (
                                 <button
                                   onClick={() => setOpenClaimModal(true)}
-                                  className="w-full flex items-center justify-center space-x-1.5 py-3 px-4 rounded-xl bg-slate-900 font-sans text-xs font-bold text-white hover:bg-slate-800 transition active:scale-95 duration-200 cursor-pointer"
+                                  className="w-full flex items-center justify-center space-x-1.5 bg-white border border-slate-300 hover:bg-slate-50/50 text-slate-700 font-sans text-xs font-bold py-3.5 px-4 rounded-xl shadow-sm cursor-pointer transition active:scale-95 duration-200"
                                 >
-                                  <ShieldQuestion className="h-4 w-4 text-emerald-400 shrink-0" />
-                                  <span>Submit Custom Proof</span>
+                                  <CheckCircle2 className="h-4 w-4 shrink-0 text-teal-600" />
+                                  <span>Log Ownership Claim</span>
                                 </button>
+                              )}
+                              
+                              {existingClaim && existingClaim.status !== 'approved' && (
+                                <div className="py-2.5 text-center font-mono text-[10px] font-bold text-emerald-700 bg-emerald-50 rounded-xl border border-emerald-100 uppercase tracking-wider">
+                                  ✓ Claim Status: {existingClaim.status}
+                                </div>
                               )}
                             </div>
                           </div>
-                        ) : (
-                          /* Open submit claim trigger buttons */
-                          <div className="space-y-4 pt-2">
-                            <button
-                              onClick={() => {
-                                if (currentUserUid) {
-                                  setIsChatActive(true);
-                                } else if (onStartChat) {
-                                  onStartChat(item.userId, item.id);
-                                }
-                              }}
-                              className="w-full flex items-center justify-center space-x-1.5 bg-teal-850 hover:bg-teal-900 border border-teal-800 text-white font-sans text-xs font-bold py-3.5 px-4 rounded-xl shadow-md cursor-pointer transition active:scale-95 duration-200"
-                            >
-                              <MessageSquare className="h-4 w-4 shrink-0 text-white/90" />
-                              <span>Message Finder</span>
-                            </button>
-                            
-                            <button
-                              onClick={() => setOpenClaimModal(true)}
-                              className="w-full flex items-center justify-center space-x-1.5 bg-white border border-slate-300 hover:bg-slate-50/50 text-slate-700 font-sans text-xs font-bold py-3.5 px-4 rounded-xl shadow-sm cursor-pointer transition active:scale-95 duration-200"
-                            >
-                              <CheckCircle2 className="h-4 w-4 shrink-0 text-teal-600" />
-                              <span>Prove Ownership & Claim</span>
-                            </button>
-                          </div>
                         )}
-                      </div>
-                    ) : (
-                      /* UNLOCKED VIEW (Approved Claim or No Questions registered) */
-                      <div className="space-y-4">
-                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 items-center">
-                          <div className="flex items-center space-x-2">
-                            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-indigo-50 border border-indigo-100 text-indigo-600 font-bold text-sm shrink-0">
-                              {item.contactName.charAt(0).toUpperCase()}
-                            </div>
-                            <div>
-                              <p className="font-sans text-[10px] text-slate-400 font-medium">Reporter</p>
-                              <p className="font-sans text-xs text-slate-800 font-bold">{item.contactName}</p>
-                            </div>
-                          </div>
-                          
-                          <div className="flex items-center space-x-2">
-                            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-emerald-50 border border-emerald-100 text-emerald-600 shrink-0">
-                              <PhoneCall className="h-4 w-4" />
-                            </div>
-                            <div className="min-w-0 flex-1">
-                              <p className="font-sans text-[10px] text-slate-400 font-medium">Contact Coordinates</p>
-                              <p className="font-sans text-xs text-slate-800 font-bold truncate">{item.contactInfo}</p>
-                            </div>
-                          </div>
-                        </div>
-
-                        {existingClaim?.status === 'approved' && (
-                          <div className="flex items-center gap-2 bg-emerald-50 border border-emerald-100 rounded-xl p-3 text-emerald-800 font-sans text-xs">
-                            <ShieldCheck className="h-4.5 w-4.5 text-emerald-500 shrink-0" />
-                            <p className="font-medium text-[11px] leading-snug">
-                              <strong>Proof Approved:</strong> The reporter authenticated your answer. Safe transactions are unlocked!
-                            </p>
-                          </div>
-                        )}
-
-                        <div className="space-y-4 pt-2">
-                          <button
-                            onClick={() => {
-                              if (currentUserUid) {
-                                setIsChatActive(true);
-                              } else if (onStartChat) {
-                                onStartChat(item.userId, item.id);
-                              }
-                            }}
-                            className="w-full flex items-center justify-center space-x-1.5 bg-teal-850 hover:bg-teal-900 border border-teal-800 text-white font-sans text-xs font-bold py-3.5 px-4 rounded-xl shadow-md cursor-pointer transition active:scale-95 duration-200"
-                          >
-                            <MessageSquare className="h-4 w-4 shrink-0 text-white/95" />
-                            <span>Direct Chat Room</span>
-                          </button>
-
-                          {/* Fallback claim submission in case no security question was present but they still want to trigger one */}
-                          {!existingClaim && (
-                            <button
-                              onClick={() => setOpenClaimModal(true)}
-                              className="w-full flex items-center justify-center space-x-1.5 bg-white border border-slate-300 hover:bg-slate-50/50 text-slate-700 font-sans text-xs font-bold py-3.5 px-4 rounded-xl shadow-sm cursor-pointer transition active:scale-95 duration-200"
-                            >
-                              <CheckCircle2 className="h-4 w-4 shrink-0 text-teal-600" />
-                              <span>Log Ownership Claim</span>
-                            </button>
-                          )}
-                          
-                          {existingClaim && existingClaim.status !== 'approved' && (
-                            <div className="py-2 text-center font-sans text-[10px] font-bold text-emerald-650 bg-emerald-50 rounded-xl border border-emerald-100">
-                              ✓ Claim Status: {existingClaim.status.toUpperCase()}
-                            </div>
-                          )}
-                        </div>
                       </div>
                     )}
                   </div>
+                ) : (
+                  <div className="text-center py-2 text-slate-500 font-sans text-xs space-y-1.5">
+                    <div className="inline-flex h-8 w-8 items-center justify-center rounded-full bg-amber-50 border border-amber-100 text-amber-500">
+                      <Lock className="h-4 w-4" />
+                    </div>
+                    <p className="font-bold text-slate-800">Credentials Layer Locked</p>
+                    <p className="text-[11px] leading-relaxed max-w-sm mx-auto">
+                      For PII privacy preservation, contact information can only be viewed by authenticated users. Please sign in with your account to access details.
+                    </p>
+                  </div>
                 )}
               </div>
-            ) : (
-              <div className="text-center py-2 text-slate-500 font-sans text-xs space-y-1.5">
-                <div className="inline-flex h-8 w-8 items-center justify-center rounded-full bg-amber-50 border border-amber-100 text-amber-500">
-                  <Lock className="h-4 w-4" />
-                </div>
-                <p className="font-bold text-slate-800">Credentials Layer Locked</p>
-                <p className="text-[11px] leading-relaxed max-w-sm mx-auto">
-                  For PII privacy preservation, contact information can only be viewed by authenticated users. Please sign in with your account to access details.
-                </p>
-              </div>
-            )}
-          </div>
 
               {/* AI Matchmaker Panel (Active entries only) */}
               {!isResolved && (
@@ -497,64 +500,62 @@ export default function ItemDetail({
                   />
                 </div>
               )}
-            </>
-          ) : (
-            currentUserUid && (
-              <div className="w-full mt-4" id="embedded-chat-view">
-                <ChatView
-                  chatId={[currentUserUid, item.userId, item.id].sort().join("_")}
-                  currentUserUid={currentUserUid}
-                  itemTitle={item.title}
-                  otherUserId={item.userId}
-                  onBack={() => setIsChatActive(false)}
-                />
-              </div>
-            )
-          )}
 
-          {/* Technical Metadata logs */}
-          <div className="flex flex-wrap items-center justify-between text-slate-400 font-sans text-[10px] pt-4 border-t border-slate-100">
-            <span className="flex items-center gap-1 uppercase font-semibold">
-              <FileClock className="h-3.5 w-3.5 text-slate-350" />
-              <span>Registered: {formattedPostedDate}</span>
-            </span>
+              {/* Technical Metadata logs */}
+              <div className="flex flex-wrap items-center justify-between text-slate-400 font-sans text-[10px] pt-4 border-t border-slate-100 gap-2">
+                <span className="flex items-center gap-1 uppercase font-semibold">
+                  <FileClock className="h-3.5 w-3.5 text-slate-350" />
+                  <span>Registered: {formattedPostedDate}</span>
+                </span>
 
-            {/* Owner controls: allow Delete */}
-            {isOwner && (
-              <button
-                onClick={handleDelete}
-                disabled={deleting}
-                className="inline-flex items-center space-x-1 text-rose-500 hover:text-rose-700 transition"
-              >
-                {deleting ? (
-                  <Loader2 className="h-3 animate-spin w-3" />
-                ) : (
-                  <Trash2 className="h-3.5 w-3.5" />
+                {/* Owner controls: allow Delete */}
+                {isOwner && (
+                  <button
+                    onClick={handleDelete}
+                    disabled={deleting}
+                    className="inline-flex items-center space-x-1 text-rose-500 hover:text-rose-700 transition cursor-pointer"
+                  >
+                    {deleting ? (
+                      <Loader2 className="h-3 animate-spin w-3" />
+                    ) : (
+                      <Trash2 className="h-3.5 w-3.5" />
+                    )}
+                    <span className="font-bold">Delete Entry</span>
+                  </button>
                 )}
-                <span className="font-bold">Delete Entry</span>
-              </button>
-            )}
-          </div>
-
-        </div>
-
+              </div>
+            </div>
+          </>
+        ) : (
+          currentUserUid && (
+            <div className="w-full h-full flex flex-col" id="embedded-chat-view" style={{ minHeight: '350px' }}>
+              <ChatView
+                chatId={[currentUserUid, item.userId, item.id].sort().join("_")}
+                currentUserUid={currentUserUid}
+                itemTitle={item.title}
+                otherUserId={item.userId}
+                onBack={() => setActiveView('details')}
+              />
+            </div>
+          )
+        )}
       </motion.div>
 
       {/* ── CLAIMS VERIFICATION MODAL COHESIVE WITH OUR STYLE (Item 2) ── */}
       <AnimatePresence>
         {openClaimModal && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/70 backdrop-blur-md p-4" id="claims-verification-modal">
+          <div className="fixed inset-0 z-[60] flex items-center justify-center bg-slate-950/80 backdrop-blur-md p-4" id="claims-verification-modal">
             <motion.div
               initial={{ opacity: 0, y: 15, scale: 0.95 }}
               animate={{ opacity: 1, y: 0, scale: 1 }}
               exit={{ opacity: 0, y: 15, scale: 0.95 }}
-              className="w-full max-w-md overflow-hidden rounded-3xl bg-white shadow-2xl border border-slate-100"
+              className="w-full max-w-md overflow-hidden rounded-3xl bg-white shadow-2xl border border-slate-150"
             >
               {/* Header with deep teal/blue gradient matching spec */}
               <div className="bg-gradient-to-tr from-teal-800 to-indigo-950 p-6 text-white relative">
                 <button 
                   onClick={() => setOpenClaimModal(false)}
-                  className="absolute top-4 right-4 text-white/70 hover:text-white rounded-full p-1.5 hover:bg-white/10 transition"
+                  className="absolute top-4 right-4 text-white/70 hover:text-white rounded-full p-1.5 hover:bg-white/10 transition cursor-pointer"
                 >
                   <X className="h-4.5 w-4.5" />
                 </button>
@@ -596,7 +597,7 @@ export default function ItemDetail({
                     value={claimAnswer}
                     onChange={(e) => setClaimAnswer(e.target.value)}
                     placeholder="Provide your exact verification answer or proof details here in as much descriptive precision as possible..."
-                    className="w-full rounded-2xl border border-slate-200 bg-white p-3.5 font-sans text-xs font-medium text-slate-900 focus:border-indigo-500 focus:outline-none focus:ring-4 focus:ring-indigo-50 leading-relaxed placeholder:text-slate-400"
+                    className="w-full rounded-2xl border border-slate-205 bg-white p-3.5 font-sans text-xs font-medium text-slate-900 focus:border-teal-600 focus:outline-none focus:ring-4 focus:ring-teal-50 leading-relaxed placeholder:text-slate-400"
                     rows={4}
                     required
                   />
@@ -606,24 +607,17 @@ export default function ItemDetail({
                 </div>
 
                 {claimErrorObj && (
-                  <div className="p-3 bg-red-50 border border-red-100 rounded-xl text-red-700 font-sans text-[11px]">
+                  <div className="p-3 bg-red-50 border border-red-100 rounded-xl text-red-750 font-sans text-[11px]">
                     ❌ {claimErrorObj}
                   </div>
                 )}
 
-                {/* Footer buttons */}
-                <div className="flex items-center space-x-3 pt-2">
-                  <button
-                    type="button"
-                    onClick={() => setOpenClaimModal(false)}
-                    className="flex-1 py-3 px-4 rounded-xl border border-slate-200 font-sans text-xs font-bold text-slate-700 hover:bg-slate-50 transition active:scale-95 duration-200 cursor-pointer"
-                  >
-                    Cancel
-                  </button>
+                {/* Footer buttons with responsive block-stacking */}
+                <div className="flex flex-col gap-2.5 pt-1">
                   <button
                     type="submit"
                     disabled={submittingClaim || !claimAnswer.trim()}
-                    className="flex-1 py-3 px-4 rounded-xl bg-gradient-to-tr from-teal-850 to-indigo-950 text-white font-sans text-xs font-bold shadow-md hover:from-teal-900 hover:to-indigo-900 transition disabled:opacity-50 active:scale-95 duration-200 flex items-center justify-center space-x-1.5 cursor-pointer"
+                    className="w-full py-3.5 px-4 rounded-xl bg-gradient-to-tr from-teal-850 to-indigo-950 text-white font-sans text-xs font-bold shadow-md hover:from-teal-900 hover:to-indigo-900 transition disabled:opacity-50 active:scale-95 duration-200 flex items-center justify-center space-x-1.5 cursor-pointer"
                   >
                     {submittingClaim ? (
                       <>
@@ -636,6 +630,13 @@ export default function ItemDetail({
                         <span>Submit Answer</span>
                       </>
                     )}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setOpenClaimModal(false)}
+                    className="w-full py-3.5 px-4 rounded-xl border border-slate-205 font-sans text-xs font-bold text-slate-700 bg-slate-50 hover:bg-slate-100 transition active:scale-95 duration-200 cursor-pointer text-center"
+                  >
+                    Cancel
                   </button>
                 </div>
               </form>
@@ -737,7 +738,7 @@ function ChatView({ chatId, currentUserUid, itemTitle, otherUserId, onBack }: Ch
   };
 
   return (
-    <div className="h-[calc(100vh-135px)] flex flex-col justify-between bg-white text-slate-800 rounded-2xl overflow-hidden border border-slate-100" id="item-conversation-container">
+    <div className="h-full flex flex-col justify-between bg-white text-slate-800 overflow-hidden" id="item-conversation-container">
       {/* 1. Rigid Header Box shrink-0 */}
       <div className="flex items-center justify-between bg-gradient-to-tr from-teal-800 to-slate-900 px-5 py-4 text-white shadow-md shrink-0">
         <button
