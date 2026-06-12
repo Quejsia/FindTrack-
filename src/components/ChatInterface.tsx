@@ -188,7 +188,7 @@ export default function ChatInterface({
         id="chat-system-overlay"
       >
         {/* Header element styled with brand identity gradient */}
-        <div className="w-full bg-gradient-to-r from-teal-800 to-slate-900 p-4 flex items-center gap-4 text-white shrink-0">
+        <div className="w-full bg-gradient-to-r from-teal-800 to-slate-900 p-4 flex items-center gap-4 text-white shrink-0 shadow-sm">
           <button
             onClick={onClose}
             className="px-3 py-1.5 rounded-xl bg-white/10 text-xs font-bold hover:bg-white/20 active:scale-95 transition cursor-pointer"
@@ -240,9 +240,9 @@ export default function ChatInterface({
                   <div className="max-w-[80%] flex flex-col space-y-1">
                     {/* Message Bubble */}
                     <div 
-                      className={`px-4 py-2.5 rounded-2xl text-xs font-sans shadow-sm break-words ${
+                      className={`px-4 py-2.5 rounded-2xl text-xs font-sans shadow-xs break-words ${
                         isMe 
-                          ? 'bg-gradient-to-tr from-teal-800 to-indigo-900 text-white rounded-tr-none' 
+                          ? 'bg-indigo-600 text-white rounded-tr-none' 
                           : 'bg-white border border-slate-200 text-slate-800 rounded-tl-none'
                       }`}
                     >
@@ -264,30 +264,32 @@ export default function ChatInterface({
           <div ref={messageEndRef} />
         </div>
 
-        {/* Chat text input footer block */}
-        <form 
-          onSubmit={handleSendMessage}
-          className="border-t border-slate-100 bg-white p-3 flex items-center space-x-2 shrink-0 animate-fade-in"
-        >
-          <input
-            type="text"
-            value={inputText}
-            onChange={(e) => setInputText(e.target.value)}
-            placeholder="Type secure handoff messages..."
-            className="flex-1 rounded-xl border border-slate-200 bg-slate-50 px-4 py-2.5 text-xs font-sans text-slate-800 focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-600 focus:bg-white transition"
-          />
-          <button
-            type="submit"
-            disabled={!inputText.trim() || sending}
-            className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-gradient-to-tr from-teal-850 to-indigo-900 text-white shadow-md shadow-indigo-100 ring-1 ring-teal-700 hover:from-teal-800 hover:to-indigo-850 transition disabled:opacity-40 disabled:pointer-events-none cursor-pointer"
+        {/* Secure Baseline Form Input Tray Area */}
+        <div className="p-3 bg-white border-t border-slate-100 shadow-xl shrink-0">
+          <form 
+            onSubmit={handleSendMessage}
+            className="flex items-center gap-2 max-w-md mx-auto"
           >
-            {sending ? (
-              <Loader2 className="h-4 w-4 animate-spin text-white" />
-            ) : (
-              <Send className="h-4 w-4" />
-            )}
-          </button>
-        </form>
+            <input
+              type="text"
+              value={inputText}
+              onChange={(e) => setInputText(e.target.value)}
+              placeholder="Type secure handoff messages..."
+              className="flex-1 px-4 py-2.5 rounded-2xl bg-slate-50 border border-slate-200 text-xs focus:outline-none focus:ring-2 focus:ring-teal-600 focus:bg-white transition"
+            />
+            <button
+              type="submit"
+              disabled={!inputText.trim() || sending}
+              className="w-10 h-10 rounded-xl bg-teal-600 text-white flex items-center justify-center font-bold text-sm hover:bg-teal-700 active:scale-95 transition disabled:opacity-40 disabled:pointer-events-none cursor-pointer"
+            >
+              {sending ? (
+                <Loader2 className="h-4 w-4 animate-spin text-white" />
+              ) : (
+                <Send className="h-4 w-4" />
+              )}
+            </button>
+          </form>
+        </div>
       </motion.div>
     </AnimatePresence>
   );
