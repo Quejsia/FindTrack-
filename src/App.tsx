@@ -1502,9 +1502,9 @@ export default function App() {
                   
                   {/* 🛡️ "PROVE IT" LANDING CLAIMS FOR OWNER ITEMS (Item 3) */}
                   <div className="p-5 bg-slate-50/50 border border-slate-200/60 rounded-3xl space-y-4" id="finder-claims-review-panel">
-                    <div className="flex flex-col gap-2 items-start justify-between sm:flex-row sm:items-center">
+                    <div className="flex flex-col gap-1.5 items-start sm:flex-row sm:items-center sm:justify-between">
                       <span className="text-sm font-bold text-slate-800 font-sans flex items-center gap-1.5 flex-wrap">🔑 Incoming Ownership Claims ({incomingClaims.filter(c => c.status === 'pending').length} pending)</span>
-                      <span className="font-mono text-[9px] bg-indigo-50 border border-indigo-100 text-indigo-700 font-bold uppercase rounded-full px-2 py-0.5 whitespace-nowrap shrink-0">Prove-it Verification Layer</span>
+                      <span className="font-mono text-[10px] px-2 py-0.5 bg-indigo-50 border border-indigo-100 text-indigo-700 font-bold uppercase rounded-full inline-block whitespace-nowrap shrink-0">Prove-it Verification Layer</span>
                     </div>
 
                     {incomingClaims.length === 0 ? (

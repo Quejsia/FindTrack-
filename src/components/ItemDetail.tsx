@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Item, Claim } from '../types';
 import { motion, AnimatePresence } from 'motion/react';
 import { getCategoryIcon } from './ItemCard';
@@ -11,7 +11,11 @@ import {
   collection, 
   query, 
   where, 
-  onSnapshot 
+  onSnapshot,
+  getDoc,
+  addDoc,
+  updateDoc,
+  orderBy
 } from 'firebase/firestore';
 import { 
   X, 
@@ -28,7 +32,9 @@ import {
   ShieldCheck,
   ShieldAlert,
   ShieldQuestion,
-  Sparkles
+  Sparkles,
+  Send,
+  Radio
 } from 'lucide-react';
 
 interface ItemDetailProps {
@@ -59,6 +65,7 @@ export default function ItemDetail({
   // Real-time Claims tracking
   const [existingClaim, setExistingClaim] = useState<Claim | null>(null);
   const [fetchingClaim, setFetchingClaim] = useState(false);
+  const [isChatActive, setIsChatActive] = useState(false);
 
   const isOwner = item.userId === currentUserUid;
   const isResolved = item.status === 'resolved';
@@ -177,7 +184,7 @@ export default function ItemDetail({
         initial={{ opacity: 0, scale: 0.95 }}
         animate={{ opacity: 1, scale: 1 }}
         exit={{ opacity: 0, scale: 0.95 }}
-        className="relative w-full max-w-2xl overflow-hidden rounded-2xl bg-white shadow-2xl "
+        className="relative w-full max-w-2xl h-auto pb-6 overflow-hidden rounded-2xl bg-white shadow-2xl"
       >
         {/* Header Ribbon */}
         <div className={`p-4 flex items-center justify-between border-b ${
@@ -260,9 +267,11 @@ export default function ItemDetail({
             </div>
           </div>
 
-          {/* Contact Details (PII Privacy-first protection) */}
-          <div className="border border-slate-200 rounded-xl p-4 bg-slate-50" id="contact-credentials">
-            <h4 className="font-sans text-xs font-bold text-slate-700 tracking-wider uppercase mb-3 flex items-center space-x-1">
+          {!isChatActive ? (
+            <>
+              {/* Contact Details (PII Privacy-first protection) */}
+              <div className="border border-slate-200 rounded-xl p-4 bg-slate-50" id="contact-credentials">
+                <h4 className="font-sans text-xs font-bold text-slate-700 tracking-wider uppercase mb-3 flex items-center space-x-1">
               <User className="h-3.5 w-3.5" />
               <span>Contact Credentials</span>
             </h4>
@@ -340,12 +349,18 @@ export default function ItemDetail({
                               </p>
                             </div>
                             
-                            <div className="h-auto space-y-2.5 pt-1">
+                            <div className="space-y-4 pt-1">
                               <button
-                                onClick={() => onStartChat && onStartChat(item.userId, item.id)}
-                                className="w-full flex items-center justify-center space-x-1.5 py-3 px-4 rounded-xl border border-slate-205 font-sans text-xs font-bold text-slate-700 bg-slate-50 hover:bg-slate-100 transition active:scale-95 duration-200 cursor-pointer"
+                                onClick={() => {
+                                  if (currentUserUid) {
+                                    setIsChatActive(true);
+                                  } else if (onStartChat) {
+                                    onStartChat(item.userId, item.id);
+                                  }
+                                }}
+                                className="w-full flex items-center justify-center space-x-1.5 bg-teal-850 hover:bg-teal-900 border border-teal-800 text-white font-sans text-xs font-bold py-3.5 px-4 rounded-xl shadow-md cursor-pointer transition active:scale-95 duration-200"
                               >
-                                <MessageSquare className="h-4 w-4 shrink-0 text-slate-500" />
+                                <MessageSquare className="h-4 w-4 shrink-0 text-white/90" />
                                 <span>Message Finder</span>
                               </button>
                               
@@ -362,20 +377,26 @@ export default function ItemDetail({
                           </div>
                         ) : (
                           /* Open submit claim trigger buttons */
-                          <div className="h-auto space-y-3.5 pt-2">
+                          <div className="space-y-4 pt-2">
                             <button
-                              onClick={() => onStartChat && onStartChat(item.userId, item.id)}
-                              className="w-full flex items-center justify-center space-x-1.5 bg-slate-100 hover:bg-slate-202 border border-slate-200 text-slate-800 font-sans text-xs font-bold py-3 px-4 rounded-xl shadow-sm cursor-pointer transition-all active:scale-95 duration-200"
+                              onClick={() => {
+                                if (currentUserUid) {
+                                  setIsChatActive(true);
+                                } else if (onStartChat) {
+                                  onStartChat(item.userId, item.id);
+                                }
+                              }}
+                              className="w-full flex items-center justify-center space-x-1.5 bg-teal-850 hover:bg-teal-900 border border-teal-800 text-white font-sans text-xs font-bold py-3.5 px-4 rounded-xl shadow-md cursor-pointer transition active:scale-95 duration-200"
                             >
-                              <MessageSquare className="h-4 w-4 shrink-0 text-slate-500" />
+                              <MessageSquare className="h-4 w-4 shrink-0 text-white/90" />
                               <span>Message Finder</span>
                             </button>
                             
                             <button
                               onClick={() => setOpenClaimModal(true)}
-                              className="w-full flex items-center justify-center space-x-1.5 bg-gradient-to-tr from-teal-850 to-indigo-900 hover:from-teal-900 hover:to-indigo-850 text-white font-sans text-xs font-bold py-3 px-4 rounded-xl shadow-md cursor-pointer transition-all active:scale-95 duration-200"
+                              className="w-full flex items-center justify-center space-x-1.5 bg-white border border-slate-300 hover:bg-slate-50/50 text-slate-700 font-sans text-xs font-bold py-3.5 px-4 rounded-xl shadow-sm cursor-pointer transition active:scale-95 duration-200"
                             >
-                              <CheckCircle2 className="h-4 w-4 shrink-0 text-teal-300" />
+                              <CheckCircle2 className="h-4 w-4 shrink-0 text-teal-600" />
                               <span>Prove Ownership & Claim</span>
                             </button>
                           </div>
@@ -415,12 +436,18 @@ export default function ItemDetail({
                           </div>
                         )}
 
-                        <div className="h-auto space-y-3.5 pt-2">
+                        <div className="space-y-4 pt-2">
                           <button
-                            onClick={() => onStartChat && onStartChat(item.userId, item.id)}
-                            className="w-full flex items-center justify-center space-x-1.5 bg-gradient-to-tr from-teal-850 to-indigo-950 text-white font-sans text-xs font-bold py-3 px-4 rounded-xl shadow-md cursor-pointer transition-all active:scale-95 duration-200"
+                            onClick={() => {
+                              if (currentUserUid) {
+                                setIsChatActive(true);
+                              } else if (onStartChat) {
+                                onStartChat(item.userId, item.id);
+                              }
+                            }}
+                            className="w-full flex items-center justify-center space-x-1.5 bg-teal-850 hover:bg-teal-900 border border-teal-800 text-white font-sans text-xs font-bold py-3.5 px-4 rounded-xl shadow-md cursor-pointer transition active:scale-95 duration-200"
                           >
-                            <MessageSquare className="h-4 w-4 shrink-0" />
+                            <MessageSquare className="h-4 w-4 shrink-0 text-white/95" />
                             <span>Direct Chat Room</span>
                           </button>
 
@@ -428,9 +455,9 @@ export default function ItemDetail({
                           {!existingClaim && (
                             <button
                               onClick={() => setOpenClaimModal(true)}
-                              className="w-full flex items-center justify-center space-x-1.5 bg-slate-100 hover:bg-slate-205 border border-slate-200 text-slate-700 font-sans text-xs font-semibold py-3 px-4 rounded-xl cursor-pointer transition-all active:scale-95 duration-200"
+                              className="w-full flex items-center justify-center space-x-1.5 bg-white border border-slate-300 hover:bg-slate-50/50 text-slate-700 font-sans text-xs font-bold py-3.5 px-4 rounded-xl shadow-sm cursor-pointer transition active:scale-95 duration-200"
                             >
-                              <CheckCircle2 className="h-4 w-4 shrink-0 text-slate-500" />
+                              <CheckCircle2 className="h-4 w-4 shrink-0 text-teal-600" />
                               <span>Log Ownership Claim</span>
                             </button>
                           )}
@@ -459,14 +486,30 @@ export default function ItemDetail({
             )}
           </div>
 
-          {/* AI Matchmaker Panel (Active entries only) */}
-          {!isResolved && (
-            <Matchmaker
-              item={item}
-              allOppositeItems={allOppositeItems}
-              onResolveItem={onResolveItem}
-              userUid={currentUserUid}
-            />
+              {/* AI Matchmaker Panel (Active entries only) */}
+              {!isResolved && (
+                <div className="mt-6 border border-slate-100 bg-slate-50/80 p-4 rounded-2xl animate-fade-in" id="gemini-matchmaker-container">
+                  <Matchmaker
+                    item={item}
+                    allOppositeItems={allOppositeItems}
+                    onResolveItem={onResolveItem}
+                    userUid={currentUserUid}
+                  />
+                </div>
+              )}
+            </>
+          ) : (
+            currentUserUid && (
+              <div className="w-full mt-4" id="embedded-chat-view">
+                <ChatView
+                  chatId={[currentUserUid, item.userId, item.id].sort().join("_")}
+                  currentUserUid={currentUserUid}
+                  itemTitle={item.title}
+                  otherUserId={item.userId}
+                  onBack={() => setIsChatActive(false)}
+                />
+              </div>
+            )
           )}
 
           {/* Technical Metadata logs */}
@@ -600,6 +643,189 @@ export default function ItemDetail({
           </div>
         )}
       </AnimatePresence>
+    </div>
+  );
+}
+
+interface ChatViewProps {
+  chatId: string;
+  currentUserUid: string;
+  itemTitle: string;
+  otherUserId: string;
+  onBack: () => void;
+}
+
+function ChatView({ chatId, currentUserUid, itemTitle, otherUserId, onBack }: ChatViewProps) {
+  const [messages, setMessages] = useState<any[]>([]);
+  const [inputText, setInputText] = useState('');
+  const [loading, setLoading] = useState(true);
+  const [sending, setSending] = useState(false);
+  const messageEndRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    messageEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  }, [messages]);
+
+  useEffect(() => {
+    if (!chatId) return;
+    setLoading(true);
+    const messagesCollection = collection(db, 'chats', chatId, 'messages');
+    const messagesQuery = query(messagesCollection, orderBy('createdAt', 'asc'));
+
+    const unsubscribe = onSnapshot(messagesQuery, (snapshot) => {
+      const msgs: any[] = [];
+      snapshot.forEach(docSnap => {
+        msgs.push({ id: docSnap.id, ...docSnap.data() });
+      });
+      setMessages(msgs);
+      setLoading(false);
+    }, (error) => {
+      console.error("Firestore message listener error:", error);
+      setLoading(false);
+    });
+
+    return unsubscribe;
+  }, [chatId]);
+
+  const handleSendMessage = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!inputText.trim() || sending) return;
+
+    setSending(true);
+    const textToSend = inputText.trim();
+    setInputText('');
+
+    try {
+      const chatDocRef = doc(db, 'chats', chatId);
+      const chatSnap = await getDoc(chatDocRef);
+      if (!chatSnap.exists()) {
+        await setDoc(chatDocRef, {
+          chatId,
+          participants: [currentUserUid, otherUserId],
+          itemId: chatId.split('_').slice(-1)[0] || '',
+          itemTitle,
+          lastMessage: textToSend,
+          timestamp: serverTimestamp()
+        });
+      }
+
+      const messagesCollection = collection(db, 'chats', chatId, 'messages');
+      await addDoc(messagesCollection, {
+        senderId: currentUserUid,
+        text: textToSend,
+        createdAt: serverTimestamp()
+      });
+
+      await updateDoc(chatDocRef, {
+        lastMessage: textToSend,
+        timestamp: serverTimestamp()
+      });
+    } catch (err) {
+      console.error("Failed to send message:", err);
+    } finally {
+      setSending(false);
+    }
+  };
+
+  const formatTime = (timestamp: any) => {
+    if (!timestamp) return 'Just now';
+    const date = timestamp.seconds ? new Date(timestamp.seconds * 1000) : new Date(timestamp);
+    return date.toLocaleTimeString('en-US', {
+      hour: '2-digit',
+      minute: '2-digit'
+    });
+  };
+
+  return (
+    <div className="h-[calc(100vh-135px)] flex flex-col justify-between bg-white text-slate-800 rounded-2xl overflow-hidden border border-slate-100" id="item-conversation-container">
+      {/* 1. Rigid Header Box shrink-0 */}
+      <div className="flex items-center justify-between bg-gradient-to-tr from-teal-800 to-slate-900 px-5 py-4 text-white shadow-md shrink-0">
+        <button
+          onClick={onBack}
+          type="button"
+          className="flex items-center gap-1.5 bg-white/10 px-3 py-2 rounded-xl text-xs font-bold text-white/95 hover:bg-white/20 transition cursor-pointer active:scale-95 duration-150"
+        >
+          <span>← Back</span>
+        </button>
+
+        <div className="flex flex-col items-end text-right flex-1 min-w-0 px-2">
+          <h3 className="font-sans text-xs font-bold tracking-tight truncate w-full max-w-[180px]">
+            {itemTitle}
+          </h3>
+          <p className="font-mono text-[8px] tracking-wider text-teal-400 font-bold uppercase">
+            Secured Finder Channel
+          </p>
+        </div>
+
+        <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-teal-500/20 text-teal-300 ring-1 ring-teal-400/30 shrink-0">
+          <Radio className="h-4 w-4 animate-pulse" />
+        </div>
+      </div>
+
+      {/* 2. Middle messaging board independent scroll zone */}
+      <div className="flex-1 overflow-y-auto bg-slate-50/50 p-4 space-y-4">
+        {loading ? (
+          <div className="flex h-full flex-col items-center justify-center space-y-2 text-slate-400">
+            <Loader2 className="h-6 w-6 animate-spin text-teal-600" />
+            <span className="font-sans text-xs font-medium">Connecting SECURE server channels...</span>
+          </div>
+        ) : messages.length === 0 ? (
+          <div className="flex h-full flex-col items-center justify-center text-center p-6 space-y-3">
+            <div className="flex h-12 w-12 items-center justify-center rounded-full bg-teal-50 text-teal-600">
+              <MessageSquare className="h-6 w-6" />
+            </div>
+            <div>
+              <h4 className="font-sans font-bold text-slate-800 text-sm">Send a message</h4>
+              <p className="font-sans text-[11px] text-slate-500 max-w-xs mt-1 leading-relaxed">
+                Coordinate handoff spots, describe identification details in high accuracy, or exchange contact details.
+              </p>
+            </div>
+          </div>
+        ) : (
+          messages.map((msg, idx) => {
+            const isMe = msg.senderId === currentUserUid;
+            return (
+              <div key={msg.id || idx} className={`flex ${isMe ? 'justify-end' : 'justify-start'}`}>
+                <div className="max-w-[80%] flex flex-col space-y-1">
+                  <div className={`px-4 py-2.5 rounded-2xl text-xs font-sans shadow-sm break-words ${
+                    isMe 
+                      ? 'bg-gradient-to-tr from-teal-800 to-indigo-900 text-white rounded-tr-none' 
+                      : 'bg-white border border-slate-200 text-slate-800 rounded-tl-none'
+                  }`}>
+                    {msg.text}
+                  </div>
+                  <span className={`font-mono text-[8.5px] text-slate-400 block px-1 ${isMe ? 'text-right' : 'text-left'}`}>
+                    {formatTime(msg.createdAt)}
+                  </span>
+                </div>
+              </div>
+            );
+          })
+        )}
+        <div ref={messageEndRef} />
+      </div>
+
+      {/* 3. Input layout locked safely directly above global elements */}
+      <form onSubmit={handleSendMessage} className="border-t border-slate-100 bg-white p-3 flex items-center space-x-2 shrink-0">
+        <input
+          type="text"
+          value={inputText}
+          onChange={(e) => setInputText(e.target.value)}
+          placeholder="Type secure handoff messages..."
+          className="flex-1 rounded-xl border border-slate-200 bg-slate-50/50 px-3.5 py-2.5 text-xs font-sans focus:border-indigo-500 focus:bg-white focus:outline-none transition placeholder:text-slate-400 duration-155"
+        />
+        <button
+          type="submit"
+          disabled={!inputText.trim() || sending}
+          className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-gradient-to-tr from-teal-850 to-indigo-950 text-white shadow-md transition-all active:scale-95 duration-150 disabled:opacity-50 cursor-pointer"
+        >
+          {sending ? (
+            <Loader2 className="h-4 w-4 animate-spin" />
+          ) : (
+            <Send className="h-4 w-4 transform rotate-45 text-teal-300" />
+          )}
+        </button>
+      </form>
     </div>
   );
 }
