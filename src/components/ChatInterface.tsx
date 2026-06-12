@@ -184,7 +184,7 @@ export default function ChatInterface({
         animate={{ opacity: 1, y: 0 }}
         exit={{ opacity: 0, y: 15 }}
         transition={{ duration: 0.2 }}
-        className="fixed inset-0 z-50 bg-white flex flex-col h-screen w-full"
+        className="fixed inset-0 z-40 bg-slate-50 flex flex-col pt-[60px] pb-[70px]"
         id="chat-system-overlay"
       >
         {/* Header element styled with brand identity gradient */}
@@ -264,10 +264,10 @@ export default function ChatInterface({
           <div ref={messageEndRef} />
         </div>
 
-        {/* Chat text input footer block with relative bottom gap padding for mobile navigation overlay */}
+        {/* Chat text input footer block */}
         <form 
           onSubmit={handleSendMessage}
-          className="border-t border-slate-100 bg-white p-3 pb-[76px] sm:pb-3 flex items-center space-x-2 shrink-0 animate-fade-in"
+          className="border-t border-slate-100 bg-white p-3 flex items-center space-x-2 shrink-0 animate-fade-in"
         >
           <input
             type="text"
