@@ -187,26 +187,17 @@ export default function ChatInterface({
         className="fixed inset-x-0 bottom-[64px] top-[56px] bg-slate-50 flex flex-col z-40 shadow-2xl"
         id="chat-system-overlay"
       >
-        {/* Header element styled with brand identity gradient */}
-        <div className="w-full bg-gradient-to-r from-teal-800 to-slate-900 p-4 flex items-center gap-4 text-white shrink-0 shadow-sm">
+        {/* Chat Header */}
+        <div className="flex items-center gap-3 px-4 py-3 bg-gradient-to-r from-teal-600 to-cyan-500 shadow-md flex-shrink-0">
           <button
             onClick={onClose}
-            className="px-3 py-1.5 rounded-xl bg-white/10 text-xs font-bold hover:bg-white/20 active:scale-95 transition cursor-pointer"
+            className="text-white font-bold text-lg leading-none p-1 cursor-pointer"
           >
             ← Back
           </button>
-
-          <div className="flex flex-col items-start justify-center flex-1 min-w-0">
-            <span className="text-sm font-bold truncate block w-full text-left">
-              {reporterName}
-            </span>
-            <span className="text-[10px] text-teal-300 font-medium block text-left">
-              Direct Message Stream
-            </span>
-          </div>
-
-          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-teal-500/20 text-teal-300 ring-1 ring-teal-400/30 shrink-0">
-            <Radio className="h-4 w-4 animate-pulse" />
+          <div className="flex flex-col">
+            <span className="text-white font-semibold text-sm">{reporterName || "Chat"}</span>
+            <span className="text-cyan-100 text-xs">Secure Handoff Messaging</span>
           </div>
         </div>
 
