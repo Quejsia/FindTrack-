@@ -184,7 +184,7 @@ export default function ChatInterface({
         animate={{ opacity: 1, y: 0 }}
         exit={{ opacity: 0, y: 15 }}
         transition={{ duration: 0.2 }}
-        className="fixed inset-0 z-40 bg-slate-50 flex flex-col pt-[60px] pb-[70px]"
+        className="fixed inset-x-0 bottom-[64px] top-[56px] bg-slate-50 flex flex-col z-40 shadow-2xl"
         id="chat-system-overlay"
       >
         {/* Header element styled with brand identity gradient */}
