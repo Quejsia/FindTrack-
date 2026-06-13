@@ -363,10 +363,9 @@ export default function ItemDetail({
                                 <div className="flex flex-col space-y-3 w-full pt-1">
                                   <button
                                     onClick={() => {
-                                      if (currentUserUid) {
-                                        setActiveView('chat');
-                                      } else if (onStartChat) {
+                                      if (onStartChat) {
                                         onStartChat(item.userId, item.id);
+                                        onClose();
                                       }
                                     }}
                                     className="w-full flex items-center justify-center space-x-1.5 bg-teal-850 hover:bg-teal-900 border border-teal-800 text-white font-sans text-xs font-bold py-3.5 px-4 rounded-xl shadow-md cursor-pointer transition active:scale-95 duration-200"
@@ -391,10 +390,9 @@ export default function ItemDetail({
                               <div className="flex flex-col space-y-3.5 w-full pt-2">
                                 <button
                                   onClick={() => {
-                                    if (currentUserUid) {
-                                      setActiveView('chat');
-                                    } else if (onStartChat) {
+                                    if (onStartChat) {
                                       onStartChat(item.userId, item.id);
+                                      onClose();
                                     }
                                   }}
                                   className="w-full flex items-center justify-center space-x-1.5 bg-teal-850 hover:bg-teal-900 border border-teal-800 text-white font-sans text-xs font-bold py-3.5 px-4 rounded-xl shadow-md cursor-pointer transition active:scale-95 duration-200"
@@ -450,10 +448,9 @@ export default function ItemDetail({
                             <div className="flex flex-col space-y-3 w-full pt-2">
                               <button
                                 onClick={() => {
-                                  if (currentUserUid) {
-                                    setActiveView('chat');
-                                  } else if (onStartChat) {
+                                  if (onStartChat) {
                                     onStartChat(item.userId, item.id);
+                                    onClose();
                                   }
                                 }}
                                 className="w-full flex items-center justify-center space-x-1.5 bg-teal-850 hover:bg-teal-900 border border-teal-800 text-white font-sans text-xs font-bold py-3.5 px-4 rounded-xl shadow-md cursor-pointer transition active:scale-95 duration-200"
