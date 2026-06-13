@@ -60,6 +60,7 @@ export default function ItemDetail({
   const [openClaimModal, setOpenClaimModal] = useState(false);
   const [claimView, setClaimView] = useState(false);
   const [claimAnswer, setClaimAnswer] = useState('');
+  const [error, setError] = useState('');
   const [submittingClaim, setSubmittingClaim] = useState(false);
   const [claimErrorObj, setClaimErrorObj] = useState<string | null>(null);
 
@@ -132,6 +133,12 @@ export default function ItemDetail({
     if (e) e.preventDefault();
     if (!currentUserUid) return;
 
+    if (claimAnswer.trim() === '') {
+      setError('Verification answer cannot be empty!');
+      return;
+    }
+    setError('');
+
     setSubmittingClaim(true);
     setClaimErrorObj(null);
 
@@ -182,7 +189,7 @@ export default function ItemDetail({
   if (claimView) {
     return (
       <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm" id="dedicated-claim-page">
-        <div className="relative w-full max-w-2xl bg-white rounded-md shadow-2xl flex flex-col overflow-hidden max-h-[90vh]">
+        <div className="relative w-full max-w-2xl mt-16 bg-white rounded-md shadow-2xl flex flex-col overflow-hidden max-h-[90vh]">
           
           {/* THE HEADER: Keep the teal "Log Ownership Claim / Prove-It Verification Layer" header clean and isolated at the top. */}
           <div className="flex items-center justify-between px-6 py-4 bg-gradient-to-r from-teal-700 to-teal-500 text-white shrink-0">
@@ -234,6 +241,11 @@ export default function ItemDetail({
                 placeholder="Provide your exact verification answer or physical proof details here in as much descriptive precision as possible..."
                 className="w-full px-4 py-3 border border-[#008080] rounded-[3px] bg-white text-gray-700 focus:outline-none focus:border-[#008080]"
               />
+              {error && (
+                <p className="text-red-500 text-xs font-semibold">
+                  {error}
+                </p>
+              )}
               {/* VERIFICATION QUESTION - Read Only */}
               <div className="mt-4">
                 <label className="text-xs font-semibold tracking-wider text-gray-500 uppercase">
@@ -736,6 +748,11 @@ export default function ItemDetail({
                     rows={4}
                     required
                   />
+                  {error && (
+                    <p className="text-red-500 text-xs font-semibold">
+                      {error}
+                    </p>
+                  )}
                   <p className="font-sans text-[10px] text-slate-400 italic">
                     The finder will inspect this proof and action your contact credentials request.
                   </p>
