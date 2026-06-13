@@ -239,6 +239,14 @@ export default function ItemDetail({
               </p>
             </div>
 
+            <div className="flex flex-col gap-2">
+              <input
+                type="text"
+                placeholder="Enter your question here..."
+                className="rounded-md border border-slate-300 p-3 w-full focus:outline-none focus:ring-2 focus:ring-teal-600 focus:border-teal-600 text-sm text-slate-800 placeholder-slate-400 bg-white shadow-sm"
+              />
+            </div>
+
             {/* TIPS CARD */}
             <div className="bg-blue-50/60 border border-blue-150 rounded-md p-4 space-y-1">
               <span className="text-[10px] font-bold text-blue-600 uppercase tracking-widest block mb-1">💡 Tips for a strong claim</span>
