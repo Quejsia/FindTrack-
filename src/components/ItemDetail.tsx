@@ -231,7 +231,7 @@ export default function ItemDetail({
                 type="text"
                 readOnly
                 value="Describe how we can verify that this item belongs to you. Specify any unique decals, stickers, contents, or circumstances where it was lost/found."
-                className="w-full mt-1 px-4 py-3 border-2 border-teal-500 rounded-xl bg-white text-gray-700 focus:outline-none focus:border-teal-600 cursor-default select-text"
+                className="w-full mt-1 px-4 py-3 border border-[#008080] rounded-[3px] bg-white text-gray-700 cursor-default select-text"
               />
             </div>
 
@@ -246,7 +246,7 @@ export default function ItemDetail({
                 value={claimAnswer}
                 onChange={(e) => setClaimAnswer(e.target.value)}
                 placeholder="Provide your exact verification answer or physical proof details here in as much descriptive precision as possible..."
-                className="rounded-md border border-slate-300 p-4 w-full focus:outline-none focus:ring-2 focus:ring-teal-600 focus:border-teal-600 text-sm text-slate-800 placeholder-slate-400 bg-white shadow-sm leading-relaxed"
+                className="w-full px-4 py-3 border border-[#008080] rounded-[3px] bg-white text-gray-700 focus:outline-none focus:border-[#008080]"
               />
               {/* VERIFICATION QUESTION - Read Only */}
               <div className="mt-4">
@@ -257,7 +257,7 @@ export default function ItemDetail({
                   type="text"
                   readOnly
                   value="[Describe how we can verify that this item belongs to you. Specify any unique decals, stickers, contents, or circumstances where it was lost/found]"
-                  className="w-full mt-1 px-4 py-3 border-2 border-teal-500 rounded-xl bg-white text-gray-700 focus:outline-none focus:border-teal-600 cursor-default select-text"
+                  className="w-full mt-1 px-4 py-3 border border-[#008080] rounded-[3px] bg-white text-gray-700 cursor-default select-text"
                 />
               </div>
               <p className="text-[10px] text-slate-400 italic">
@@ -278,7 +278,7 @@ export default function ItemDetail({
             </div>
 
             {/* TIPS CARD */}
-            <div className="bg-blue-50/60 border border-blue-150 rounded-md p-4 space-y-1">
+            <div className="mt-4 p-4 border border-[#008080] rounded-[3px] bg-white space-y-1">
               <span className="text-[10px] font-bold text-blue-600 uppercase tracking-widest block mb-1">💡 Tips for a strong claim</span>
               <p className="text-xs text-slate-650 leading-relaxed">• State items inside (e.g. specific cards, quantity of cash, etc.)</p>
               <p className="text-xs text-slate-650 leading-relaxed">• Mention distinct scratches, custom keychains, stickers, or wallpaper setups</p>
@@ -296,7 +296,7 @@ export default function ItemDetail({
               <button
                 type="button"
                 onClick={() => setClaimView(false)}
-                className="px-5 py-3 rounded-md border border-slate-300 text-slate-700 bg-white hover:bg-slate-50 font-semibold text-sm transition active:scale-95 duration-150 shadow-sm"
+                className="px-6 py-3 border border-[#008080] rounded-[3px] bg-white text-gray-700 text-xs font-medium transition active:scale-95 duration-150 shadow-sm hover:bg-slate-50"
               >
                 Cancel
               </button>
