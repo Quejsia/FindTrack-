@@ -145,10 +145,10 @@ export default function ItemDetail({
         itemTitle: item.title,
         imageUrl: item.imageUrl || '',
         claimerId: currentUserUid,
-         claimerName: auth.currentUser?.displayName || 'Representative Name',
-         claimerEmail: auth.currentUser?.email || '',
-         claimerContact: auth.currentUser?.phoneNumber || '',
-         finderId: item.userId,
+        claimerName: auth.currentUser?.displayName || 'Representative Name',
+        claimerEmail: auth.currentUser?.email || '',
+        claimerContact: auth.currentUser?.phoneNumber || '',
+        finderId: item.userId,
         securityQuestion: item.securityQuestion || 'Please verify physical details for item ownership confirmation.',
         providedAnswer: claimAnswer.trim(),
         status: 'pending',
@@ -187,11 +187,11 @@ export default function ItemDetail({
           <button 
             type="button"
             onClick={() => setClaimView(false)} 
-            className="text-white font-bold text-sm bg-teal-800/40 hover:bg-teal-800/60 px-3 py-1.5 rounded-lg transition active:scale-95 cursor-pointer"
+            className="text-white font-bold text-lg"
           >
             ← Back
           </button>
-          <div className="flex flex-col flex-1 pl-1">
+          <div className="flex flex-col">
             <span className="text-white font-semibold text-sm">Log Ownership Claim</span>
             <span className="text-cyan-100 text-xs">Prove-It Verification Layer</span>
           </div>
@@ -199,61 +199,55 @@ export default function ItemDetail({
 
         {/* SECTION 2 — SCROLLABLE BODY */}
         <div className="overflow-y-auto flex-1 px-4 py-5 space-y-4">
-          {/* Card A — Item Summary */}
-          <div className="bg-white rounded-2xl p-4 border-l-4 border-teal-500 shadow-sm space-y-1">
-            <span className="text-xs text-slate-500 font-sans block">🏷️ You are claiming:</span>
-            <div className="font-sans font-bold text-slate-800 text-sm">
-              {item.title} — {item.location} — {formattedDate}
-            </div>
+          {/* CARD 1 — Item Summary */}
+          <div className="bg-white rounded-2xl shadow-sm p-4 border-l-4 border-teal-500">
+            <p className="text-xs font-bold text-teal-600 uppercase mb-1">🏷️ You Are Claiming</p>
+            <p className="text-base font-bold text-gray-800">{item?.title}</p>
+            <p className="text-sm text-gray-500">{item?.location} · {formattedDate}</p>
           </div>
 
-          {/* Card B — Ownership Challenge */}
-          <div className="bg-amber-50 rounded-2xl p-4 border-l-4 border-amber-400 shadow-sm space-y-2">
-            <span className="text-[10px] uppercase font-mono font-bold text-amber-700 tracking-wider block">
-              ⚠️  OWNERSHIP CHALLENGE
-            </span>
-            <p className="font-sans text-xs text-slate-700 leading-relaxed">
+          {/* CARD 2 — Ownership Challenge Question */}
+          <div className="bg-amber-50 rounded-2xl shadow-sm p-4 border-l-4 border-amber-400">
+            <p className="text-xs font-bold text-amber-600 uppercase mb-2">⚠️ Ownership Challenge</p>
+            <p className="text-sm font-semibold text-gray-800 leading-relaxed">
+              Describe how we can verify that this item belongs to you.
+            </p>
+            <p className="text-sm text-gray-600 mt-1 leading-relaxed">
               {hasSecurityQuestion 
                 ? item.securityQuestion 
-                : "Describe how we can verify that this item belongs to you. Specify any unique decals, stickers, contents, or circumstances where it was lost/found."}
+                : "Specify any unique decals, stickers, contents, or circumstances where it was lost/found."}
             </p>
           </div>
 
-          {/* Card C — Verification Answer textarea */}
-          <div className="bg-white rounded-2xl p-4 shadow-sm space-y-2 border border-slate-100">
-            <label htmlFor="claimer-answer" className="block text-[10px] font-mono font-bold text-teal-600 uppercase tracking-widest">
-              YOUR VERIFICATION ANSWER *
-            </label>
+          {/* CARD 3 — Verification Answer Input */}
+          <div className="bg-white rounded-2xl shadow-sm p-4">
+            <p className="text-xs font-bold text-teal-600 uppercase mb-2">Your Verification Answer *</p>
             <textarea
-              id="claimer-answer"
+              rows={6}
               value={claimAnswer}
               onChange={(e) => setClaimAnswer(e.target.value)}
               placeholder="Provide your exact verification answer or proof details here in as much descriptive precision as possible..."
-              className="w-full rounded-xl border border-gray-300 bg-white p-3.5 font-sans text-xs font-medium text-slate-900 focus:border-teal-600 focus:outline-none focus:ring-2 focus:ring-teal-100 leading-relaxed placeholder:text-slate-400"
-              rows={6}
-              required
+              className="w-full border border-gray-300 rounded-xl p-3 text-sm text-gray-800 placeholder-gray-400 resize-none focus:outline-none focus:ring-2 focus:ring-teal-400"
             />
-            <p className="font-sans text-[10px] text-gray-500 italic mt-1">
+            <p className="text-xs text-gray-400 italic mt-2">
               The finder will inspect this proof and action your contact credentials request.
             </p>
           </div>
 
-          {/* Card D — Tips Card */}
-          <div className="bg-blue-50 border-l-4 border-blue-400 rounded-2xl p-4 shadow-sm space-y-2">
-            <div className="font-sans font-bold text-blue-900 text-xs flex items-center gap-1.5">
-              <span>💡</span> Tips for a Strong Claim
-            </div>
-            <ul className="list-disc list-inside space-y-1 text-[11px] text-blue-800 font-medium font-sans">
-              <li>Mention unique scratches, stickers, or markings on the item</li>
-              <li>Describe what was inside the item when you lost it</li>
-              <li>State the exact date, time, and place you lost it</li>
-              <li>Include any serial numbers, receipts, or purchase proof</li>
-              <li>The more specific your answer, the faster your claim is approved</li>
+          {/* CARD 4 — Tips Card */}
+          <div className="bg-blue-50 rounded-2xl shadow-sm p-4 border-l-4 border-blue-400">
+            <p className="text-xs font-bold text-blue-600 uppercase mb-2">💡 Tips for a Strong Claim</p>
+            <ul className="space-y-1">
+              <li className="text-sm text-gray-700 font-sans">• Mention unique scratches, stickers, or markings on the item</li>
+              <li className="text-sm text-gray-700 font-sans">• Describe what was inside the item when you lost it</li>
+              <li className="text-sm text-gray-700 font-sans">• State the exact date, time and place you lost it</li>
+              <li className="text-sm text-gray-700 font-sans">• Include any serial numbers, receipts, or purchase proof</li>
+              <li className="text-sm text-gray-700 font-sans">• The more specific your answer, the faster your claim is approved</li>
             </ul>
           </div>
 
           {claimErrorObj && (
-            <div className="p-3 bg-red-50 border border-red-100 rounded-xl text-red-750 font-sans text-[11px]">
+            <div className="p-3 bg-red-50 border border-red-105 rounded-xl text-red-700 font-sans text-[11px]">
               ❌ {claimErrorObj}
             </div>
           )}
@@ -264,7 +258,7 @@ export default function ItemDetail({
           <button
             type="button"
             onClick={() => setClaimView(false)}
-            className="px-5 py-3 border border-gray-300 rounded-xl font-sans text-xs font-bold text-gray-600 hover:bg-gray-50 transition active:scale-95 duration-200 cursor-pointer text-center"
+            className="border border-gray-300 rounded-xl px-5 py-3 text-gray-600 text-sm font-medium"
           >
             Cancel
           </button>
@@ -272,7 +266,7 @@ export default function ItemDetail({
             type="button"
             disabled={submittingClaim || !claimAnswer.trim()}
             onClick={() => handleClaimSubmit()}
-            className="flex-1 bg-teal-600 hover:bg-teal-700 text-white font-sans text-xs font-semibold py-3 px-4 rounded-xl shadow-md cursor-pointer transition active:scale-95 duration-200 flex items-center justify-center space-x-1.5"
+            className="flex-1 bg-teal-600 hover:bg-teal-700 text-white rounded-xl py-3 text-sm font-semibold flex items-center justify-center gap-2"
           >
             {submittingClaim ? (
               <>
@@ -281,8 +275,7 @@ export default function ItemDetail({
               </>
             ) : (
               <>
-                <CheckCircle2 className="h-4 w-4" />
-                <span>Submit Answer</span>
+                <span>✅ Submit Answer</span>
               </>
             )}
           </button>
@@ -716,7 +709,7 @@ export default function ItemDetail({
                     value={claimAnswer}
                     onChange={(e) => setClaimAnswer(e.target.value)}
                     placeholder="Provide your exact verification answer or proof details here in as much descriptive precision as possible..."
-                    className="w-full rounded-2xl border border-slate-205 bg-white p-3.5 font-sans text-xs font-medium text-slate-900 focus:border-teal-600 focus:outline-none focus:ring-4 focus:ring-teal-50 leading-relaxed placeholder:text-slate-400"
+                    className="w-full rounded-2xl border border-slate-205 bg-white p-3.5 font-sans text-xs font-medium text-slate-900 focus:border-teal-600 focus:outline-none focus:ring-4 focus:ring-teal-50"
                     rows={4}
                     required
                   />
