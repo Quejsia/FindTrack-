@@ -40,7 +40,7 @@ import {
 interface ItemDetailProps {
   item: Item;
   onClose: () => void;
-  allOppositeItems: Item[]; // Candidates of opposite tracking category
+  allOppositeItems: Item[]; 
   onResolveItem: (itemId: string, matchingItemId: string) => Promise<void>;
   onDeleteItem: (itemId: string) => Promise<void>;
   currentUserUid?: string;
@@ -181,104 +181,108 @@ export default function ItemDetail({
 
   if (claimView) {
     return (
-      <div className="fixed inset-x-0 bottom-[64px] top-[56px] bg-slate-50 flex flex-col z-40" id="dedicated-claim-page">
-        {/* SECTION 1 — TEAL HEADER */}
-        <div className="flex items-center gap-3 px-4 py-3 bg-gradient-to-r from-teal-700 to-teal-500 shadow-md flex-shrink-0">
-          <button 
-            type="button"
-            onClick={() => setClaimView(false)} 
-            className="text-white font-bold text-sm bg-teal-800/40 hover:bg-teal-800/60 px-3 py-1.5 rounded transition active:scale-95 cursor-pointer"
-          >
-            ← Back
-          </button>
-          <div className="flex flex-col">
-            <span className="text-white font-semibold text-sm">Log Ownership Claim</span>
-            <span className="text-cyan-100 text-xs">Prove-It Verification Layer</span>
-          </div>
-        </div>
-
-        {/* SECTION 2 — SCROLLABLE BODY */}
-        <div className="overflow-y-auto flex-1 px-4 py-5 space-y-4">
-          {/* CARD 1 — Item Summary (Crisp Rectangle) */}
-          <div className="bg-white rounded-md shadow-sm p-5 border border-slate-200 border-l-4 border-l-teal-500">
-            <p className="text-xs font-bold text-teal-600 uppercase mb-1">🏷️ You Are Claiming</p>
-            <p className="text-base font-bold text-gray-800">{item?.title}</p>
-            <p className="text-sm text-gray-500 mt-0.5">{item?.location} · {formattedDate}</p>
-          </div>
-
-          {/* CARD 2 — Ownership Challenge Question (Crisp Rectangle, Amber Theme) */}
-          <div className="bg-amber-50 rounded-md shadow-sm p-5 border border-amber-200 border-l-4 border-l-amber-400">
-            <p className="text-xs font-bold text-amber-600 uppercase mb-2">⚠️ Ownership Challenge</p>
-            <p className="text-sm font-semibold text-gray-800 leading-relaxed">
-              Describe how we can verify that this item belongs to you.
-            </p>
-            <p className="text-sm text-gray-600 mt-1 leading-relaxed">
-              {hasSecurityQuestion 
-                ? item.securityQuestion 
-                : "Specify any unique decals, stickers, contents, or circumstances where it was lost/found."}
-            </p>
-          </div>
-
-          {/* CARD 3 — Verification Answer Input (Crisp Rectangle, Generous Padding) */}
-          <div className="bg-white rounded-md shadow-sm p-5 border border-slate-200">
-            <p className="text-xs font-bold text-teal-600 uppercase mb-3">Your Verification Answer *</p>
-            <textarea
-              rows={6}
-              value={claimAnswer}
-              onChange={(e) => setClaimAnswer(e.target.value)}
-              placeholder="Provide your exact verification answer or proof details here in as much descriptive precision as possible..."
-              className="w-full border border-gray-300 rounded-md p-4 text-sm text-gray-800 placeholder-gray-400 resize-none focus:outline-none focus:ring-2 focus:ring-teal-400 leading-relaxed"
-            />
-            <p className="text-xs text-gray-400 italic mt-3">
-              The finder will inspect this proof and action your contact credentials request.
-            </p>
-          </div>
-
-          {/* CARD 4 — Tips Card (Crisp Rectangle, Info Theme) */}
-          <div className="bg-blue-50 rounded-md shadow-sm p-5 border border-blue-100 border-l-4 border-l-blue-400">
-            <p className="text-xs font-bold text-blue-600 uppercase mb-2">💡 Tips for a Strong Claim</p>
-            <ul className="space-y-1.5">
-              <li className="text-sm text-gray-700 font-sans">• Mention unique scratches, stickers, or markings on the item</li>
-              <li className="text-sm text-gray-700 font-sans">• Describe what was inside the item when you lost it</li>
-              <li className="text-sm text-gray-700 font-sans">• State the exact date, time and place you lost it</li>
-              <li className="text-sm text-gray-700 font-sans">• Include any serial numbers, receipts, or purchase proof</li>
-              <li className="text-sm text-gray-700 font-sans">• The more specific your answer, the faster your claim is approved</li>
-            </ul>
-          </div>
-
-          {claimErrorObj && (
-            <div className="p-4 bg-red-50 border border-red-200 rounded-md text-red-700 font-sans text-xs">
-              ❌ {claimErrorObj}
+      <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm" id="dedicated-claim-page">
+        <div className="relative w-full max-w-2xl bg-white rounded-md shadow-2xl flex flex-col overflow-hidden max-h-[90vh]">
+          
+          {/* THE HEADER: Keep the teal "Log Ownership Claim / Prove-It Verification Layer" header clean and isolated at the top. */}
+          <div className="flex items-center justify-between px-6 py-4 bg-gradient-to-r from-teal-700 to-teal-500 text-white shrink-0">
+            <div className="flex flex-col">
+              <span className="text-base font-bold text-white leading-tight">Log Ownership Claim</span>
+              <span className="text-teal-105 text-xs font-mono">Prove-It Verification Layer</span>
             </div>
-          )}
-        </div>
+            <button
+              type="button"
+              onClick={() => setClaimView(false)}
+              className="text-white hover:text-teal-100 bg-teal-800/40 hover:bg-teal-800/60 px-3 py-1.5 rounded-md text-xs font-semibold uppercase tracking-wider transition cursor-pointer"
+            >
+              ← Back
+            </button>
+          </div>
 
-        {/* SECTION 3 — STICKY BOTTOM BAR */}
-        <div className="sticky bottom-0 bg-white border-t border-gray-200 px-4 py-3 flex gap-3 shadow-lg z-50">
-          <button
-            type="button"
-            onClick={() => setClaimView(false)}
-            className="border border-gray-300 rounded-md px-5 py-3 text-gray-650 text-sm font-medium hover:bg-slate-50 transition active:scale-95 duration-200"
-          >
-            Cancel
-          </button>
-          <button
-            type="button"
-            disabled={submittingClaim || !claimAnswer.trim()}
-            onClick={() => handleClaimSubmit()}
-            className="flex-1 bg-teal-600 hover:bg-teal-700 text-white rounded-md py-3 text-sm font-semibold flex items-center justify-center gap-2 shadow transition active:scale-95 duration-200"
-          >
-            {submittingClaim ? (
-              <>
-                <Loader2 className="h-4 w-4 animate-spin shrink-0" />
-                <span>Submitting...</span>
-              </>
-            ) : (
-              <>
-                <span>✅ Submit Answer</span>
-              </>
+          {/* MAIN WRAPPER: Use a clean vertical flex container with proper padding so elements don't collide */}
+          <div className="p-5 flex flex-col gap-4 w-full overflow-y-auto bg-slate-50">
+            
+            {/* ITEM SUMMARY CARD */}
+            <div className="bg-white rounded-md p-4 border border-slate-200 shadow-sm border-l-4 border-l-teal-500">
+              <span className="text-[10px] font-bold text-teal-600 uppercase tracking-widest block mb-1">🏷️ Current Claim Item</span>
+              <h4 className="text-base font-bold text-slate-800">{item.title}</h4>
+              <p className="text-xs text-slate-500 mt-1">{item.location} · {formattedDate}</p>
+            </div>
+
+            {/* RESTORED QUESTION CARD: Bring back the verification question container right below the header. */}
+            <div className="rounded-md bg-white p-4 border border-slate-200 shadow-sm border-l-4 border-l-amber-500">
+              <span className="text-[10px] font-bold text-amber-600 uppercase tracking-widest block mb-1">⚠️ Ownership Challenge Question</span>
+              <p className="text-sm font-semibold text-slate-800 leading-relaxed">
+                Describe how we can verify that this item belongs to you.
+              </p>
+              <p className="text-sm text-slate-605 mt-2 bg-amber-50/50 p-4 rounded-md border border-amber-100 font-medium leading-relaxed">
+                {hasSecurityQuestion 
+                  ? item.securityQuestion 
+                  : "Specify any unique decals, stickers, contents, or circumstances where it was lost/found."}
+              </p>
+            </div>
+
+            {/* RESTORED ANSWER INPUT: Bring back the label and the spacious text input area. */}
+            <div className="flex flex-col gap-2">
+              <label htmlFor="claim-answer-textarea" className="text-[10px] font-bold text-slate-600 uppercase tracking-widest">
+                YOUR VERIFICATION ANSWER *
+              </label>
+              <textarea
+                id="claim-answer-textarea"
+                rows={5}
+                value={claimAnswer}
+                onChange={(e) => setClaimAnswer(e.target.value)}
+                placeholder="Provide your exact verification answer or physical proof details here in as much descriptive precision as possible..."
+                className="rounded-md border border-slate-300 p-4 w-full focus:outline-none focus:ring-2 focus:ring-teal-600 focus:border-teal-600 text-sm text-slate-800 placeholder-slate-400 bg-white shadow-sm leading-relaxed"
+              />
+              <p className="text-[10px] text-slate-400 italic">
+                The finder will inspect this proof and action your contact credentials request.
+              </p>
+            </div>
+
+            {/* TIPS CARD */}
+            <div className="bg-blue-50/60 border border-blue-150 rounded-md p-4 space-y-1">
+              <span className="text-[10px] font-bold text-blue-600 uppercase tracking-widest block mb-1">💡 Tips for a strong claim</span>
+              <p className="text-xs text-slate-650 leading-relaxed">• State items inside (e.g. specific cards, quantity of cash, etc.)</p>
+              <p className="text-xs text-slate-650 leading-relaxed">• Mention distinct scratches, custom keychains, stickers, or wallpaper setups</p>
+              <p className="text-xs text-slate-650 leading-relaxed">• State the exact date, time range and place you lost or found it</p>
+            </div>
+
+            {claimErrorObj && (
+              <div className="p-3 bg-red-50 border border-red-200 rounded-md text-red-700 text-xs font-semibold">
+                ❌ {claimErrorObj}
+              </div>
             )}
-          </button>
+
+            {/* CLEAN BUTTON LAYOUT: Move the "Cancel" and "✅ Submit Answer" buttons BELOW the text input area. */}
+            <div className="flex items-center gap-3 mt-2">
+              <button
+                type="button"
+                onClick={() => setClaimView(false)}
+                className="px-5 py-3 rounded-md border border-slate-300 text-slate-700 bg-white hover:bg-slate-50 font-semibold text-sm transition active:scale-95 duration-150 shadow-sm"
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                disabled={submittingClaim || !claimAnswer.trim()}
+                onClick={() => handleClaimSubmit()}
+                className="flex-1 px-5 py-3 rounded-md bg-teal-600 hover:bg-teal-700 disabled:bg-teal-400 text-white font-semibold text-sm flex items-center justify-center gap-2 shadow-md transition active:scale-95 duration-150"
+              >
+                {submittingClaim ? (
+                  <>
+                    <Loader2 className="h-4 w-4 animate-spin shrink-0" />
+                    <span>Submitting...</span>
+                  </>
+                ) : (
+                  <>
+                    <span>✅ Submit Answer</span>
+                  </>
+                )}
+              </button>
+            </div>
+
+          </div>
         </div>
       </div>
     );
@@ -291,7 +295,7 @@ export default function ItemDetail({
         initial={{ opacity: 0, scale: 0.95 }}
         animate={{ opacity: 1, scale: 1 }}
         exit={{ opacity: 0, scale: 0.95 }}
-        className={`relative w-full max-w-2xl overflow-hidden rounded-3xl bg-white shadow-2xl transition-all duration-300 ${
+        className={`relative w-full max-w-2xl overflow-hidden rounded-md bg-white shadow-2xl transition-all duration-300 ${
           activeView === 'chat' 
             ? 'h-[85vh] sm:h-[600px] flex flex-col justify-between' 
             : 'h-auto pb-6'
@@ -313,7 +317,7 @@ export default function ItemDetail({
                 : 'bg-emerald-50/50 border-emerald-100 text-emerald-900'
             }`}>
               <div className="flex items-center space-x-2">
-                <span className={`inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-xs font-bold font-sans uppercase ${
+                <span className={`inline-flex items-center gap-1 rounded-md px-2.5 py-0.5 text-xs font-bold font-sans uppercase ${
                   item.type === 'lost' ? 'bg-rose-100' : 'bg-emerald-100'
                 }`}>
                   {item.type}
@@ -324,6 +328,7 @@ export default function ItemDetail({
               </div>
 
               <button
+                type="button"
                 onClick={onClose}
                 className="rounded-full p-1 text-slate-400 hover:bg-slate-100 hover:text-slate-600 transition"
               >
@@ -339,7 +344,7 @@ export default function ItemDetail({
                 {/* Left side: Photo or placeholder */}
                 <div className="sm:col-span-1">
                   {item.imageUrl ? (
-                    <div className="relative aspect-square w-full rounded-xl border border-slate-200 overflow-hidden bg-slate-50">
+                    <div className="relative aspect-square w-full rounded-md border border-slate-200 overflow-hidden bg-slate-50">
                       <img
                         src={item.imageUrl}
                         alt={item.title}
@@ -348,7 +353,7 @@ export default function ItemDetail({
                       />
                     </div>
                   ) : (
-                    <div className={`aspect-square w-full rounded-xl border flex flex-col items-center justify-center ${
+                    <div className={`aspect-square w-full rounded-md border flex flex-col items-center justify-center ${
                       item.type === 'lost' 
                         ? 'bg-rose-50/50 border-rose-100 text-rose-500' 
                         : 'bg-emerald-50/50 border-emerald-100 text-emerald-600'
@@ -368,7 +373,7 @@ export default function ItemDetail({
 
                   {/* Status and metadata tags */}
                   <div className="grid grid-cols-2 gap-3 text-slate-600 font-sans text-xs">
-                    <div className="flex items-center space-x-2 bg-slate-50 p-2 rounded-lg border border-slate-100">
+                    <div className="flex items-center space-x-2 bg-slate-50 p-2 rounded-md border border-slate-100">
                       <MapPin className="h-4 w-4 text-slate-400 shrink-0" />
                       <div className="min-w-0">
                         <p className="font-sans text-[10px] text-slate-400 uppercase font-semibold">Location</p>
@@ -376,7 +381,7 @@ export default function ItemDetail({
                       </div>
                     </div>
 
-                    <div className="flex items-center space-x-2 bg-slate-50 p-2 rounded-lg border border-slate-100">
+                    <div className="flex items-center space-x-2 bg-slate-50 p-2 rounded-md border border-slate-100">
                       <Calendar className="h-4 w-4 text-slate-400 shrink-0" />
                       <div>
                         <p className="font-sans text-[10px] text-slate-400 uppercase font-semibold">Date Logged</p>
@@ -388,7 +393,7 @@ export default function ItemDetail({
               </div>
 
               {/* Contact Details (PII Privacy-first protection) */}
-              <div className="border border-slate-200 rounded-xl p-4 bg-slate-50" id="contact-credentials">
+              <div className="border border-slate-200 rounded-md p-4 bg-slate-50" id="contact-credentials">
                 <h4 className="font-sans text-xs font-bold text-slate-700 tracking-wider uppercase mb-3 flex items-center space-x-1">
                   <User className="h-3.5 w-3.5" />
                   <span>Contact Credentials</span>
@@ -400,7 +405,7 @@ export default function ItemDetail({
                       /* OWNER VIEW */
                       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 items-center">
                         <div className="flex items-center space-x-2">
-                          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-indigo-50 border border-indigo-100 text-indigo-600 font-bold text-sm shrink-0">
+                          <div className="flex h-8 w-8 items-center justify-center rounded-md bg-indigo-50 border border-indigo-100 text-indigo-600 font-bold text-sm shrink-0">
                             {item.contactName.charAt(0).toUpperCase()}
                           </div>
                           <div>
@@ -409,7 +414,7 @@ export default function ItemDetail({
                           </div>
                         </div>
                         <div className="flex items-center space-x-2">
-                          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-emerald-50 border border-emerald-100 text-emerald-600 shrink-0">
+                          <div className="flex h-8 w-8 items-center justify-center rounded-md bg-emerald-50 border border-emerald-100 text-emerald-600 shrink-0">
                             <PhoneCall className="h-4 w-4" />
                           </div>
                           <div>
@@ -424,8 +429,8 @@ export default function ItemDetail({
                         {isCredentialsLocked ? (
                           /* Mask PII Details behind claims block */
                           <div className="space-y-4">
-                            <div className="flex items-start space-x-3 bg-white p-3.5 rounded-xl border border-slate-200/60 shadow-sm">
-                              <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-indigo-50 text-indigo-600 shrink-0 border border-indigo-100">
+                            <div className="flex items-start space-x-3 bg-white p-3.5 rounded-md border border-slate-200/60 shadow-sm">
+                              <div className="flex h-8 w-8 items-center justify-center rounded-md bg-indigo-50 text-indigo-600 shrink-0 border border-indigo-100">
                                 <Lock className="h-4 w-4" />
                               </div>
                               <div className="flex-1">
@@ -438,19 +443,19 @@ export default function ItemDetail({
 
                             {/* Claims progress or claim submission button */}
                             {existingClaim ? (
-                              <div className="p-4 bg-white border border-slate-200/80 rounded-xl shadow-sm space-y-3">
+                              <div className="p-4 bg-white border border-slate-200/80 rounded-md shadow-sm space-y-3">
                                 <div className="flex items-center justify-between">
                                   <span className="text-[10px] uppercase font-bold text-slate-400 font-sans tracking-wide">
                                     Claim Response History
                                   </span>
-                                  <span className={`inline-flex items-center gap-1 text-[9px] font-bold px-2 py-0.5 rounded-full uppercase ${
-                                    existingClaim.status === 'pending' ? 'bg-amber-100 text-amber-805' : 'bg-rose-100 text-rose-800'
+                                  <span className={`inline-flex items-center gap-1 text-[9px] font-bold px-2 py-0.5 rounded-md uppercase ${
+                                    existingClaim.status === 'pending' ? 'bg-amber-100 text-amber-800' : 'bg-rose-100 text-rose-800'
                                   }`}>
                                     {existingClaim.status}
                                   </span>
                                 </div>
 
-                                <p className="font-sans text-xs font-semibold text-slate-700 bg-slate-50 p-2.5 rounded-lg border border-slate-100 leading-relaxed italic">
+                                <p className="font-sans text-xs font-semibold text-slate-700 bg-slate-50 p-2.5 rounded-md border border-slate-100 leading-relaxed italic">
                                   "{existingClaim.securityQuestion}"
                                 </p>
                                 
@@ -469,13 +474,14 @@ export default function ItemDetail({
                                 
                                 <div className="flex flex-col space-y-3 w-full pt-1">
                                   <button
+                                    type="button"
                                     onClick={() => {
                                       if (onStartChat) {
                                         onStartChat(item.userId, item.id);
                                         onClose();
                                       }
                                     }}
-                                    className="w-full flex items-center justify-center space-x-1.5 bg-teal-850 hover:bg-teal-900 border border-teal-800 text-white font-sans text-xs font-bold py-3.5 px-4 rounded-xl shadow-md cursor-pointer transition active:scale-95 duration-200"
+                                    className="w-full flex items-center justify-center space-x-1.5 bg-teal-850 hover:bg-teal-900 border border-teal-800 text-white font-sans text-xs font-bold py-3.5 px-4 rounded-md shadow-md cursor-pointer transition active:scale-95 duration-200"
                                   >
                                     <MessageSquare className="h-4 w-4 shrink-0 text-white/90" />
                                     <span>Message Finder</span>
@@ -483,8 +489,9 @@ export default function ItemDetail({
                                   
                                   {existingClaim.status === 'rejected' && (
                                     <button
+                                      type="button"
                                       onClick={() => setClaimView(true)}
-                                      className="w-full flex items-center justify-center space-x-1.5 py-3.5 px-4 rounded-xl bg-slate-900 text-white font-sans text-xs font-bold hover:bg-slate-800 transition active:scale-95 duration-200 cursor-pointer shadow-md"
+                                      className="w-full flex items-center justify-center space-x-1.5 py-3.5 px-4 rounded-md bg-slate-900 text-white font-sans text-xs font-bold hover:bg-slate-800 transition active:scale-95 duration-200 cursor-pointer shadow-md"
                                     >
                                       <ShieldQuestion className="h-4 w-4 text-emerald-400 shrink-0" />
                                       <span>Submit Custom Proof</span>
@@ -496,21 +503,23 @@ export default function ItemDetail({
                               /* Open submit claim trigger buttons */
                               <div className="flex flex-col space-y-3.5 w-full pt-2">
                                 <button
+                                  type="button"
                                   onClick={() => {
                                     if (onStartChat) {
                                       onStartChat(item.userId, item.id);
                                       onClose();
                                     }
                                   }}
-                                  className="w-full flex items-center justify-center space-x-1.5 bg-teal-850 hover:bg-teal-900 border border-teal-800 text-white font-sans text-xs font-bold py-3.5 px-4 rounded-xl shadow-md cursor-pointer transition active:scale-95 duration-200"
+                                  className="w-full flex items-center justify-center space-x-1.5 bg-teal-850 hover:bg-teal-900 border border-teal-800 text-white font-sans text-xs font-bold py-3.5 px-4 rounded-md shadow-md cursor-pointer transition active:scale-95 duration-200"
                                 >
                                   <MessageSquare className="h-4 w-4 shrink-0 text-white/90" />
                                   <span>Message Finder</span>
                                 </button>
                                 
                                 <button
+                                  type="button"
                                   onClick={() => setClaimView(true)}
-                                  className="w-full flex items-center justify-center space-x-1.5 bg-white border border-slate-300 hover:bg-slate-50/50 text-slate-700 font-sans text-xs font-bold py-3.5 px-4 rounded-xl shadow-sm cursor-pointer transition active:scale-95 duration-200"
+                                  className="w-full flex items-center justify-center space-x-1.5 bg-white border border-slate-300 hover:bg-slate-50/50 text-slate-700 font-sans text-xs font-bold py-3.5 px-4 rounded-md shadow-sm cursor-pointer transition active:scale-95 duration-200"
                                 >
                                   <CheckCircle2 className="h-4 w-4 shrink-0 text-teal-600" />
                                   <span>Prove Ownership & Claim</span>
@@ -523,7 +532,7 @@ export default function ItemDetail({
                           <div className="space-y-4">
                             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 items-center">
                               <div className="flex items-center space-x-2">
-                                <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-indigo-50 border border-indigo-100 text-indigo-600 font-bold text-sm shrink-0">
+                                <div className="flex h-8 w-8 items-center justify-center rounded-md bg-indigo-50 border border-indigo-100 text-indigo-600 font-bold text-sm shrink-0">
                                   {item.contactName.charAt(0).toUpperCase()}
                                 </div>
                                 <div>
@@ -533,7 +542,7 @@ export default function ItemDetail({
                               </div>
                               
                               <div className="flex items-center space-x-2">
-                                <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-emerald-50 border border-emerald-100 text-emerald-600 shrink-0">
+                                <div className="flex h-8 w-8 items-center justify-center rounded-md bg-emerald-50 border border-emerald-100 text-emerald-600 shrink-0">
                                   <PhoneCall className="h-4 w-4" />
                                 </div>
                                 <div className="min-w-0 flex-1">
@@ -544,7 +553,7 @@ export default function ItemDetail({
                             </div>
 
                             {existingClaim?.status === 'approved' && (
-                              <div className="flex items-center gap-2 bg-emerald-50 border border-emerald-100 rounded-xl p-3 text-emerald-800 font-sans text-xs">
+                              <div className="flex items-center gap-2 bg-emerald-50 border border-emerald-100 rounded-md p-3 text-emerald-800 font-sans text-xs">
                                 <ShieldCheck className="h-4.5 w-4.5 text-emerald-500 shrink-0" />
                                 <p className="font-medium text-[11px] leading-snug">
                                   <strong>Proof Approved:</strong> The reporter authenticated your answer. Safe transactions are unlocked!
@@ -554,13 +563,14 @@ export default function ItemDetail({
 
                             <div className="flex flex-col space-y-3 w-full pt-2">
                               <button
+                                type="button"
                                 onClick={() => {
                                   if (onStartChat) {
                                     onStartChat(item.userId, item.id);
                                     onClose();
                                   }
                                 }}
-                                className="w-full flex items-center justify-center space-x-1.5 bg-teal-850 hover:bg-teal-900 border border-teal-800 text-white font-sans text-xs font-bold py-3.5 px-4 rounded-xl shadow-md cursor-pointer transition active:scale-95 duration-200"
+                                className="w-full flex items-center justify-center space-x-1.5 bg-teal-850 hover:bg-teal-900 border border-teal-800 text-white font-sans text-xs font-bold py-3.5 px-4 rounded-md shadow-md cursor-pointer transition active:scale-95 duration-200"
                               >
                                 <MessageSquare className="h-4 w-4 shrink-0 text-white/95" />
                                 <span>Direct Chat Room</span>
@@ -568,8 +578,9 @@ export default function ItemDetail({
 
                               {!existingClaim && (
                                 <button
+                                  type="button"
                                   onClick={() => setClaimView(true)}
-                                  className="w-full flex items-center justify-center space-x-1.5 bg-white border border-slate-300 hover:bg-slate-50/50 text-slate-700 font-sans text-xs font-bold py-3.5 px-4 rounded-xl shadow-sm cursor-pointer transition active:scale-95 duration-200"
+                                  className="w-full flex items-center justify-center space-x-1.5 bg-white border border-slate-300 hover:bg-slate-50/50 text-slate-700 font-sans text-xs font-bold py-3.5 px-4 rounded-md shadow-sm cursor-pointer transition active:scale-95 duration-200"
                                 >
                                   <CheckCircle2 className="h-4 w-4 shrink-0 text-teal-600" />
                                   <span>Log Ownership Claim</span>
@@ -577,7 +588,7 @@ export default function ItemDetail({
                               )}
                               
                               {existingClaim && existingClaim.status !== 'approved' && (
-                                <div className="py-2.5 text-center font-mono text-[10px] font-bold text-emerald-700 bg-emerald-50 rounded-xl border border-emerald-100 uppercase tracking-wider">
+                                <div className="py-2.5 text-center font-mono text-[10px] font-bold text-emerald-700 bg-emerald-50 rounded-md border border-emerald-100 uppercase tracking-wider">
                                   ✓ Claim Status: {existingClaim.status}
                                 </div>
                               )}
@@ -602,7 +613,7 @@ export default function ItemDetail({
 
               {/* AI Matchmaker Panel (Active entries only) */}
               {!isResolved && (
-                <div className="mt-6 border border-slate-100 bg-slate-50/80 p-4 rounded-2xl animate-fade-in" id="gemini-matchmaker-container">
+                <div className="mt-6 border border-slate-100 bg-slate-50/80 p-4 rounded-md animate-fade-in" id="gemini-matchmaker-container">
                   <Matchmaker
                     item={item}
                     allOppositeItems={allOppositeItems}
@@ -622,6 +633,7 @@ export default function ItemDetail({
                 {/* Owner controls: allow Delete */}
                 {isOwner && (
                   <button
+                    type="button"
                     onClick={handleDelete}
                     disabled={deleting}
                     className="inline-flex items-center space-x-1 text-rose-500 hover:text-rose-700 transition cursor-pointer"
@@ -665,6 +677,7 @@ export default function ItemDetail({
             >
               <div className="bg-gradient-to-tr from-teal-800 to-indigo-950 p-6 text-white relative">
                 <button 
+                  type="button"
                   onClick={() => setOpenClaimModal(false)}
                   className="absolute top-4 right-4 text-white/70 hover:text-white rounded-full p-1.5 hover:bg-white/10 transition cursor-pointer"
                 >
@@ -854,6 +867,7 @@ function ChatView({ chatId, currentUserUid, itemTitle, otherUserId, reporterName
       {/* 1. Rigid Header Box shrink-0 */}
       <div className="w-full bg-gradient-to-r from-teal-800 to-slate-900 p-4 flex items-center gap-4 text-white shrink-0">
         <button
+          type="button"
           onClick={onBack}
           className="px-3 py-1.5 rounded-md bg-white/10 text-xs font-bold hover:bg-white/20 active:scale-95 transition cursor-pointer"
         >
@@ -869,13 +883,13 @@ function ChatView({ chatId, currentUserUid, itemTitle, otherUserId, reporterName
           </span>
         </div>
 
-        <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-teal-500/20 text-teal-300 ring-1 ring-teal-400/30 shrink-0">
+        <div className="flex h-8 w-8 items-center justify-center rounded-md bg-teal-500/20 text-teal-300 ring-1 ring-teal-400/30 shrink-0">
           <Radio className="h-4 w-4 animate-pulse" />
         </div>
       </div>
 
       {/* 2. Middle messaging board independent scroll zone */}
-      <div className="flex-1 overflow-y-auto bg-slate-50/50 p-4 space-y-4">
+      <div className="flex-1 overflow-y-auto bg-slate-50/50 p-4 space-y-4 font-sans text-xs">
         {loading ? (
           <div className="flex h-full flex-col items-center justify-center space-y-2 text-slate-400">
             <Loader2 className="h-6 w-6 animate-spin text-teal-600" />
@@ -899,10 +913,10 @@ function ChatView({ chatId, currentUserUid, itemTitle, otherUserId, reporterName
             return (
               <div key={msg.id || idx} className={`flex ${isMe ? 'justify-end' : 'justify-start'}`}>
                 <div className="max-w-[80%] flex flex-col space-y-1">
-                  <div className={`px-4 py-2.5 rounded-2xl text-xs font-sans shadow-sm break-words ${
+                  <div className={`px-4 py-2.5 rounded-md text-xs font-sans shadow-sm break-words ${
                     isMe 
-                      ? 'bg-gradient-to-tr from-teal-800 to-indigo-900 text-white rounded-tr-none' 
-                      : 'bg-white border border-slate-200 text-slate-800 rounded-tl-none'
+                      ? 'bg-gradient-to-tr from-teal-800 to-indigo-900 text-white' 
+                      : 'bg-white border border-slate-200 text-slate-800'
                   }`}>
                     {msg.text}
                   </div>
@@ -924,12 +938,12 @@ function ChatView({ chatId, currentUserUid, itemTitle, otherUserId, reporterName
           value={inputText}
           onChange={(e) => setInputText(e.target.value)}
           placeholder="Type secure handoff messages..."
-          className="flex-1 rounded-xl border border-slate-200 bg-slate-50/50 px-3.5 py-2.5 text-xs font-sans focus:border-indigo-500 focus:bg-white focus:outline-none transition placeholder:text-slate-400 duration-155"
+          className="flex-1 rounded-md border border-slate-200 bg-slate-50/50 px-3.5 py-2.5 text-xs font-sans focus:border-indigo-500 focus:bg-white focus:outline-none transition placeholder:text-slate-400 duration-155"
         />
         <button
           type="submit"
           disabled={!inputText.trim() || sending}
-          className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-gradient-to-tr from-teal-850 to-indigo-950 text-white shadow-md transition-all active:scale-95 duration-150 disabled:opacity-50 cursor-pointer"
+          className="flex h-9 w-9 shrink-0 items-center justify-center rounded-md bg-gradient-to-tr from-teal-850 to-indigo-950 text-white shadow-md transition-all active:scale-95 duration-150 disabled:opacity-50 cursor-pointer"
         >
           {sending ? (
             <Loader2 className="h-4 w-4 animate-spin" />
