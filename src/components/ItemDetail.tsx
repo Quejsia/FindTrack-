@@ -60,6 +60,7 @@ export default function ItemDetail({
   const [openClaimModal, setOpenClaimModal] = useState(false);
   const [claimView, setClaimView] = useState(false);
   const [claimAnswer, setClaimAnswer] = useState('');
+  const [claimQuestion, setClaimQuestion] = useState('Enter your question here...');
   const [submittingClaim, setSubmittingClaim] = useState(false);
   const [claimErrorObj, setClaimErrorObj] = useState<string | null>(null);
 
@@ -242,9 +243,13 @@ export default function ItemDetail({
             <div className="flex flex-col gap-2">
               <input
                 type="text"
-                placeholder="Enter your question here..."
-                className="rounded-md border border-slate-300 p-3 w-full focus:outline-none focus:ring-2 focus:ring-teal-600 focus:border-teal-600 text-sm text-slate-800 placeholder-slate-400 bg-white shadow-sm"
+                value={claimQuestion}
+                onChange={(e) => setClaimQuestion(e.target.value)}
+                className="rounded-md border border-slate-300 p-4 w-full focus:outline-none focus:ring-2 focus:ring-teal-600 focus:border-teal-600 text-sm text-slate-800 bg-white shadow-sm leading-relaxed"
               />
+              <p className="text-[10px] text-slate-400 italic">
+                The finder will answer this question to verify your claim.
+              </p>
             </div>
 
             {/* TIPS CARD */}
