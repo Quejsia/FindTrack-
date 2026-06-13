@@ -211,12 +211,6 @@ export default function ItemDetail({
 
             {/* VERIFICATION QUESTION BOX */}
             <div className="p-4 bg-slate-100 border border-slate-200 rounded-md text-xs font-medium text-slate-700 mb-2">
-              {hasSecurityQuestion && (
-                <div className="mb-2 pb-2 border-b border-slate-200">
-                  <span className="text-[10px] uppercase font-bold text-teal-600 block mb-1">Item Owner's Challenge Question:</span>
-                  <p className="text-sm font-semibold text-slate-800">"{item.securityQuestion}"</p>
-                </div>
-              )}
               <p className="leading-relaxed">
                 Describe how we can verify that this item belongs to you. Specify any unique decals, stickers, contents, or circumstances where it was lost/found.
               </p>
