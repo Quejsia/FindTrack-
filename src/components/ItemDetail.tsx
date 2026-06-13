@@ -187,7 +187,7 @@ export default function ItemDetail({
           <button 
             type="button"
             onClick={() => setClaimView(false)} 
-            className="text-white font-bold text-lg"
+            className="text-white font-bold text-sm bg-teal-800/40 hover:bg-teal-800/60 px-3 py-1.5 rounded transition active:scale-95 cursor-pointer"
           >
             ← Back
           </button>
@@ -199,15 +199,15 @@ export default function ItemDetail({
 
         {/* SECTION 2 — SCROLLABLE BODY */}
         <div className="overflow-y-auto flex-1 px-4 py-5 space-y-4">
-          {/* CARD 1 — Item Summary */}
-          <div className="bg-white rounded-2xl shadow-sm p-4 border-l-4 border-teal-500">
+          {/* CARD 1 — Item Summary (Crisp Rectangle) */}
+          <div className="bg-white rounded-md shadow-sm p-5 border border-slate-200 border-l-4 border-l-teal-500">
             <p className="text-xs font-bold text-teal-600 uppercase mb-1">🏷️ You Are Claiming</p>
             <p className="text-base font-bold text-gray-800">{item?.title}</p>
-            <p className="text-sm text-gray-500">{item?.location} · {formattedDate}</p>
+            <p className="text-sm text-gray-500 mt-0.5">{item?.location} · {formattedDate}</p>
           </div>
 
-          {/* CARD 2 — Ownership Challenge Question */}
-          <div className="bg-amber-50 rounded-2xl shadow-sm p-4 border-l-4 border-amber-400">
+          {/* CARD 2 — Ownership Challenge Question (Crisp Rectangle, Amber Theme) */}
+          <div className="bg-amber-50 rounded-md shadow-sm p-5 border border-amber-200 border-l-4 border-l-amber-400">
             <p className="text-xs font-bold text-amber-600 uppercase mb-2">⚠️ Ownership Challenge</p>
             <p className="text-sm font-semibold text-gray-800 leading-relaxed">
               Describe how we can verify that this item belongs to you.
@@ -219,25 +219,25 @@ export default function ItemDetail({
             </p>
           </div>
 
-          {/* CARD 3 — Verification Answer Input */}
-          <div className="bg-white rounded-2xl shadow-sm p-4">
-            <p className="text-xs font-bold text-teal-600 uppercase mb-2">Your Verification Answer *</p>
+          {/* CARD 3 — Verification Answer Input (Crisp Rectangle, Generous Padding) */}
+          <div className="bg-white rounded-md shadow-sm p-5 border border-slate-200">
+            <p className="text-xs font-bold text-teal-600 uppercase mb-3">Your Verification Answer *</p>
             <textarea
               rows={6}
               value={claimAnswer}
               onChange={(e) => setClaimAnswer(e.target.value)}
               placeholder="Provide your exact verification answer or proof details here in as much descriptive precision as possible..."
-              className="w-full border border-gray-300 rounded-xl p-3 text-sm text-gray-800 placeholder-gray-400 resize-none focus:outline-none focus:ring-2 focus:ring-teal-400"
+              className="w-full border border-gray-300 rounded-md p-4 text-sm text-gray-800 placeholder-gray-400 resize-none focus:outline-none focus:ring-2 focus:ring-teal-400 leading-relaxed"
             />
-            <p className="text-xs text-gray-400 italic mt-2">
+            <p className="text-xs text-gray-400 italic mt-3">
               The finder will inspect this proof and action your contact credentials request.
             </p>
           </div>
 
-          {/* CARD 4 — Tips Card */}
-          <div className="bg-blue-50 rounded-2xl shadow-sm p-4 border-l-4 border-blue-400">
+          {/* CARD 4 — Tips Card (Crisp Rectangle, Info Theme) */}
+          <div className="bg-blue-50 rounded-md shadow-sm p-5 border border-blue-100 border-l-4 border-l-blue-400">
             <p className="text-xs font-bold text-blue-600 uppercase mb-2">💡 Tips for a Strong Claim</p>
-            <ul className="space-y-1">
+            <ul className="space-y-1.5">
               <li className="text-sm text-gray-700 font-sans">• Mention unique scratches, stickers, or markings on the item</li>
               <li className="text-sm text-gray-700 font-sans">• Describe what was inside the item when you lost it</li>
               <li className="text-sm text-gray-700 font-sans">• State the exact date, time and place you lost it</li>
@@ -247,7 +247,7 @@ export default function ItemDetail({
           </div>
 
           {claimErrorObj && (
-            <div className="p-3 bg-red-50 border border-red-105 rounded-xl text-red-700 font-sans text-[11px]">
+            <div className="p-4 bg-red-50 border border-red-200 rounded-md text-red-700 font-sans text-xs">
               ❌ {claimErrorObj}
             </div>
           )}
@@ -258,7 +258,7 @@ export default function ItemDetail({
           <button
             type="button"
             onClick={() => setClaimView(false)}
-            className="border border-gray-300 rounded-xl px-5 py-3 text-gray-600 text-sm font-medium"
+            className="border border-gray-300 rounded-md px-5 py-3 text-gray-650 text-sm font-medium hover:bg-slate-50 transition active:scale-95 duration-200"
           >
             Cancel
           </button>
@@ -266,7 +266,7 @@ export default function ItemDetail({
             type="button"
             disabled={submittingClaim || !claimAnswer.trim()}
             onClick={() => handleClaimSubmit()}
-            className="flex-1 bg-teal-600 hover:bg-teal-700 text-white rounded-xl py-3 text-sm font-semibold flex items-center justify-center gap-2"
+            className="flex-1 bg-teal-600 hover:bg-teal-700 text-white rounded-md py-3 text-sm font-semibold flex items-center justify-center gap-2 shadow transition active:scale-95 duration-200"
           >
             {submittingClaim ? (
               <>
@@ -661,9 +661,8 @@ export default function ItemDetail({
               initial={{ opacity: 0, y: 15, scale: 0.95 }}
               animate={{ opacity: 1, y: 0, scale: 1 }}
               exit={{ opacity: 0, y: 15, scale: 0.95 }}
-              className="w-full max-w-md overflow-hidden rounded-3xl bg-white shadow-2xl border border-slate-150"
+              className="w-full max-w-md overflow-hidden rounded-md bg-white shadow-2xl border border-slate-150"
             >
-              {/* Header with deep teal/blue gradient matching spec */}
               <div className="bg-gradient-to-tr from-teal-800 to-indigo-950 p-6 text-white relative">
                 <button 
                   onClick={() => setOpenClaimModal(false)}
@@ -691,7 +690,7 @@ export default function ItemDetail({
                   <label className="block text-[9px] font-mono font-bold text-slate-400 uppercase tracking-widest">
                     Verification Question
                   </label>
-                  <div className="bg-slate-50 border border-slate-205/65 rounded-2xl p-4">
+                  <div className="bg-slate-50 border border-slate-205/65 rounded-md p-4">
                     <p className="font-sans text-xs font-bold text-slate-800 leading-relaxed">
                       {hasSecurityQuestion 
                         ? item.securityQuestion 
@@ -705,11 +704,11 @@ export default function ItemDetail({
                     Your Verification Answer *
                   </label>
                   <textarea
-                    id="claimer-answer"
+                    id="claimer-answer-modal"
                     value={claimAnswer}
                     onChange={(e) => setClaimAnswer(e.target.value)}
                     placeholder="Provide your exact verification answer or proof details here in as much descriptive precision as possible..."
-                    className="w-full rounded-2xl border border-slate-205 bg-white p-3.5 font-sans text-xs font-medium text-slate-900 focus:border-teal-600 focus:outline-none focus:ring-4 focus:ring-teal-50"
+                    className="w-full rounded-md border border-slate-250 bg-white p-4 font-sans text-xs font-medium text-slate-900 focus:border-teal-600 focus:outline-none focus:ring-2 focus:ring-teal-100 leading-relaxed placeholder:text-slate-400"
                     rows={4}
                     required
                   />
@@ -719,7 +718,7 @@ export default function ItemDetail({
                 </div>
 
                 {claimErrorObj && (
-                  <div className="p-3 bg-red-50 border border-red-100 rounded-xl text-red-750 font-sans text-[11px]">
+                  <div className="p-3 bg-red-50 border border-red-100 rounded-md text-red-750 font-sans text-[11px]">
                     ❌ {claimErrorObj}
                   </div>
                 )}
@@ -729,7 +728,7 @@ export default function ItemDetail({
                   <button
                     type="submit"
                     disabled={submittingClaim || !claimAnswer.trim()}
-                    className="w-full py-3.5 px-4 rounded-xl bg-gradient-to-tr from-teal-850 to-indigo-950 text-white font-sans text-xs font-bold shadow-md hover:from-teal-900 hover:to-indigo-900 transition disabled:opacity-50 active:scale-95 duration-200 flex items-center justify-center space-x-1.5 cursor-pointer"
+                    className="w-full py-3.5 px-4 rounded-md bg-gradient-to-tr from-teal-850 to-indigo-950 text-white font-sans text-xs font-bold shadow-md hover:from-teal-900 hover:to-indigo-900 transition disabled:opacity-50 active:scale-95 duration-200 flex items-center justify-center space-x-1.5 cursor-pointer"
                   >
                     {submittingClaim ? (
                       <>
@@ -746,7 +745,7 @@ export default function ItemDetail({
                   <button
                     type="button"
                     onClick={() => setOpenClaimModal(false)}
-                    className="w-full py-3.5 px-4 rounded-xl border border-slate-205 font-sans text-xs font-bold text-slate-700 bg-slate-50 hover:bg-slate-100 transition active:scale-95 duration-200 cursor-pointer text-center"
+                    className="w-full py-3.5 px-4 rounded-md border border-slate-205 font-sans text-xs font-bold text-slate-700 bg-slate-50 hover:bg-slate-100 transition active:scale-95 duration-200 cursor-pointer text-center"
                   >
                     Cancel
                   </button>
@@ -856,7 +855,7 @@ function ChatView({ chatId, currentUserUid, itemTitle, otherUserId, reporterName
       <div className="w-full bg-gradient-to-r from-teal-800 to-slate-900 p-4 flex items-center gap-4 text-white shrink-0">
         <button
           onClick={onBack}
-          className="px-3 py-1.5 rounded-xl bg-white/10 text-xs font-bold hover:bg-white/20 active:scale-95 transition cursor-pointer"
+          className="px-3 py-1.5 rounded-md bg-white/10 text-xs font-bold hover:bg-white/20 active:scale-95 transition cursor-pointer"
         >
           ← Back
         </button>
