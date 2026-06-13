@@ -182,9 +182,13 @@ export default function ItemDetail({
   if (claimView) {
     return (
       <div className="fixed inset-x-0 bottom-[64px] top-[56px] bg-slate-50 flex flex-col z-40" id="dedicated-claim-page">
-        {/* 1. Header (same style as the chat view header) */}
+        {/* SECTION 1 — TEAL HEADER */}
         <div className="flex items-center gap-3 px-4 py-3 bg-gradient-to-r from-teal-700 to-teal-500 shadow-md flex-shrink-0">
-          <button onClick={() => setClaimView(false)} className="text-white font-bold text-lg">
+          <button 
+            type="button"
+            onClick={() => setClaimView(false)} 
+            className="text-white font-bold text-sm bg-teal-800/40 hover:bg-teal-800/60 px-3 py-1.5 rounded-lg transition active:scale-95 cursor-pointer"
+          >
             ← Back
           </button>
           <div className="flex flex-col flex-1 pl-1">
@@ -193,53 +197,58 @@ export default function ItemDetail({
           </div>
         </div>
 
-        {/* 2. Scrollable Content Body */}
-        <div className="overflow-y-auto flex-1 px-4 py-5 space-y-5">
-          {/* A. Item Summary Card */}
+        {/* SECTION 2 — SCROLLABLE BODY */}
+        <div className="overflow-y-auto flex-1 px-4 py-5 space-y-4">
+          {/* Card A — Item Summary */}
           <div className="bg-white rounded-2xl p-4 border-l-4 border-teal-500 shadow-sm space-y-1">
-            <h4 className="font-sans font-bold text-slate-800 text-sm">Claiming: {item.title}</h4>
-            <p className="font-sans text-xs text-slate-500">📍 Location: {item.location}</p>
-            <p className="font-sans text-xs text-slate-500">📅 Date: {formattedDate}</p>
+            <span className="text-xs text-slate-500 font-sans block">🏷️ You are claiming:</span>
+            <div className="font-sans font-bold text-slate-800 text-sm">
+              {item.title} — {item.location} — {formattedDate}
+            </div>
           </div>
 
-          {/* B. Verification Challenge Box */}
-          <div className="bg-amber-50 rounded-2xl p-4 border-l-4 border-amber-500 shadow-sm space-y-2">
+          {/* Card B — Ownership Challenge */}
+          <div className="bg-amber-50 rounded-2xl p-4 border-l-4 border-amber-400 shadow-sm space-y-2">
             <span className="text-[10px] uppercase font-mono font-bold text-amber-700 tracking-wider block">
-              OWNERSHIP CHALLENGE
+              ⚠️  OWNERSHIP CHALLENGE
             </span>
-            <p className="font-sans text-xs text-slate-700 leading-relaxed font-semibold">
+            <p className="font-sans text-xs text-slate-700 leading-relaxed">
               {hasSecurityQuestion 
                 ? item.securityQuestion 
                 : "Describe how we can verify that this item belongs to you. Specify any unique decals, stickers, contents, or circumstances where it was lost/found."}
             </p>
           </div>
 
-          {/* C. Your Verification Answer textarea */}
-          <div className="space-y-1.5">
-            <label htmlFor="claimer-answer" className="block text-[9px] font-mono font-bold text-slate-400 uppercase tracking-widest">
-              Your Verification Answer *
+          {/* Card C — Verification Answer textarea */}
+          <div className="bg-white rounded-2xl p-4 shadow-sm space-y-2 border border-slate-100">
+            <label htmlFor="claimer-answer" className="block text-[10px] font-mono font-bold text-teal-600 uppercase tracking-widest">
+              YOUR VERIFICATION ANSWER *
             </label>
             <textarea
               id="claimer-answer"
               value={claimAnswer}
               onChange={(e) => setClaimAnswer(e.target.value)}
               placeholder="Provide your exact verification answer or proof details here in as much descriptive precision as possible..."
-              className="w-full rounded-2xl border border-slate-205 bg-white p-3.5 font-sans text-xs font-medium text-slate-900 focus:border-teal-600 focus:outline-none focus:ring-4 focus:ring-teal-50/50 leading-relaxed placeholder:text-slate-400"
-              rows={5}
+              className="w-full rounded-xl border border-gray-300 bg-white p-3.5 font-sans text-xs font-medium text-slate-900 focus:border-teal-600 focus:outline-none focus:ring-2 focus:ring-teal-100 leading-relaxed placeholder:text-slate-400"
+              rows={6}
               required
             />
+            <p className="font-sans text-[10px] text-gray-500 italic mt-1">
+              The finder will inspect this proof and action your contact credentials request.
+            </p>
           </div>
 
-          {/* D. Helpful Tips Card */}
-          <div className="bg-blue-50 border-l-4 border-blue-500 rounded-2xl p-4 shadow-sm space-y-2">
-            <h5 className="font-sans font-bold text-blue-900 text-xs flex items-center gap-1.5">
+          {/* Card D — Tips Card */}
+          <div className="bg-blue-50 border-l-4 border-blue-400 rounded-2xl p-4 shadow-sm space-y-2">
+            <div className="font-sans font-bold text-blue-900 text-xs flex items-center gap-1.5">
               <span>💡</span> Tips for a Strong Claim
-            </h5>
+            </div>
             <ul className="list-disc list-inside space-y-1 text-[11px] text-blue-800 font-medium font-sans">
-              <li>Mention unique scratches, stickers, or markings</li>
-              <li>Describe what was inside the item when lost</li>
-              <li>State the exact date and time you lost it</li>
-              <li>Include any receipts or serial numbers if available</li>
+              <li>Mention unique scratches, stickers, or markings on the item</li>
+              <li>Describe what was inside the item when you lost it</li>
+              <li>State the exact date, time, and place you lost it</li>
+              <li>Include any serial numbers, receipts, or purchase proof</li>
+              <li>The more specific your answer, the faster your claim is approved</li>
             </ul>
           </div>
 
@@ -250,12 +259,12 @@ export default function ItemDetail({
           )}
         </div>
 
-        {/* 3. Bottom Submit Bar */}
-        <div className="sticky bottom-0 bg-white border-t px-4 py-3 flex gap-3 z-50">
+        {/* SECTION 3 — STICKY BOTTOM BAR */}
+        <div className="sticky bottom-0 bg-white border-t border-gray-200 px-4 py-3 flex gap-3 shadow-lg z-50">
           <button
             type="button"
             onClick={() => setClaimView(false)}
-            className="px-4 py-3 border border-slate-205 rounded-xl font-sans text-xs font-bold text-slate-705 bg-slate-50 hover:bg-slate-100 transition active:scale-95 duration-200 cursor-pointer text-center"
+            className="px-5 py-3 border border-gray-300 rounded-xl font-sans text-xs font-bold text-gray-600 hover:bg-gray-50 transition active:scale-95 duration-200 cursor-pointer text-center"
           >
             Cancel
           </button>
@@ -263,7 +272,7 @@ export default function ItemDetail({
             type="button"
             disabled={submittingClaim || !claimAnswer.trim()}
             onClick={() => handleClaimSubmit()}
-            className="flex-1 bg-teal-650 hover:bg-teal-700 text-white font-sans text-xs font-bold py-3 px-4 rounded-xl shadow-md cursor-pointer transition active:scale-95 duration-200 flex items-center justify-center space-x-1.5"
+            className="flex-1 bg-teal-600 hover:bg-teal-700 text-white font-sans text-xs font-semibold py-3 px-4 rounded-xl shadow-md cursor-pointer transition active:scale-95 duration-200 flex items-center justify-center space-x-1.5"
           >
             {submittingClaim ? (
               <>
