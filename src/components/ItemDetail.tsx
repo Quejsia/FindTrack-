@@ -209,10 +209,15 @@ export default function ItemDetail({
               <p className="text-xs text-slate-500 mt-1">{item.location} · {formattedDate}</p>
             </div>
 
-            {/* VERIFICATION QUESTION BOX */}
-            <div className="p-4 bg-slate-100 border border-slate-200 rounded-md text-xs font-medium text-slate-700 mb-2">
-              <p className="leading-relaxed">
-                Describe how we can verify that this item belongs to you. Specify any unique decals, stickers, contents, or circumstances where it was lost/found.
+            <div className="bg-amber-50 rounded-2xl shadow-sm p-4 border-l-4 border-amber-400">
+              <p className="text-xs font-bold text-amber-600 uppercase tracking-wide mb-2">
+                ⚠️ Ownership Challenge
+              </p>
+              <p className="text-sm font-semibold text-gray-800 leading-relaxed">
+                Describe how we can verify that this item belongs to you.
+              </p>
+              <p className="text-sm text-gray-600 mt-1 leading-relaxed">
+                Specify any unique decals, stickers, contents, or circumstances where it was lost/found.
               </p>
             </div>
 
