@@ -59,7 +59,7 @@ export default function ItemDetail({
   const [deleting, setDeleting] = useState(false);
   const [openClaimModal, setOpenClaimModal] = useState(false);
   const [claimView, setClaimView] = useState(false);
-  const [claimAnswer, setClaimAnswer] = useState('');
+  const [answer, setAnswer] = useState('');
   const [error, setError] = useState('');
   const [submittingClaim, setSubmittingClaim] = useState(false);
   const [claimErrorObj, setClaimErrorObj] = useState<string | null>(null);
@@ -129,11 +129,11 @@ export default function ItemDetail({
     }
   };
 
-  const handleClaimSubmit = async (e?: React.FormEvent) => {
+  const handleSubmit = async (e?: React.FormEvent) => {
     if (e) e.preventDefault();
     if (!currentUserUid) return;
 
-    if (claimAnswer.trim() === '') {
+    if (answer.trim() === '') {
       setError('Verification answer cannot be empty!');
       return;
     }
@@ -157,7 +157,7 @@ export default function ItemDetail({
         claimerContact: auth.currentUser?.phoneNumber || '',
         finderId: item.userId,
         securityQuestion: item.securityQuestion || 'Please verify physical details for item ownership confirmation.',
-        providedAnswer: claimAnswer.trim(),
+        providedAnswer: answer.trim(),
         status: 'pending',
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString()
@@ -236,16 +236,12 @@ export default function ItemDetail({
               <textarea
                 id="claim-answer-textarea"
                 rows={5}
-                value={claimAnswer}
-                onChange={(e) => setClaimAnswer(e.target.value)}
+                value={answer}
+                onChange={(e) => setAnswer(e.target.value)}
                 placeholder="Provide your exact verification answer or physical proof details here in as much descriptive precision as possible..."
                 className="w-full px-4 py-3 border border-[#008080] rounded-[3px] bg-white text-gray-700 focus:outline-none focus:border-[#008080]"
               />
-              {error && (
-                <p className="text-red-500 text-xs font-semibold">
-                  {error}
-                </p>
-              )}
+              {error && <p className="text-red-500 text-sm mt-1">{error}</p>}
               {/* VERIFICATION QUESTION - Read Only */}
               <div className="mt-4">
                 <label className="text-xs font-semibold tracking-wider text-gray-500 uppercase">
@@ -288,8 +284,8 @@ export default function ItemDetail({
               </button>
               <button
                 type="button"
-                disabled={submittingClaim || !claimAnswer.trim()}
-                onClick={() => handleClaimSubmit()}
+                disabled={submittingClaim || !answer.trim()}
+                onClick={() => handleSubmit()}
                 className="flex-1 px-6 py-3 border border-[#008080] rounded bg-[#008080] hover:bg-teal-700 disabled:bg-teal-400 disabled:border-teal-400 text-white font-medium text-sm flex items-center justify-center gap-2 shadow-md transition"
               >
                 {submittingClaim ? (
@@ -721,7 +717,7 @@ export default function ItemDetail({
               </div>
 
               {/* Modal Body */}
-              <form onSubmit={handleClaimSubmit} className="p-6 space-y-5">
+              <form onSubmit={handleSubmit} className="p-6 space-y-5">
                 <div className="space-y-2">
                   <label className="block text-[9px] font-mono font-bold text-slate-400 uppercase tracking-widest">
                     Verification Question
@@ -741,18 +737,14 @@ export default function ItemDetail({
                   </label>
                   <textarea
                     id="claimer-answer-modal"
-                    value={claimAnswer}
-                    onChange={(e) => setClaimAnswer(e.target.value)}
+                    value={answer}
+                    onChange={(e) => setAnswer(e.target.value)}
                     placeholder="Provide your exact verification answer or proof details here in as much descriptive precision as possible..."
                     className="w-full rounded-md border border-slate-250 bg-white p-4 font-sans text-xs font-medium text-slate-900 focus:border-teal-600 focus:outline-none focus:ring-2 focus:ring-teal-100 leading-relaxed placeholder:text-slate-400"
                     rows={4}
                     required
                   />
-                  {error && (
-                    <p className="text-red-500 text-xs font-semibold">
-                      {error}
-                    </p>
-                  )}
+                  {error && <p className="text-red-500 text-sm mt-1">{error}</p>}
                   <p className="font-sans text-[10px] text-slate-400 italic">
                     The finder will inspect this proof and action your contact credentials request.
                   </p>
@@ -768,7 +760,7 @@ export default function ItemDetail({
                 <div className="flex flex-col gap-2.5 pt-1">
                   <button
                     type="submit"
-                    disabled={submittingClaim || !claimAnswer.trim()}
+                    disabled={submittingClaim || !answer.trim()}
                     className="w-full py-3.5 px-4 rounded-md bg-gradient-to-tr from-teal-850 to-indigo-950 text-white font-sans text-xs font-bold shadow-md hover:from-teal-900 hover:to-indigo-900 transition disabled:opacity-50 active:scale-95 duration-200 flex items-center justify-center space-x-1.5 cursor-pointer"
                   >
                     {submittingClaim ? (
