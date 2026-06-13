@@ -248,6 +248,18 @@ export default function ItemDetail({
                 placeholder="Provide your exact verification answer or physical proof details here in as much descriptive precision as possible..."
                 className="rounded-md border border-slate-300 p-4 w-full focus:outline-none focus:ring-2 focus:ring-teal-600 focus:border-teal-600 text-sm text-slate-800 placeholder-slate-400 bg-white shadow-sm leading-relaxed"
               />
+              {/* VERIFICATION QUESTION - Read Only */}
+              <div className="mt-4">
+                <label className="text-xs font-semibold tracking-wider text-gray-500 uppercase">
+                  Your Question <span className="text-red-500">*</span>
+                </label>
+                <input
+                  type="text"
+                  readOnly
+                  value="[Describe how we can verify that this item belongs to you. Specify any unique decals, stickers, contents, or circumstances where it was lost/found]"
+                  className="w-full mt-1 px-4 py-3 border-2 border-teal-500 rounded-xl bg-white text-gray-700 focus:outline-none focus:border-teal-600 cursor-default select-text"
+                />
+              </div>
               <p className="text-[10px] text-slate-400 italic">
                 The finder will inspect this proof and action your contact credentials request.
               </p>
