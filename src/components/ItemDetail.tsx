@@ -222,6 +222,19 @@ export default function ItemDetail({
               </p>
             </div>
 
+            {/* VERIFICATION QUESTION - Read Only */}
+            <div className="mb-4">
+              <label className="text-xs font-semibold tracking-wider text-gray-500 uppercase">
+                Verification Question <span className="text-red-500">*</span>
+              </label>
+              <input
+                type="text"
+                readOnly
+                value="Describe how we can verify that this item belongs to you. Specify any unique decals, stickers, contents, or circumstances where it was lost/found."
+                className="w-full mt-1 px-4 py-3 border-2 border-teal-500 rounded-xl bg-white text-gray-700 focus:outline-none focus:border-teal-600 cursor-default select-text"
+              />
+            </div>
+
             {/* RESTORED ANSWER INPUT: Bring back the label and the spacious text input area. */}
             <div className="flex flex-col gap-2">
               <label htmlFor="claim-answer-textarea" className="text-[10px] font-bold text-slate-600 uppercase tracking-widest">
