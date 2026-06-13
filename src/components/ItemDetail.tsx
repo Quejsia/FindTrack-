@@ -209,16 +209,16 @@ export default function ItemDetail({
               <p className="text-xs text-slate-500 mt-1">{item.location} · {formattedDate}</p>
             </div>
 
-            {/* RESTORED QUESTION CARD: Bring back the verification question container right below the header. */}
-            <div className="rounded-md bg-white p-4 border border-slate-200 shadow-sm border-l-4 border-l-amber-500">
-              <span className="text-[10px] font-bold text-amber-600 uppercase tracking-widest block mb-1">⚠️ Ownership Challenge Question</span>
-              <p className="text-sm font-semibold text-slate-800 leading-relaxed">
-                Describe how we can verify that this item belongs to you.
-              </p>
-              <p className="text-sm text-slate-605 mt-2 bg-amber-50/50 p-4 rounded-md border border-amber-100 font-medium leading-relaxed">
-                {hasSecurityQuestion 
-                  ? item.securityQuestion 
-                  : "Specify any unique decals, stickers, contents, or circumstances where it was lost/found."}
+            {/* VERIFICATION QUESTION BOX */}
+            <div className="p-4 bg-slate-100 border border-slate-200 rounded-md text-xs font-medium text-slate-700 mb-2">
+              {hasSecurityQuestion && (
+                <div className="mb-2 pb-2 border-b border-slate-200">
+                  <span className="text-[10px] uppercase font-bold text-teal-600 block mb-1">Item Owner's Challenge Question:</span>
+                  <p className="text-sm font-semibold text-slate-800">"{item.securityQuestion}"</p>
+                </div>
+              )}
+              <p className="leading-relaxed">
+                Describe how we can verify that this item belongs to you. Specify any unique decals, stickers, contents, or circumstances where it was lost/found.
               </p>
             </div>
 
