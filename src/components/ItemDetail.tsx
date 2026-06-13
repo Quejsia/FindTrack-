@@ -58,6 +58,7 @@ export default function ItemDetail({
 }: ItemDetailProps) {
   const [deleting, setDeleting] = useState(false);
   const [openClaimModal, setOpenClaimModal] = useState(false);
+  const [claimView, setClaimView] = useState(false);
   const [claimAnswer, setClaimAnswer] = useState('');
   const [submittingClaim, setSubmittingClaim] = useState(false);
   const [claimErrorObj, setClaimErrorObj] = useState<string | null>(null);
@@ -127,8 +128,8 @@ export default function ItemDetail({
     }
   };
 
-  const handleClaimSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleClaimSubmit = async (e?: React.FormEvent) => {
+    if (e) e.preventDefault();
     if (!currentUserUid) return;
 
     setSubmittingClaim(true);
@@ -144,10 +145,10 @@ export default function ItemDetail({
         itemTitle: item.title,
         imageUrl: item.imageUrl || '',
         claimerId: currentUserUid,
-        claimerName: auth.currentUser?.displayName || 'Representative Name',
-        claimerEmail: auth.currentUser?.email || '',
-        claimerContact: auth.currentUser?.phoneNumber || '',
-        finderId: item.userId,
+         claimerName: auth.currentUser?.displayName || 'Representative Name',
+         claimerEmail: auth.currentUser?.email || '',
+         claimerContact: auth.currentUser?.phoneNumber || '',
+         finderId: item.userId,
         securityQuestion: item.securityQuestion || 'Please verify physical details for item ownership confirmation.',
         providedAnswer: claimAnswer.trim(),
         status: 'pending',
@@ -163,6 +164,7 @@ export default function ItemDetail({
 
       setClaimAnswer('');
       setOpenClaimModal(false);
+      setClaimView(false);
     } catch (err: any) {
       console.error("Failed to post claim:", err);
       setClaimErrorObj(err.message || String(err));
@@ -176,6 +178,109 @@ export default function ItemDetail({
 
   // Check if contact info should be hidden under security rules
   const isCredentialsLocked = hasSecurityQuestion && !isOwner && (!existingClaim || existingClaim.status !== 'approved');
+
+  if (claimView) {
+    return (
+      <div className="fixed inset-x-0 bottom-[64px] top-[56px] bg-slate-50 flex flex-col z-40" id="dedicated-claim-page">
+        {/* 1. Header (same style as the chat view header) */}
+        <div className="flex items-center gap-3 px-4 py-3 bg-gradient-to-r from-teal-700 to-teal-500 shadow-md flex-shrink-0">
+          <button onClick={() => setClaimView(false)} className="text-white font-bold text-lg">
+            ← Back
+          </button>
+          <div className="flex flex-col flex-1 pl-1">
+            <span className="text-white font-semibold text-sm">Log Ownership Claim</span>
+            <span className="text-cyan-100 text-xs">Prove-It Verification Layer</span>
+          </div>
+        </div>
+
+        {/* 2. Scrollable Content Body */}
+        <div className="overflow-y-auto flex-1 px-4 py-5 space-y-5">
+          {/* A. Item Summary Card */}
+          <div className="bg-white rounded-2xl p-4 border-l-4 border-teal-500 shadow-sm space-y-1">
+            <h4 className="font-sans font-bold text-slate-800 text-sm">Claiming: {item.title}</h4>
+            <p className="font-sans text-xs text-slate-500">📍 Location: {item.location}</p>
+            <p className="font-sans text-xs text-slate-500">📅 Date: {formattedDate}</p>
+          </div>
+
+          {/* B. Verification Challenge Box */}
+          <div className="bg-amber-50 rounded-2xl p-4 border-l-4 border-amber-500 shadow-sm space-y-2">
+            <span className="text-[10px] uppercase font-mono font-bold text-amber-700 tracking-wider block">
+              OWNERSHIP CHALLENGE
+            </span>
+            <p className="font-sans text-xs text-slate-700 leading-relaxed font-semibold">
+              {hasSecurityQuestion 
+                ? item.securityQuestion 
+                : "Describe how we can verify that this item belongs to you. Specify any unique decals, stickers, contents, or circumstances where it was lost/found."}
+            </p>
+          </div>
+
+          {/* C. Your Verification Answer textarea */}
+          <div className="space-y-1.5">
+            <label htmlFor="claimer-answer" className="block text-[9px] font-mono font-bold text-slate-400 uppercase tracking-widest">
+              Your Verification Answer *
+            </label>
+            <textarea
+              id="claimer-answer"
+              value={claimAnswer}
+              onChange={(e) => setClaimAnswer(e.target.value)}
+              placeholder="Provide your exact verification answer or proof details here in as much descriptive precision as possible..."
+              className="w-full rounded-2xl border border-slate-205 bg-white p-3.5 font-sans text-xs font-medium text-slate-900 focus:border-teal-600 focus:outline-none focus:ring-4 focus:ring-teal-50/50 leading-relaxed placeholder:text-slate-400"
+              rows={5}
+              required
+            />
+          </div>
+
+          {/* D. Helpful Tips Card */}
+          <div className="bg-blue-50 border-l-4 border-blue-500 rounded-2xl p-4 shadow-sm space-y-2">
+            <h5 className="font-sans font-bold text-blue-900 text-xs flex items-center gap-1.5">
+              <span>💡</span> Tips for a Strong Claim
+            </h5>
+            <ul className="list-disc list-inside space-y-1 text-[11px] text-blue-800 font-medium font-sans">
+              <li>Mention unique scratches, stickers, or markings</li>
+              <li>Describe what was inside the item when lost</li>
+              <li>State the exact date and time you lost it</li>
+              <li>Include any receipts or serial numbers if available</li>
+            </ul>
+          </div>
+
+          {claimErrorObj && (
+            <div className="p-3 bg-red-50 border border-red-100 rounded-xl text-red-750 font-sans text-[11px]">
+              ❌ {claimErrorObj}
+            </div>
+          )}
+        </div>
+
+        {/* 3. Bottom Submit Bar */}
+        <div className="sticky bottom-0 bg-white border-t px-4 py-3 flex gap-3 z-50">
+          <button
+            type="button"
+            onClick={() => setClaimView(false)}
+            className="px-4 py-3 border border-slate-205 rounded-xl font-sans text-xs font-bold text-slate-705 bg-slate-50 hover:bg-slate-100 transition active:scale-95 duration-200 cursor-pointer text-center"
+          >
+            Cancel
+          </button>
+          <button
+            type="button"
+            disabled={submittingClaim || !claimAnswer.trim()}
+            onClick={() => handleClaimSubmit()}
+            className="flex-1 bg-teal-650 hover:bg-teal-700 text-white font-sans text-xs font-bold py-3 px-4 rounded-xl shadow-md cursor-pointer transition active:scale-95 duration-200 flex items-center justify-center space-x-1.5"
+          >
+            {submittingClaim ? (
+              <>
+                <Loader2 className="h-4 w-4 animate-spin shrink-0" />
+                <span>Submitting...</span>
+              </>
+            ) : (
+              <>
+                <CheckCircle2 className="h-4 w-4" />
+                <span>Submit Answer</span>
+              </>
+            )}
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm" id="item-details-drawer">
@@ -376,7 +481,7 @@ export default function ItemDetail({
                                   
                                   {existingClaim.status === 'rejected' && (
                                     <button
-                                      onClick={() => setOpenClaimModal(true)}
+                                      onClick={() => setClaimView(true)}
                                       className="w-full flex items-center justify-center space-x-1.5 py-3.5 px-4 rounded-xl bg-slate-900 text-white font-sans text-xs font-bold hover:bg-slate-800 transition active:scale-95 duration-200 cursor-pointer shadow-md"
                                     >
                                       <ShieldQuestion className="h-4 w-4 text-emerald-400 shrink-0" />
@@ -402,7 +507,7 @@ export default function ItemDetail({
                                 </button>
                                 
                                 <button
-                                  onClick={() => setOpenClaimModal(true)}
+                                  onClick={() => setClaimView(true)}
                                   className="w-full flex items-center justify-center space-x-1.5 bg-white border border-slate-300 hover:bg-slate-50/50 text-slate-700 font-sans text-xs font-bold py-3.5 px-4 rounded-xl shadow-sm cursor-pointer transition active:scale-95 duration-200"
                                 >
                                   <CheckCircle2 className="h-4 w-4 shrink-0 text-teal-600" />
@@ -461,7 +566,7 @@ export default function ItemDetail({
 
                               {!existingClaim && (
                                 <button
-                                  onClick={() => setOpenClaimModal(true)}
+                                  onClick={() => setClaimView(true)}
                                   className="w-full flex items-center justify-center space-x-1.5 bg-white border border-slate-300 hover:bg-slate-50/50 text-slate-700 font-sans text-xs font-bold py-3.5 px-4 rounded-xl shadow-sm cursor-pointer transition active:scale-95 duration-200"
                                 >
                                   <CheckCircle2 className="h-4 w-4 shrink-0 text-teal-600" />
