@@ -221,19 +221,6 @@ export default function ItemDetail({
               </p>
             </div>
 
-            {/* VERIFICATION QUESTION - Read Only */}
-            <div className="mb-4">
-              <label className="text-xs font-semibold tracking-wider text-gray-500 uppercase">
-                Verification Question <span className="text-red-500">*</span>
-              </label>
-              <input
-                type="text"
-                readOnly
-                value="Describe how we can verify that this item belongs to you. Specify any unique decals, stickers, contents, or circumstances where it was lost/found."
-                className="w-full mt-1 px-4 py-3 border border-[#008080] rounded-[3px] bg-white text-gray-700 cursor-default select-text"
-              />
-            </div>
-
             {/* RESTORED ANSWER INPUT: Bring back the label and the spacious text input area. */}
             <div className="flex flex-col gap-2">
               <label htmlFor="claim-answer-textarea" className="text-[10px] font-bold text-slate-600 uppercase tracking-widest">
@@ -250,23 +237,23 @@ export default function ItemDetail({
               {/* VERIFICATION QUESTION - Read Only */}
               <div className="mt-4">
                 <label className="text-xs font-semibold tracking-wider text-gray-500 uppercase">
-                  Your Question <span className="text-red-500">*</span>
+                  Verification Question
                 </label>
                 <input
                   type="text"
                   readOnly
                   value="Describe how we can verify that this item belongs to you. Specify any unique decals, stickers, contents, or circumstances where it was lost/found."
-                  className="w-[105%] -ml-[2.5%] mt-1 px-4 py-3 border border-[#008080] rounded-[3px] bg-[#3d4857] text-white cursor-default select-text"
+                  className="w-full mt-1 p-[12px] border border-[#008080] rounded bg-white text-black cursor-default select-text"
                 />
               </div>
-              <p className="text-[10px] text-slate-400 italic">
+              <p className="text-[10px] text-[#008080] italic mt-1">
                 The finder will inspect this proof and action your contact credentials request.
               </p>
             </div>
 
             {/* TIPS CARD */}
-            <div className="mt-4 p-4 border border-[#008080] rounded-[3px] bg-white space-y-1">
-              <span className="text-[10px] font-bold text-blue-600 uppercase tracking-widest block mb-1">💡 Tips for a strong claim</span>
+            <div className="mt-[40px] p-4 border border-[#008080] rounded-[3px] bg-white space-y-1">
+              <span className="text-[10px] font-bold text-[#008080] uppercase tracking-widest block mb-1">💡 Tips for a strong claim</span>
               <p className="text-xs text-slate-650 leading-relaxed">• State items inside (e.g. specific cards, quantity of cash, etc.)</p>
               <p className="text-xs text-slate-650 leading-relaxed">• Mention distinct scratches, custom keychains, stickers, or wallpaper setups</p>
               <p className="text-xs text-slate-650 leading-relaxed">• State the exact date, time range and place you lost or found it</p>
@@ -279,11 +266,11 @@ export default function ItemDetail({
             )}
 
             {/* CLEAN BUTTON LAYOUT: Move the "Cancel" and "✅ Submit Answer" buttons BELOW the text input area. */}
-            <div className="flex items-center gap-3 mt-2">
+            <div className="flex items-center gap-3 mt-[30px]">
               <button
                 type="button"
                 onClick={() => setClaimView(false)}
-                className="px-6 py-3 border border-[#008080] rounded-[3px] bg-white text-gray-700 text-xs font-medium ml-2 -mt-1 transition active:scale-95 duration-150 shadow-sm hover:bg-slate-50"
+                className="px-6 py-3 border border-[#008080] rounded text-[#008080] bg-white text-sm font-medium transition shadow-sm hover:bg-slate-50"
               >
                 Cancel
               </button>
@@ -291,7 +278,7 @@ export default function ItemDetail({
                 type="button"
                 disabled={submittingClaim || !claimAnswer.trim()}
                 onClick={() => handleClaimSubmit()}
-                className="flex-1 px-5 py-3 rounded-md bg-teal-600 hover:bg-teal-700 disabled:bg-teal-400 text-white font-semibold text-sm flex items-center justify-center gap-2 shadow-md transition active:scale-95 duration-150"
+                className="flex-1 px-6 py-3 border border-[#008080] rounded bg-[#008080] hover:bg-teal-700 disabled:bg-teal-400 disabled:border-teal-400 text-white font-medium text-sm flex items-center justify-center gap-2 shadow-md transition"
               >
                 {submittingClaim ? (
                   <>
