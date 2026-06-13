@@ -255,8 +255,8 @@ export default function ItemDetail({
                 <input
                   type="text"
                   readOnly
-                  value="Describe how we can verify that this item belongs to you."
-                  className="w-[105%] -ml-[2.5%] mt-1 px-4 py-3 border border-[#008080] rounded-[3px] bg-white text-gray-700 cursor-default select-text"
+                  value="Describe how we can verify that this item belongs to you. Specify any unique decals, stickers, contents, or circumstances where it was lost/found."
+                  className="w-[105%] -ml-[2.5%] mt-1 px-4 py-3 border border-[#008080] rounded-[3px] bg-[#3d4857] text-white cursor-default select-text"
                 />
               </div>
               <p className="text-[10px] text-slate-400 italic">

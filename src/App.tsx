@@ -1293,14 +1293,26 @@ export default function App() {
 
                   <div className="form-group bg-slate-50 border border-slate-205 rounded-xl p-4 my-2" style={{ backgroundColor: '#f8fafc', border: '1px solid #e2e8f0', borderRadius: '12px', padding: '16px', margin: '8px 0' }}>
                     <label htmlFor="r_securityQuestion" className="text-slate-800 font-bold" style={{ fontWeight: 'bold', color: '#1e293b' }}>🔑 Prove It! Verification Question (Optional)</label>
-                    <input 
-                      id="r_securityQuestion" 
-                      type="text" 
-                      placeholder="e.g., What color sticker is on the back? / What's the keychain brand?" 
-                      value={reportSecurityQuestion}
-                      onChange={(e) => setReportSecurityQuestion(e.target.value)}
-                      style={{ marginTop: '4px' }}
-                    />
+                    <div style={{ position: 'relative' }}>
+                      <input 
+                        id="r_securityQuestion" 
+                        type="text" 
+                        placeholder="e.g., What color sticker is on the back? / What's the keychain brand?" 
+                        value={reportSecurityQuestion}
+                        onChange={(e) => setReportSecurityQuestion(e.target.value)}
+                        style={{ 
+                          marginTop: '4px',
+                          paddingRight: reportSecurityQuestion.trim().length >= 4 ? '36px' : undefined,
+                          borderColor: reportSecurityQuestion.trim().length >= 4 ? '#10b981' : undefined,
+                          backgroundColor: reportSecurityQuestion.trim().length >= 4 ? '#ecfdf5' : undefined
+                        }}
+                      />
+                      {reportSecurityQuestion.trim().length >= 4 && (
+                        <div style={{ position: 'absolute', right: '12px', top: 'calc(50% + 2px)', transform: 'translateY(-50%)', color: '#10b981', fontWeight: 'bold', fontSize: '18px', pointerEvents: 'none' }}>
+                          ✓
+                        </div>
+                      )}
+                    </div>
                     <p className="text-[10px] text-slate-500 mt-1" style={{ fontSize: '10px', color: '#64748b', marginTop: '4px', lineHeight: '1.4' }}>
                       Add an optional verification question to protect this item. To claim it, other users will be requested to provide a matching answer.
                     </p>

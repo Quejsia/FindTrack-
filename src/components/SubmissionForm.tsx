@@ -330,13 +330,24 @@ export default function SubmissionForm({ onSubmit, onClose, defaultContactName =
           <label className="block text-xs font-bold font-sans text-slate-750 uppercase tracking-wider mb-1.5 flex items-center gap-1">
             <span>🔑 "Prove It" Security Verification Question (Optional)</span>
           </label>
-          <input
-            type="text"
-            value={securityQuestion}
-            onChange={(e) => setSecurityQuestion(e.target.value)}
-            placeholder="e.g. What color sticker is on the back? / Can you name the keychain brand?"
-            className="w-full rounded-lg border border-slate-250 bg-white px-3.5 py-2 font-sans text-xs font-medium text-slate-900 focus:border-indigo-500 focus:outline-none"
-          />
+          <div className="relative">
+            <input
+              type="text"
+              value={securityQuestion}
+              onChange={(e) => setSecurityQuestion(e.target.value)}
+              placeholder="e.g. What color sticker is on the back? / Can you name the keychain brand?"
+              className={`w-full rounded-lg border px-3.5 py-2 font-sans text-xs font-medium text-slate-900 focus:outline-none transition-colors ${
+                securityQuestion.trim().length >= 4 
+                  ? 'border-emerald-500 bg-emerald-50 focus:border-emerald-500 pr-10' 
+                  : 'border-slate-250 bg-white focus:border-indigo-500'
+              }`}
+            />
+            {securityQuestion.trim().length >= 4 && (
+              <div className="absolute right-3 top-1/2 -translate-y-1/2 text-emerald-500 font-bold pointer-events-none">
+                ✓
+              </div>
+            )}
+          </div>
           <p className="font-sans text-[10px] text-slate-500 mt-1.5 leading-relaxed">
             Prevent fraudulent claims. If another user claims this item, they will be prompted to answer this verification question first.
           </p>
