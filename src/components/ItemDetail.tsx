@@ -256,7 +256,7 @@ export default function ItemDetail({
                   type="text"
                   readOnly
                   value="Describe how we can verify that this item belongs to you."
-                  className="w-full mt-1 px-4 py-3 border border-[#008080] rounded-[3px] bg-white text-gray-700 cursor-default select-text"
+                  className="w-[105%] -ml-[2.5%] mt-1 px-4 py-3 border border-[#008080] rounded-[3px] bg-white text-gray-700 cursor-default select-text"
                 />
               </div>
               <p className="text-[10px] text-slate-400 italic">
