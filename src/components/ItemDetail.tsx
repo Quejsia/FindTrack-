@@ -60,7 +60,6 @@ export default function ItemDetail({
   const [openClaimModal, setOpenClaimModal] = useState(false);
   const [claimView, setClaimView] = useState(false);
   const [claimAnswer, setClaimAnswer] = useState('');
-  const [claimQuestion, setClaimQuestion] = useState('Enter your question here...');
   const [submittingClaim, setSubmittingClaim] = useState(false);
   const [claimErrorObj, setClaimErrorObj] = useState<string | null>(null);
 
@@ -256,24 +255,12 @@ export default function ItemDetail({
                 <input
                   type="text"
                   readOnly
-                  value="[Describe how we can verify that this item belongs to you. Specify any unique decals, stickers, contents, or circumstances where it was lost/found]"
+                  value="Describe how we can verify that this item belongs to you."
                   className="w-full mt-1 px-4 py-3 border border-[#008080] rounded-[3px] bg-white text-gray-700 cursor-default select-text"
                 />
               </div>
               <p className="text-[10px] text-slate-400 italic">
                 The finder will inspect this proof and action your contact credentials request.
-              </p>
-            </div>
-
-            <div className="flex flex-col gap-2">
-              <input
-                type="text"
-                value={claimQuestion}
-                onChange={(e) => setClaimQuestion(e.target.value)}
-                className="rounded-md border border-slate-300 p-4 w-full focus:outline-none focus:ring-2 focus:ring-teal-600 focus:border-teal-600 text-sm text-slate-800 bg-white shadow-sm leading-relaxed"
-              />
-              <p className="text-[10px] text-slate-400 italic">
-                The finder will answer this question to verify your claim.
               </p>
             </div>
 
@@ -296,7 +283,7 @@ export default function ItemDetail({
               <button
                 type="button"
                 onClick={() => setClaimView(false)}
-                className="px-6 py-3 border border-[#008080] rounded-[3px] bg-white text-gray-700 text-xs font-medium transition active:scale-95 duration-150 shadow-sm hover:bg-slate-50"
+                className="px-6 py-3 border border-[#008080] rounded-[3px] bg-white text-gray-700 text-xs font-medium ml-2 -mt-1 transition active:scale-95 duration-150 shadow-sm hover:bg-slate-50"
               >
                 Cancel
               </button>
