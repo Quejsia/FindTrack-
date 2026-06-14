@@ -73,8 +73,13 @@ const ONBOARD_STEPS = [
 ];
 
 export default function App() {
-  // Navigation layout state: 'landing' | 'login' | 'signup' | 'dashboard'
-  const [currentView, setCurrentView] = useState<'landing' | 'login' | 'signup' | 'dashboard'>('landing');
+  // Navigation layout state: 'landing' | 'login' | 'signup' | 'dashboard' | 'verify-email' | 'privacy' | 'terms'
+  const [currentView, setCurrentView] = useState<'landing' | 'login' | 'signup' | 'dashboard' | 'verify-email' | 'privacy' | 'terms'>(() => {
+    const path = window.location.pathname;
+    if (path === '/privacy') return 'privacy';
+    if (path === '/terms') return 'terms';
+    return 'landing';
+  });
   
   // Dashboard panel selector
   const [activeTab, setActiveTab] = useState<string>('home');
@@ -148,6 +153,34 @@ export default function App() {
     }, 3300);
   };
 
+  const handleBackToSafety = () => {
+    if (auth.currentUser) {
+      if (auth.currentUser.email && !auth.currentUser.emailVerified) {
+        setCurrentView('verify-email');
+        window.history.pushState(null, '', '/verify-email');
+      } else {
+        setCurrentView('dashboard');
+        window.history.pushState(null, '', '/');
+      }
+    } else {
+      try {
+        const guestSession = localStorage.getItem("sessionUser");
+        if (guestSession) {
+          const session = JSON.parse(guestSession);
+          if (session && session.email === "") {
+            setCurrentView('dashboard');
+            window.history.pushState(null, '', '/');
+            return;
+          }
+        }
+      } catch (e) {
+        console.error(e);
+      }
+      setCurrentView('landing');
+      window.history.pushState(null, '', '/');
+    }
+  };
+
   // Check login session
   const isLoggedIn = useMemo(() => {
     return user !== null;
@@ -178,7 +211,10 @@ export default function App() {
         }
         
         // Block unverified email users from accessing protected views (dashboard)
-        if (currentUser.email && !currentUser.emailVerified) {
+        const path = window.location.pathname;
+        if (path === '/privacy' || path === '/terms') {
+          setCurrentView(path === '/privacy' ? 'privacy' : 'terms');
+        } else if (currentUser.email && !currentUser.emailVerified) {
           setCurrentView('verify-email');
         } else {
           // Switch view to dashboard on successful load
@@ -193,7 +229,12 @@ export default function App() {
             if (session && session.email === "") {
               setProfileName("Guest");
               setProfileEmail("");
-              setCurrentView('dashboard');
+              const path = window.location.pathname;
+              if (path === '/privacy' || path === '/terms') {
+                setCurrentView(path === '/privacy' ? 'privacy' : 'terms');
+              } else {
+                setCurrentView('dashboard');
+              }
             }
           }
         } catch (e) {
@@ -214,6 +255,34 @@ export default function App() {
 
     return unsubscribe;
   }, []);
+
+  // Handle browser back/forward buttons (routing sync)
+  useEffect(() => {
+    const handlePopState = () => {
+      const path = window.location.pathname;
+      if (path === '/privacy') {
+        setCurrentView('privacy');
+      } else if (path === '/terms') {
+        setCurrentView('terms');
+      } else if (path === '/login') {
+        setCurrentView('login');
+      } else if (path === '/signup') {
+        setCurrentView('signup');
+      } else if (path === '/' || path === '') {
+        if (auth.currentUser) {
+          if (auth.currentUser.email && !auth.currentUser.emailVerified) {
+            setCurrentView('verify-email');
+          } else {
+            setCurrentView('dashboard');
+          }
+        } else {
+          setCurrentView('landing');
+        }
+      }
+    };
+    window.addEventListener('popstate', handlePopState);
+    return () => window.removeEventListener('popstate', handlePopState);
+  }, [user]);
 
   // 2. Real-time Firestore Sync of items / reports
   useEffect(() => {
@@ -831,8 +900,28 @@ export default function App() {
             </div>
           </div>
 
-          <footer className="landing-footer">
+          <footer className="landing-footer flex flex-col sm:flex-row justify-between items-center gap-4">
             <p>Built with ❤️ for Things · FindTrack v2.0</p>
+            <div className="flex gap-4">
+              <button 
+                onClick={() => {
+                  setCurrentView('privacy');
+                  window.history.pushState(null, '', '/privacy');
+                }} 
+                className="hover:text-white transition cursor-pointer text-slate-400 font-medium"
+              >
+                Privacy Policy
+              </button>
+              <button 
+                onClick={() => {
+                  setCurrentView('terms');
+                  window.history.pushState(null, '', '/terms');
+                }} 
+                className="hover:text-white transition cursor-pointer text-slate-400 font-medium"
+              >
+                Terms of Service
+              </button>
+            </div>
           </footer>
         </div>
       )}
@@ -1082,6 +1171,137 @@ export default function App() {
               <div className="auth-footer" style={{ marginTop: '16px', color: 'rgba(255,255,255,0.5)', fontSize: '12px', textAlign: 'center' }}>
                 Already verified? Click "Check Verification Status" above.
               </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ── VIEW 6: PRIVACY POLICY PAGE ── */}
+      {currentView === 'privacy' && (
+        <div style={{ minHeight: '100vh', background: 'radial-gradient(ellipse at bottom, #1e293b 0%, #0f172a 100%)', color: '#f8fafc', padding: '40px 16px', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+          <div style={{ maxWidth: '800px', width: '100%', background: 'rgba(30, 41, 59, 0.7)', border: '1px solid rgba(255, 255, 255, 0.1)', borderRadius: '24px', padding: '36px', backdropFilter: 'blur(20px)', boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.3)' }} className="mx-auto">
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '32px', borderBottom: '1px solid rgba(255, 255, 255, 0.1)', paddingBottom: '20px' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                <span style={{ fontSize: '32px' }}>🔒</span>
+                <div>
+                  <h1 style={{ fontSize: '24px', fontWeight: '800', lineHeight: 1.2 }}>Privacy Policy</h1>
+                  <p style={{ fontSize: '13px', color: 'rgba(255,255,255,0.5)', marginTop: '4px' }}>FindTrack Lost &amp; Found Platform</p>
+                </div>
+              </div>
+              <button 
+                onClick={handleBackToSafety}
+                style={{ background: 'rgba(255, 255, 255, 0.12)', color: 'white', border: 'none', borderRadius: '8px', padding: '8px 16px', fontWeight: '600', cursor: 'pointer', fontSize: '13px' }}
+                className="hover:bg-white/20 transition-all"
+              >
+                ← Go Back
+              </button>
+            </div>
+
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '24px', fontSize: '14px', lineHeight: '1.7', color: 'rgba(255, 255, 255, 0.85)' }}>
+              <section>
+                <h3 style={{ fontSize: '16px', fontWeight: '700', color: '#38bdf8', marginBottom: '8px' }}>1. Introduction</h3>
+                <p>Welcome to FindTrack. We are dedicated to protecting your personal information and your right to privacy. This Privacy Policy describes how we collect, use, and process your information when you use our lost and found platform.</p>
+              </section>
+
+              <section>
+                <h3 style={{ fontSize: '16px', fontWeight: '700', color: '#38bdf8', marginBottom: '8px' }}>2. Information We Collect</h3>
+                <p>To provide our services, facilitate claiming, and enable safe communications, we collect the following personal details:</p>
+                <ul style={{ listStyleType: 'disc', paddingLeft: '20px', marginTop: '8px', display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                  <li><strong>Account Credentials:</strong> Full name, verified email address, and profile pictures when you register.</li>
+                  <li><strong>Contact Information:</strong> Phone numbers or social handle contact info you voluntarily provide so claimants/finders can get in touch with you.</li>
+                  <li><strong>Item Reports Data:</strong> Item characteristics, dates, text descriptions, images of lost or found belongings, and exact or approximate locations where items were misplaced or recovered.</li>
+                </ul>
+              </section>
+
+              <section>
+                <h3 style={{ fontSize: '16px', fontWeight: '700', color: '#38bdf8', marginBottom: '8px' }}>3. How We Use Your Information</h3>
+                <p>We process your personal information for purposes based on legitimate interests, the fulfillment of our services, and user convenience:</p>
+                <ul style={{ listStyleType: 'disc', paddingLeft: '20px', marginTop: '8px', display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                  <li>To facilitate user account creation, profile management, and authentication check-ins.</li>
+                  <li>To list lost/found items and coordinate ownership claims between users.</li>
+                  <li>To send real-time alerts or email matchmaker suggestions and notifications about matching items.</li>
+                  <li>To provide direct communication channels specifically for coordinating item returns.</li>
+                </ul>
+              </section>
+
+              <section>
+                <h3 style={{ fontSize: '16px', fontWeight: '700', color: '#38bdf8', marginBottom: '8px' }}>4. Data Security &amp; Storage</h3>
+                <p>Your account, contact profile information, and reported item details are safely stored using secure Cloud Firebase/Firestore infrastructure. Only authorized users can update their profiles or manage active items. We implement security protocols to protect your personal information against unauthorized retrieval, alteration, or disclosure.</p>
+              </section>
+
+              <section>
+                <h3 style={{ fontSize: '16px', fontWeight: '700', color: '#38bdf8', marginBottom: '8px' }}>5. Your Rights &amp; Data Deletion</h3>
+                <p>You can access, modify, or delete your personal contact coordinates at any time directly through the <strong>My Profile</strong> or <strong>My Items</strong> dashboards. If you wish to completely close your account or wipe your listing data, please reach out to our team or use the direct profile purge settings.</p>
+              </section>
+            </div>
+
+            <div style={{ marginTop: '40px', borderTop: '1px solid rgba(255, 255, 255, 0.1)', paddingTop: '20px', textAlign: 'center', fontSize: '12px', color: 'rgba(255,255,255,0.4)' }}>
+              Last updated: {new Date().toLocaleDateString(undefined, { year: 'numeric', month: 'long', day: 'numeric' })} · FindTrack Platform Security
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ── VIEW 7: TERMS OF SERVICE PAGE ── */}
+      {currentView === 'terms' && (
+        <div style={{ minHeight: '100vh', background: 'radial-gradient(ellipse at bottom, #1e293b 0%, #0f172a 100%)', color: '#f8fafc', padding: '40px 16px', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+          <div style={{ maxWidth: '800px', width: '100%', background: 'rgba(30, 41, 59, 0.7)', border: '1px solid rgba(255, 255, 255, 0.1)', borderRadius: '24px', padding: '36px', backdropFilter: 'blur(20px)', boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.3)' }} className="mx-auto">
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '32px', borderBottom: '1px solid rgba(255, 255, 255, 0.1)', paddingBottom: '20px' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                <span style={{ fontSize: '32px' }}>⚖️</span>
+                <div>
+                  <h1 style={{ fontSize: '24px', fontWeight: '800', lineHeight: 1.2 }}>Terms of Service</h1>
+                  <p style={{ fontSize: '13px', color: 'rgba(255,255,255,0.5)', marginTop: '4px' }}>FindTrack Lost &amp; Found Platform</p>
+                </div>
+              </div>
+              <button 
+                onClick={handleBackToSafety}
+                style={{ background: 'rgba(255, 255, 255, 0.12)', color: 'white', border: 'none', borderRadius: '8px', padding: '8px 16px', fontWeight: '600', cursor: 'pointer', fontSize: '13px' }}
+                className="hover:bg-white/20 transition-all"
+              >
+                ← Go Back
+              </button>
+            </div>
+
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '24px', fontSize: '14px', lineHeight: '1.7', color: 'rgba(255, 255, 255, 0.85)' }}>
+              <section>
+                <h3 style={{ fontSize: '16px', fontWeight: '700', color: '#38bdf8', marginBottom: '8px' }}>1. Agreement to Terms</h3>
+                <p>By registering, logging in, browsing as a guest, or submitting reports on FindTrack, you accept and agree to follow these Terms of Service. If you do not agree to all of these Terms, you are prohibited from using the application.</p>
+              </section>
+
+              <section>
+                <h3 style={{ fontSize: '16px', fontWeight: '700', color: '#38bdf8', marginBottom: '8px' }}>2. User Responsibilities &amp; Acceptable Use</h3>
+                <p>When posting lost or found items and interacting with other community members, you agree to:</p>
+                <ul style={{ listStyleType: 'disc', paddingLeft: '20px', marginTop: '8px', display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                  <li>Provide accurate, genuine, and reliable details regarding found objects, locations, and descriptions.</li>
+                  <li>Refrain from listing fraudulent claims, fake items, offensive photos, or inaccurate contact information.</li>
+                  <li>Respect other users and use the interactive real-time coordinates, chats, and claims desk only for legitimate recovery purposes.</li>
+                  <li>Never attempt to gain unauthorized access to other user profiles, databases, or restricted platform APIs.</li>
+                </ul>
+              </section>
+
+              <section>
+                <h3 style={{ fontSize: '16px', fontWeight: '700', color: '#38bdf8', marginBottom: '8px' }}>3. Verification of Ownership &amp; Meetups</h3>
+                <p>FindTrack provides verification mechanisms (such as custom security confirmation questions) to help confirm proof of ownership prior to release. However:</p>
+                <ul style={{ listStyleType: 'disc', paddingLeft: '20px', marginTop: '8px', display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                  <li>Users are solely responsible for thoroughly vetting proof of ownership before handing over items.</li>
+                  <li>Physical meetups, handling of high-value items, and exchanges are at your own discretion. We encourage coordinating safe, public, well-lit spaces (such as security desk areas, campuses, or official lost and found centers).</li>
+                </ul>
+              </section>
+
+              <section>
+                <h3 style={{ fontSize: '16px', fontWeight: '700', color: '#38bdf8', marginBottom: '8px' }}>4. Disclaimer of Warrant &amp; Limitation of Liability</h3>
+                <p>FindTrack is provided "as is" and "as available". We do not guarantee that your lost items will be found, or that matches suggested by the system are 100% correct. Under no circumstances shall FindTrack, our developers, or our affiliates be liable for damages, item damage, theft, fraud, or any conflicts arising from physical item exchange coordinates.</p>
+              </section>
+
+              <section>
+                <h3 style={{ fontSize: '16px', fontWeight: '700', color: '#38bdf8', marginBottom: '8px' }}>5. Modifications to Service</h3>
+                <p>We reserves the right to modify or adjust the features, layouts, database rules, or services of FindTrack at any time. Continued use of the platform after updates indicates consent to all revised guidelines.</p>
+              </section>
+            </div>
+
+            <div style={{ marginTop: '40px', borderTop: '1px solid rgba(255, 255, 255, 0.1)', paddingTop: '20px', textAlign: 'center', fontSize: '12px', color: 'rgba(255,255,255,0.4)' }}>
+              Last updated: {new Date().toLocaleDateString(undefined, { year: 'numeric', month: 'long', day: 'numeric' })} · FindTrack Community Terms
             </div>
           </div>
         </div>
@@ -1365,6 +1585,32 @@ export default function App() {
                   </div>
 
                   <div className="tip-banner">💡 Tip: Report lost items within 24 hours for the best chance of recovery!</div>
+
+                  <footer style={{ marginTop: '32px', paddingTop: '20px', borderTop: '1px solid rgba(0, 0, 0, 0.08)', display: 'flex', flexDirection: 'column', gap: '12px', alignItems: 'center', justifyContent: 'space-between', fontSize: '12px', color: '#64748b' }} className="sm:flex-row">
+                    <p>© {new Date().getFullYear()} FindTrack · Lost &amp; Found System</p>
+                    <div style={{ display: 'flex', gap: '16px' }}>
+                      <button 
+                        onClick={() => {
+                          setCurrentView('privacy');
+                          window.history.pushState(null, '', '/privacy');
+                        }} 
+                        style={{ cursor: 'pointer', background: 'none', border: 'none', padding: 0, fontWeight: '600', color: '#475569' }}
+                        className="hover:text-slate-900 transition"
+                      >
+                        Privacy Policy
+                      </button>
+                      <button 
+                        onClick={() => {
+                          setCurrentView('terms');
+                          window.history.pushState(null, '', '/terms');
+                        }} 
+                        style={{ cursor: 'pointer', background: 'none', border: 'none', padding: 0, fontWeight: '600', color: '#475569' }}
+                        className="hover:text-slate-900 transition"
+                      >
+                        Terms of Service
+                      </button>
+                    </div>
+                  </footer>
                 </div>
               )}
             </section>
