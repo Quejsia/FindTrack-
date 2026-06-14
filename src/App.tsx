@@ -28,6 +28,7 @@ import ChatInterface, { ChatInboxList } from './components/ChatInterface';
 import ItemDetail from './components/ItemDetail';
 import { Item, Claim } from './types';
 import { ShieldCheck } from 'lucide-react';
+import { uploadToCloudinary } from './lib/cloudinary';
 
 interface ItemReport {
   id: string;
@@ -106,6 +107,8 @@ export default function App() {
   const [reportDesc, setReportDesc] = useState('');
   const [reportType, setReportType] = useState<'lost' | 'found'>('lost');
   const [reportImage, setReportImage] = useState<string>('');
+  const [reportImageFile, setReportImageFile] = useState<File | null>(null);
+  const [isUploading, setIsUploading] = useState(false);
   const [reportSecurityQuestion, setReportSecurityQuestion] = useState('');
   const [incomingClaims, setIncomingClaims] = useState<Claim[]>([]);
 
@@ -409,6 +412,7 @@ export default function App() {
   const handleImageFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
+    setReportImageFile(file);
     const reader = new FileReader();
     reader.onload = () => {
       if (reader.result) {
@@ -443,6 +447,20 @@ export default function App() {
       return;
     }
 
+    setIsUploading(true);
+    let finalImageUrl = reportImage || '';
+
+    if (reportImageFile) {
+      try {
+        finalImageUrl = await uploadToCloudinary(reportImageFile);
+      } catch (err) {
+        console.error("Cloudinary upload error:", err);
+        triggerToast("❌ Failed to upload image.", "error");
+        setIsUploading(false);
+        return;
+      }
+    }
+
     const payloadId = 'r_' + Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
     
     // Firestore Object Schema aligned with security rules constraints
@@ -458,7 +476,7 @@ export default function App() {
       contactName: profileName || 'Student',
       contactInfo: profileContact || profileEmail || 'No contact provided',
       date: new Date().toLocaleDateString(),
-      imageUrl: reportImage || '',
+      imageUrl: finalImageUrl,
       createdAt: serverTimestamp(),
       updatedAt: serverTimestamp(),
       claimed: false,
@@ -475,6 +493,7 @@ export default function App() {
       setReportDesc('');
       setReportType('lost');
       setReportImage('');
+      setReportImageFile(null);
       setReportSecurityQuestion('');
 
       // Auto redirect to Search to view entries
@@ -1318,7 +1337,9 @@ export default function App() {
                     </p>
                   </div>
 
-                  <button className="primary-btn" type="submit">📤 Submit Report</button>
+                  <button className="primary-btn" type="submit" disabled={isUploading}>
+                    {isUploading ? 'Uploading & Submitting...' : '📤 Submit Report'}
+                  </button>
                 </form>
               </div>
             </section>
