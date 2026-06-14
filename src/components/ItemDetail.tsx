@@ -172,7 +172,7 @@ export default function ItemDetail({
         updatedAt: serverTimestamp()
       });
 
-      setClaimAnswer('');
+      setAnswer('');
       setOpenClaimModal(false);
       setClaimView(false);
     } catch (err: any) {
