@@ -1481,6 +1481,15 @@ export default function App() {
               >
                 ℹ️ About / Help
               </li>
+              <li 
+                onClick={() => { 
+                  setSidebarOpen(false); 
+                  window.location.href = "mailto:novapulsarsupport@gmail.com?subject=FindTrack%20Beta%20Feedback&body=Hi%20FindTrack%20Team%2C%20here%20is%20my%20feedback%3A%20";
+                }} 
+                className="drawer-item"
+              >
+                📝 Feedback
+              </li>
             </ul>
           </aside>
 
