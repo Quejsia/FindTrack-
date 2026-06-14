@@ -42,7 +42,9 @@ service cloud.firestore {
         && data.contactName is string && data.contactName.size() <= 100
         && data.contactInfo is string && data.contactInfo.size() <= 200
         && data.date is string && data.date.size() <= 100
-        && data.get('imageUrl', '') is string && data.get('imageUrl', '').size() <= 500000;
+        && data.get('imageUrl', '') is string && data.get('imageUrl', '').size() <= 500000
+        && data.get('verificationQuestion', '') is string
+        && data.get('verificationQuestion', '').size() <= 500;
     }
 
     // Validates potential match parameters, enforcing score limits
@@ -98,13 +100,40 @@ service cloud.firestore {
         && isValidItem(incoming())
         && (
           // Limit actual client modifications to expected functional fields
-          incoming().diff(existing()).affectedKeys().hasOnly(['title', 'description', 'category', 'location', 'status', 'contactName', 'contactInfo', 'date', 'imageUrl', 'updatedAt'])
+          incoming().diff(existing()).affectedKeys().hasOnly(['title', 'description', 'category', 'location', 'status', 'contactName', 'contactInfo', 'date', 'imageUrl', 'updatedAt', 'verificationQuestion', 'securityQuestion'])
         );
 
       // Deleting item entries
       allow delete: if isSignedIn()
         && isEmailVerified()
         && existing().userId == request.auth.uid;
+    }
+
+    // --- Claims Collection Rules ---
+    match /claims/{claimId} {
+      allow read: if isSignedIn()
+        && isEmailVerified()
+        && (
+          existing().claimerId == request.auth.uid ||
+          existing().finderId == request.auth.uid ||
+          get(/databases/$(database)/documents/items/$(existing().itemId)).data.userId == request.auth.uid
+        );
+
+      allow create: if isSignedIn()
+        && isEmailVerified()
+        && isValidId(claimId)
+        && claimId == incoming().id
+        && incoming().claimerId == request.auth.uid;
+
+      allow update: if isSignedIn()
+        && isEmailVerified()
+        && isValidId(claimId)
+        && (
+          existing().finderId == request.auth.uid ||
+          get(/databases/$(database)/documents/items/$(existing().itemId)).data.userId == request.auth.uid
+        )
+        && incoming().diff(existing()).affectedKeys().hasOnly(['status', 'updatedAt'])
+        && (incoming().status == 'approved' || incoming().status == 'declined');
     }
 
     // --- Matches Collection Rules ---
