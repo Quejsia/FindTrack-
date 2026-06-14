@@ -82,6 +82,12 @@ app.post('/api/analyze-image', apiLimiter, requireAuth, async (req, res) => {
        return;
     }
 
+    const ALLOWED_TYPES = ['image/jpeg', 'image/png', 'image/webp', 'image/gif'];
+    if (!ALLOWED_TYPES.includes(mimeType)) {
+      res.status(400).json({ error: 'Invalid image type.' });
+      return;
+    }
+
     const ai = getGeminiClient();
 
     const imagePart = {
@@ -99,7 +105,7 @@ Return a structured representation containing:
 4. suggestedLocation (where such an item is commonly lost or found based on visual clues, or default to general guess).`;
 
     const response = await ai.models.generateContent({
-      model: 'gemini-3.5-flash',
+      model: 'gemini-2.0-flash',
       contents: { parts: [imagePart, { text: promptString }] },
       config: {
         responseMimeType: 'application/json',
@@ -157,11 +163,11 @@ app.post('/api/ai-matchmaker', apiLimiter, requireAuth, async (req, res) => {
 
     const instructionsPrompt = `You are the core intelligence matching engine for the Lost & Found app, FindTrack.
 We have a target item that was ${itemToMatch.type === 'lost' ? 'LOST' : 'FOUND'}:
-- Title: "${itemToMatch.title}"
-- Category: "${itemToMatch.category}"
-- Description: "${itemToMatch.description}"
-- Location Tracked: "${itemToMatch.location}"
-- Date Posted: "${itemToMatch.date}"
+- Title: ${JSON.stringify(itemToMatch.title)}
+- Category: ${JSON.stringify(itemToMatch.category)}
+- Description: ${JSON.stringify(itemToMatch.description)}
+- Location Tracked: ${JSON.stringify(itemToMatch.location)}
+- Date Posted: ${JSON.stringify(itemToMatch.date)}
 
 Compare this target item against the following candidates of the opposite tracking list:
 ${JSON.stringify(candidates.map(c => ({ id: c.id, title: c.title, category: c.category, description: c.description, location: c.location, date: c.date })))}
@@ -173,7 +179,7 @@ For each candidate, calculate:
 Filter and return ONLY matches having a confidence score of 35% or higher. Sort the results with higher confidence scores of matching first.`;
 
     const response = await ai.models.generateContent({
-      model: 'gemini-3.5-flash',
+      model: 'gemini-2.0-flash',
       contents: instructionsPrompt,
       config: {
         responseMimeType: 'application/json',
