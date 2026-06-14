@@ -4,6 +4,13 @@ import { fileURLToPath } from 'url';
 import { createServer as createViteServer } from 'vite';
 import { GoogleGenAI, Type } from '@google/genai';
 import dotenv from 'dotenv';
+import rateLimit from 'express-rate-limit';
+import * as admin from 'firebase-admin';
+
+// Initialize firebase admin
+if (!admin.apps.length) {
+  admin.initializeApp();
+}
 
 // Load environment variables
 dotenv.config();
@@ -14,6 +21,28 @@ const PORT = 3000;
 // High limit payload support for high-res base64 photo uploads
 app.use(express.json({ limit: '12mb' }));
 app.use(express.urlencoded({ limit: '12mb', extended: true }));
+
+const apiLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 20, // max 20 requests per 15 minutes per IP
+  message: { error: 'Too many requests from this IP, please try again after 15 minutes.' }
+});
+
+const requireAuth = async (req: express.Request, res: express.Response, next: express.NextFunction) => {
+  const authHeader = req.headers.authorization;
+  if (!authHeader || !authHeader.startsWith('Bearer ')) {
+    res.status(401).json({ error: 'Unauthorized: Missing or invalid token.' });
+    return; // Don't proceed without terminating properly since TS needs next() or return here but wait we already sent response so just return
+  }
+  const token = authHeader.split('Bearer ')[1];
+  try {
+    const decodedToken = await admin.auth().verifyIdToken(token);
+    (req as any).user = decodedToken;
+    next();
+  } catch (error) {
+    res.status(401).json({ error: 'Unauthorized: Invalid token.' });
+  }
+};
 
 // Lazy initializer for Gemini client to prevent startup failure if key is missing
 let aiClient: GoogleGenAI | null = null;
@@ -44,7 +73,7 @@ app.get('/api/health', (req, res) => {
  * API Route: Analyze Uploaded Image
  * Analyzes items from an image attachment and returns structured lost & found characteristics.
  */
-app.post('/api/analyze-image', async (req, res) => {
+app.post('/api/analyze-image', apiLimiter, requireAuth, async (req, res) => {
   try {
     const { imageBase64, mimeType } = req.body;
     if (!imageBase64 || !mimeType) {
@@ -110,7 +139,7 @@ Return a structured representation containing:
  * API Route: Compare user items with opposite tracking collections using Gemini Flash.
  * Returns a list of matches sorted by confidence levels.
  */
-app.post('/api/ai-matchmaker', async (req, res) => {
+app.post('/api/ai-matchmaker', apiLimiter, requireAuth, async (req, res) => {
   try {
     const { itemToMatch, candidates } = req.body;
     if (!itemToMatch || !candidates || !Array.isArray(candidates)) {

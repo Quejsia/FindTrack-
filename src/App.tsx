@@ -99,6 +99,7 @@ export default function App() {
   const [onboardStep, setOnboardStep] = useState(0);
   const [zoomImg, setZoomImg] = useState<string | null>(null);
   const [showGuestModal, setShowGuestModal] = useState(false);
+  const [guestBannerDismissed, setGuestBannerDismissed] = useState(false);
   const [activeChatId, setActiveChatId] = useState<string | null>(null);
 
   // Dashboard inputs
@@ -1183,6 +1184,32 @@ export default function App() {
                 </div>
               ) : (
                 <div id="homeContent">
+                  {profileName === 'Guest' && !guestBannerDismissed && (
+                    <div style={{ backgroundColor: '#fefce8', border: '1px solid #fef08a', borderRadius: '12px', padding: '16px', marginBottom: '16px', display: 'flex', flexDirection: 'column', gap: '12px', boxShadow: '0 1px 2px rgba(0,0,0,0.05)' }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                        <span style={{ fontSize: '20px' }}>⚠️</span>
+                        <p style={{ color: '#854d0e', fontSize: '14px', fontWeight: '500', margin: 0 }}>
+                          You're browsing as a guest. Sign in to report or claim items.
+                        </p>
+                      </div>
+                      <div style={{ display: 'flex', gap: '8px', alignSelf: 'flex-start' }}>
+                        <button 
+                          onClick={() => {
+                            setCurrentView('landing');
+                          }}
+                          style={{ padding: '8px 16px', backgroundColor: '#ca8a04', color: 'white', fontSize: '13px', fontWeight: 'bold', borderRadius: '8px', border: 'none', cursor: 'pointer' }}
+                        >
+                          Sign In
+                        </button>
+                        <button 
+                          onClick={() => setGuestBannerDismissed(true)}
+                          style={{ padding: '8px 16px', backgroundColor: '#fef08a', color: '#854d0e', fontSize: '13px', fontWeight: 'bold', borderRadius: '8px', border: 'none', cursor: 'pointer' }}
+                        >
+                          Continue as Guest
+                        </button>
+                      </div>
+                    </div>
+                  )}
                   <div className="welcome-card">
                     <div className="welcome-left">
                       <p className="muted">Welcome back 👋</p>
