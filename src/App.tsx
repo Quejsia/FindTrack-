@@ -3,7 +3,8 @@ import {
   User, 
   onAuthStateChanged,
   createUserWithEmailAndPassword,
-  signInWithEmailAndPassword
+  signInWithEmailAndPassword,
+  sendEmailVerification
 } from 'firebase/auth';
 import { 
   collection, 
@@ -176,8 +177,13 @@ export default function App() {
           console.error(e);
         }
         
-        // Switch view to dashboard on successful load
-        setCurrentView('dashboard');
+        // Block unverified email users from accessing protected views (dashboard)
+        if (currentUser.email && !currentUser.emailVerified) {
+          setCurrentView('verify-email');
+        } else {
+          // Switch view to dashboard on successful load
+          setCurrentView('dashboard');
+        }
       } else {
         // If guest is currently in session, direct to dashboard
         try {
@@ -264,6 +270,13 @@ export default function App() {
     return unsubscribe;
   }, [user]);
 
+  // Safeguard: Block unverified users from accessing protected views (dashboard) and redirect them to verify screen
+  useEffect(() => {
+    if (auth.currentUser && auth.currentUser.email && !auth.currentUser.emailVerified && currentView === 'dashboard') {
+      setCurrentView('verify-email');
+    }
+  }, [currentView, user]);
+
   // 3. Initiate Onboarding trigger
   useEffect(() => {
     if (currentView === 'dashboard') {
@@ -294,7 +307,11 @@ export default function App() {
       triggerToast("✅ Login successful! Redirecting...", "success");
       setAuthEmail('');
       setAuthPass('');
-      setCurrentView('dashboard');
+      if (credentials.user.email && !credentials.user.emailVerified) {
+        setCurrentView('verify-email');
+      } else {
+        setCurrentView('dashboard');
+      }
     } catch (err: any) {
       console.error("SignIn error:", err);
       triggerToast("❌ Invalid email or password. Please try again.", "error");
@@ -340,14 +357,17 @@ export default function App() {
       setProfileContact(signupContact);
       setProfileEmail(authEmail.trim().toLowerCase());
 
-      triggerToast("✅ Account created successfully!", "success");
+      // Automatically send a verification email using Firebase sendEmailVerification()
+      await sendEmailVerification(credentials.user);
+
+      triggerToast("✅ Account created! Please check your email to verify.", "success");
       
       setSignupFirst('');
       setSignupLast('');
       setSignupContact('');
       setAuthEmail('');
       setAuthPass('');
-      setCurrentView('dashboard');
+      setCurrentView('verify-email');
     } catch (err: any) {
       console.error("SignUp error:", err);
       if (err.code === 'auth/email-already-in-use') {
@@ -722,7 +742,7 @@ export default function App() {
       </div>
 
       {/* ── IMMERSIVE BACKGROUND GRID (Only on landing or auth views) ── */}
-      {(currentView === 'landing' || currentView === 'login' || currentView === 'signup') && (
+      {(currentView === 'landing' || currentView === 'login' || currentView === 'signup' || currentView === 'verify-email') && (
         <div className="bg-scene">
           <div className="bg-orb"></div>
           <div className="bg-orb"></div>
@@ -983,6 +1003,84 @@ export default function App() {
 
               <div className="auth-footer">
                 Already have an account? <button onClick={() => setCurrentView('login')} className="text-[#38bdf8] font-bold hover:underline">Sign in →</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ── VIEW 5: VERIFY EMAIL SCREEN ── */}
+      {currentView === 'verify-email' && (
+        <div className="landing-page flex items-center justify-center">
+          <div className="auth-wrap">
+            <div className="back-link">
+              <button onClick={async () => { await logOut(); setCurrentView('landing'); }} className="text-slate-400 hover:text-white transition">← Logout &amp; return</button>
+            </div>
+
+            <div className="auth-logo">
+              <div className="auth-logo-icon">✉️</div>
+              <h1>FindTrack</h1>
+              <p>Email Verification Required</p>
+            </div>
+
+            <div className="auth-card" style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+              <div className="card-title" style={{ fontSize: '20px', fontWeight: 'bold', color: 'white', marginBottom: '4px' }}>Verify Your Email ✉️</div>
+              <div className="card-sub" style={{ fontSize: '13px', color: 'rgba(255,255,255,0.7)', lineHeight: '1.6', marginBottom: '8px' }}>
+                We've sent a verification email to <strong style={{ color: '#38bdf8' }}>{auth.currentUser?.email || profileEmail || "your email address"}</strong>. 
+                Please check your inbox (including your spam folder) and click the verification link.
+              </div>
+
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                <button 
+                  onClick={async () => {
+                    try {
+                      if (auth.currentUser) {
+                        await auth.currentUser.reload();
+                        if (auth.currentUser.emailVerified) {
+                          triggerToast("✅ Verification successful! Welcome to FindTrack.", "success");
+                          setCurrentView('dashboard');
+                        } else {
+                          triggerToast("ℹ️ Email is not verified yet. Please check your inbox.", "error");
+                        }
+                      } else {
+                        triggerToast("❌ Session lost. Please log in again.", "error");
+                        setCurrentView('login');
+                      }
+                    } catch (e: any) {
+                      console.error(e);
+                      triggerToast("❌ " + (e.message || "Failed to check status."), "error");
+                    }
+                  }} 
+                  className="btn-submit"
+                  style={{ width: '100%', padding: '12px', borderRadius: '8px', fontWeight: 'bold', cursor: 'pointer' }}
+                >
+                  🔄 Check Verification Status
+                </button>
+
+                <button 
+                  onClick={async () => {
+                    try {
+                      if (auth.currentUser) {
+                        await sendEmailVerification(auth.currentUser);
+                        triggerToast("✅ Verification email resent!", "success");
+                      } else {
+                        triggerToast("❌ Session lost. Please log in again.", "error");
+                        setCurrentView('login');
+                      }
+                    } catch (e: any) {
+                      console.error(e);
+                      triggerToast("❌ " + (e.message || "Failed to resend email."), "error");
+                    }
+                  }}
+                  className="btn-submit"
+                  style={{ width: '100%', padding: '10px', borderRadius: '8px', fontWeight: '500', fontSize: '13px', background: 'rgba(255, 255, 255, 0.15)', border: '1px solid rgba(255, 255, 255, 0.2)', cursor: 'pointer' }}
+                >
+                  📨 Resend Verification Email
+                </button>
+              </div>
+
+              <div className="auth-footer" style={{ marginTop: '16px', color: 'rgba(255,255,255,0.5)', fontSize: '12px', textAlign: 'center' }}>
+                Already verified? Click "Check Verification Status" above.
               </div>
             </div>
           </div>
