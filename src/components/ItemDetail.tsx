@@ -300,7 +300,7 @@ export default function ItemDetail({
               </button>
               <button
                 type="button"
-                disabled={submittingClaim || !answer.trim()}
+                disabled={submittingClaim}
                 onClick={() => handleSubmit()}
                 className="flex-1 px-6 py-3 border border-[#008080] rounded bg-[#008080] hover:bg-teal-700 disabled:bg-teal-400 disabled:border-teal-400 text-white font-medium text-sm flex items-center justify-center gap-2 shadow-md transition"
               >
@@ -761,7 +761,6 @@ export default function ItemDetail({
                     placeholder="Provide your exact verification answer or proof details here in as much descriptive precision as possible..."
                     className="w-full rounded-md border border-slate-250 bg-white p-4 font-sans text-xs font-medium text-slate-900 focus:border-teal-600 focus:outline-none focus:ring-2 focus:ring-teal-100 leading-relaxed placeholder:text-slate-400"
                     rows={4}
-                    required
                   />
                   {error && <p className="text-xs font-bold text-red-500 mt-1 animate-pulse">{error}</p>}
                   <p className="font-sans text-[10px] text-slate-400 italic">
@@ -779,7 +778,7 @@ export default function ItemDetail({
                 <div className="flex flex-col gap-2.5 pt-1">
                   <button
                     type="submit"
-                    disabled={submittingClaim || !answer.trim()}
+                    disabled={submittingClaim}
                     className="w-full py-3.5 px-4 rounded-md bg-gradient-to-tr from-teal-850 to-indigo-950 text-white font-sans text-xs font-bold shadow-md hover:from-teal-900 hover:to-indigo-900 transition disabled:opacity-50 active:scale-95 duration-200 flex items-center justify-center space-x-1.5 cursor-pointer"
                   >
                     {submittingClaim ? (
