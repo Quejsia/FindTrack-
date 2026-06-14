@@ -234,10 +234,14 @@ export default function ItemDetail({
                 ⚠️ Ownership Challenge
               </p>
               <p className="text-sm font-semibold text-gray-800 leading-relaxed">
-                Describe how we can verify that this item belongs to you.
+                {item.securityQuestion && item.securityQuestion.trim()
+                  ? item.securityQuestion
+                  : "Describe how we can verify that this item belongs to you."}
               </p>
               <p className="text-sm text-gray-600 mt-1 leading-relaxed">
-                Specify any unique decals, stickers, contents, or circumstances where it was lost/found.
+                {item.securityQuestion && item.securityQuestion.trim()
+                  ? "Please answer the verification question above set by the owner."
+                  : "Specify any unique decals, stickers, contents, or circumstances where it was lost/found."}
               </p>
             </div>
 
@@ -266,7 +270,7 @@ export default function ItemDetail({
                 <input
                   type="text"
                   readOnly
-                  value="Describe how we can verify that this item belongs to you. Specify any unique decals, stickers, contents, or circumstances where it was lost/found."
+                  value={item.securityQuestion && item.securityQuestion.trim() ? item.securityQuestion : "Describe how we can verify that this item belongs to you. Specify any unique decals, stickers, contents, or circumstances where it was lost/found."}
                   className="w-full mt-1 p-[12px] border border-[#008080] rounded bg-white text-black cursor-default select-text"
                 />
               </div>
