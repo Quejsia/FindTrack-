@@ -61,6 +61,7 @@ export default function ItemDetail({
   const [claimView, setClaimView] = useState(false);
   const [answer, setAnswer] = useState('');
   const [error, setError] = useState('');
+  const [isShaking, setIsShaking] = useState(false);
   const [submittingClaim, setSubmittingClaim] = useState(false);
   const [claimErrorObj, setClaimErrorObj] = useState<string | null>(null);
 
@@ -133,8 +134,10 @@ export default function ItemDetail({
     if (e) e.preventDefault();
     if (!currentUserUid) return;
 
-    if (answer.trim() === '') {
-      setError('Verification answer cannot be empty!');
+    if (!answer.trim()) {
+      setError('Verification answer cannot be empty 🫙');
+      setIsShaking(true);
+      setTimeout(() => setIsShaking(false), 500);
       return;
     }
     setError('');
@@ -188,7 +191,17 @@ export default function ItemDetail({
 
   if (claimView) {
     return (
-      <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm" id="dedicated-claim-page">
+      <div className="fixed inset-0 z-50 flex items-center justify-center p-4 pt-24 bg-slate-900/60 backdrop-blur-sm" id="dedicated-claim-page">
+        <style>{`
+          @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            20%, 60% { transform: translateX(-4px); }
+            40%, 80% { transform: translateX(4px); }
+          }
+          .animate-shake {
+            animation: shake 0.4s cubic-bezier(.36,.07,.19,.97) both;
+          }
+        `}</style>
         <div className="relative w-full max-w-2xl mt-16 bg-white rounded-md shadow-2xl flex flex-col overflow-hidden max-h-[90vh]">
           
           {/* THE HEADER: Keep the teal "Log Ownership Claim / Prove-It Verification Layer" header clean and isolated at the top. */}
@@ -229,7 +242,7 @@ export default function ItemDetail({
             </div>
 
             {/* RESTORED ANSWER INPUT: Bring back the label and the spacious text input area. */}
-            <div className="flex flex-col gap-2">
+            <div className={`flex flex-col gap-2 ${isShaking ? 'animate-shake border-red-500' : ''}`}>
               <label htmlFor="claim-answer-textarea" className="text-[10px] font-bold text-slate-600 uppercase tracking-widest">
                 YOUR VERIFICATION ANSWER *
               </label>
@@ -237,11 +250,14 @@ export default function ItemDetail({
                 id="claim-answer-textarea"
                 rows={5}
                 value={answer}
-                onChange={(e) => setAnswer(e.target.value)}
+                onChange={(e) => { 
+                  setAnswer(e.target.value); 
+                  if (error) setError(''); 
+                }}
                 placeholder="Provide your exact verification answer or physical proof details here in as much descriptive precision as possible..."
                 className="w-full px-4 py-3 border border-[#008080] rounded-[3px] bg-white text-gray-700 focus:outline-none focus:border-[#008080]"
               />
-              {error && <p className="text-red-500 text-sm mt-1">{error}</p>}
+              {error && <p className="text-xs font-bold text-red-500 mt-1 animate-pulse">{error}</p>}
               {/* VERIFICATION QUESTION - Read Only */}
               <div className="mt-4">
                 <label className="text-xs font-semibold tracking-wider text-gray-500 uppercase">
@@ -731,20 +747,23 @@ export default function ItemDetail({
                   </div>
                 </div>
 
-                <div className="space-y-2">
+                <div className={`space-y-2 ${isShaking ? 'animate-shake border-red-500' : ''}`}>
                   <label htmlFor="claimer-answer" className="block text-[9px] font-mono font-bold text-slate-400 uppercase tracking-widest">
                     Your Verification Answer *
                   </label>
                   <textarea
                     id="claimer-answer-modal"
                     value={answer}
-                    onChange={(e) => setAnswer(e.target.value)}
+                    onChange={(e) => { 
+                      setAnswer(e.target.value); 
+                      if (error) setError(''); 
+                    }}
                     placeholder="Provide your exact verification answer or proof details here in as much descriptive precision as possible..."
                     className="w-full rounded-md border border-slate-250 bg-white p-4 font-sans text-xs font-medium text-slate-900 focus:border-teal-600 focus:outline-none focus:ring-2 focus:ring-teal-100 leading-relaxed placeholder:text-slate-400"
                     rows={4}
                     required
                   />
-                  {error && <p className="text-red-500 text-sm mt-1">{error}</p>}
+                  {error && <p className="text-xs font-bold text-red-500 mt-1 animate-pulse">{error}</p>}
                   <p className="font-sans text-[10px] text-slate-400 italic">
                     The finder will inspect this proof and action your contact credentials request.
                   </p>
