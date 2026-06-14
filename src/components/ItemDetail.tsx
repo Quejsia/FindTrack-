@@ -605,9 +605,9 @@ export default function ItemDetail({
                                     onClose();
                                   }
                                 }}
-                                className="w-full flex items-center justify-center space-x-1.5 bg-teal-850 hover:bg-teal-900 border border-teal-800 text-white font-sans text-xs font-bold py-3.5 px-4 rounded-md shadow-md cursor-pointer transition active:scale-95 duration-200"
+                                className="w-full flex items-center justify-center space-x-1.5 bg-teal-850 hover:bg-teal-900 border border-teal-800 text-[#1a1a1a] font-sans text-xs font-bold py-3.5 px-4 rounded-md shadow-md cursor-pointer transition active:scale-95 duration-200"
                               >
-                                <MessageSquare className="h-4 w-4 shrink-0 text-white/95" />
+                                <MessageSquare className="h-4 w-4 shrink-0 text-[#1a1a1a]" />
                                 <span>Direct Chat Room</span>
                               </button>
 
