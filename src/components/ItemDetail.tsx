@@ -251,8 +251,25 @@ export default function ItemDetail({
 
             {/* RESTORED ANSWER INPUT: Bring back the label and the spacious text input area. */}
             <div className={`flex flex-col gap-2 ${isShaking ? 'animate-shake border-red-500' : ''}`}>
-              <label htmlFor="claim-answer-textarea" className="text-[10px] font-bold text-slate-600 uppercase tracking-widest">
-                YOUR VERIFICATION ANSWER *
+              {/* VERIFICATION QUESTION - Read Only */}
+              <div className="mb-4">
+                <label className="text-xs font-semibold tracking-wider text-gray-500 uppercase">
+                  VERIFICATION QUESTION
+                </label>
+                {item.securityQuestion && item.securityQuestion.trim() ? (
+                  <div className="w-full mt-1 p-[12px] border border-[#008080] rounded bg-white text-black">
+                    <p className="font-bold text-xs mb-1">🔑 OWNER'S SECRET QUESTION</p>
+                    <p className="italic">"{item.securityQuestion}"</p>
+                  </div>
+                ) : (
+                  <div className="w-full mt-1 p-[12px] border border-[#008080] rounded bg-white text-black cursor-default select-text">
+                    Describe how we can verify that this item belongs to you. Specify any unique decals, stickers, contents, or circumstances where it was lost/found.
+                  </div>
+                )}
+              </div>
+
+              <label htmlFor="claim-answer-textarea" className="text-[10px] font-bold text-slate-600 uppercase tracking-widest mt-2">
+                YOUR ANSWER
               </label>
               <textarea
                 id="claim-answer-textarea"
@@ -262,22 +279,10 @@ export default function ItemDetail({
                   setAnswer(e.target.value); 
                   if (error) setError(''); 
                 }}
-                placeholder="Provide your exact verification answer or physical proof details here in as much descriptive precision as possible..."
+                placeholder="Type your answer here..."
                 className="w-full px-4 py-3 border border-[#008080] rounded-[3px] bg-white text-gray-700 focus:outline-none focus:border-[#008080]"
               />
               {error && <p className="text-xs font-bold text-red-500 mt-1 animate-pulse">{error}</p>}
-              {/* VERIFICATION QUESTION - Read Only */}
-              <div className="mt-4">
-                <label className="text-xs font-semibold tracking-wider text-gray-500 uppercase">
-                  Verification Question
-                </label>
-                <input
-                  type="text"
-                  readOnly
-                  value={item.securityQuestion && item.securityQuestion.trim() ? item.securityQuestion : "Describe how we can verify that this item belongs to you. Specify any unique decals, stickers, contents, or circumstances where it was lost/found."}
-                  className="w-full mt-1 p-[12px] border border-[#008080] rounded bg-white text-black cursor-default select-text"
-                />
-              </div>
               <p className="text-[10px] text-[#008080] italic mt-1">
                 The finder will inspect this proof and action your contact credentials request.
               </p>
@@ -744,20 +749,25 @@ export default function ItemDetail({
               <form onSubmit={handleSubmit} className="p-6 space-y-5">
                 <div className="space-y-2">
                   <label className="block text-[9px] font-mono font-bold text-slate-400 uppercase tracking-widest">
-                    Verification Question
+                    VERIFICATION QUESTION
                   </label>
-                  <div className="bg-slate-50 border border-slate-205/65 rounded-md p-4">
-                    <p className="font-sans text-xs font-bold text-slate-800 leading-relaxed">
-                      {hasSecurityQuestion 
-                        ? item.securityQuestion 
-                        : "Describe how we can verify that this item belongs to you. Specify any unique decals, stickers, contents, or circumstances where it was lost/found."}
-                    </p>
-                  </div>
+                  {hasSecurityQuestion ? (
+                    <div className="bg-amber-50 border border-amber-200 rounded-md p-4 text-amber-900">
+                      <p className="font-bold text-xs mb-1">🔑 OWNER'S SECRET QUESTION</p>
+                      <p className="font-sans text-xs italic leading-relaxed">"{item.securityQuestion}"</p>
+                    </div>
+                  ) : (
+                    <div className="bg-slate-50 border border-slate-205/65 rounded-md p-4">
+                      <p className="font-sans text-xs text-slate-800 leading-relaxed">
+                        Describe how we can verify that this item belongs to you. Specify any unique decals, stickers, contents, or circumstances where it was lost/found.
+                      </p>
+                    </div>
+                  )}
                 </div>
 
                 <div className={`space-y-2 ${isShaking ? 'animate-shake border-red-500' : ''}`}>
-                  <label htmlFor="claimer-answer" className="block text-[9px] font-mono font-bold text-slate-400 uppercase tracking-widest">
-                    Your Verification Answer *
+                  <label htmlFor="claimer-answer-modal" className="block text-[9px] font-mono font-bold text-slate-400 uppercase tracking-widest">
+                    YOUR ANSWER
                   </label>
                   <textarea
                     id="claimer-answer-modal"
@@ -766,7 +776,7 @@ export default function ItemDetail({
                       setAnswer(e.target.value); 
                       if (error) setError(''); 
                     }}
-                    placeholder="Provide your exact verification answer or proof details here in as much descriptive precision as possible..."
+                    placeholder="Type your answer here..."
                     className="w-full rounded-md border border-slate-250 bg-white p-4 font-sans text-xs font-medium text-slate-900 focus:border-teal-600 focus:outline-none focus:ring-2 focus:ring-teal-100 leading-relaxed placeholder:text-slate-400"
                     rows={4}
                   />
