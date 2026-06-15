@@ -565,7 +565,7 @@ export default function App() {
       status: 'active',
       contactName: profileName || 'Student',
       contactInfo: profileContact || profileEmail || 'No contact provided',
-      date: new Date().toLocaleDateString(),
+      date: new Date().toISOString(),
       imageUrl: finalImageUrl,
       createdAt: serverTimestamp(),
       updatedAt: serverTimestamp(),
@@ -1578,7 +1578,7 @@ export default function App() {
                           </div>
                           <div className="recent-info">
                             <div className="recent-title">{r.title}</div>
-                            <div className="recent-meta">{r.location || "Location unknown"} · {r.date || "Just now"}</div>
+                            <div className="recent-meta">{r.location || "Location unknown"} · {r.date ? new Date(r.date).toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }) : "Just now"}</div>
                           </div>
                           <div className={`badge ${r.claimed ? 'claimed' : r.type}`}>
                             {r.claimed ? "CLAIMED" : r.type.toUpperCase()}
@@ -1826,7 +1826,7 @@ export default function App() {
                       <div className="card-footer">
                         <div>
                           <small style={{ display: 'block', color: '#64748b' }}>{r.location || "Unknown location"}</small>
-                          <small style={{ color: '#94a3b8' }}>{r.date || "Just now"}</small>
+                          <small style={{ color: '#94a3b8' }}>{r.date ? new Date(r.date).toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }) : "Just now"}</small>
                         </div>
                         <div className={`badge ${r.claimed ? 'claimed' : r.type}`}>
                           {r.claimed ? "CLAIMED" : r.type.toUpperCase()}
@@ -1865,7 +1865,7 @@ export default function App() {
                     imageUrl: r.image || r.imageUrl || '',
                     contactName: r.contactName || 'Representative',
                     contactInfo: r.contactInfo || 'No contact info provided',
-                    date: r.date || new Date().toLocaleDateString(),
+                    date: r.date || new Date().toISOString(),
                     createdAt: r.createdAt ? (r.createdAt.seconds ? new Date(r.createdAt.seconds * 1000).toISOString() : String(r.createdAt)) : new Date().toISOString(),
                     updatedAt: r.createdAt ? (r.createdAt.seconds ? new Date(r.createdAt.seconds * 1000).toISOString() : String(r.createdAt)) : new Date().toISOString(),
                   };
@@ -1882,7 +1882,7 @@ export default function App() {
                     imageUrl: x.image || x.imageUrl || '',
                     contactName: x.contactName || 'Representative',
                     contactInfo: x.contactInfo || 'No contact info provided',
-                    date: x.date || new Date().toLocaleDateString(),
+                    date: x.date || new Date().toISOString(),
                     createdAt: x.createdAt ? (x.createdAt.seconds ? new Date(x.createdAt.seconds * 1000).toISOString() : String(x.createdAt)) : new Date().toISOString(),
                     updatedAt: x.createdAt ? (x.createdAt.seconds ? new Date(x.createdAt.seconds * 1000).toISOString() : String(x.createdAt)) : new Date().toISOString(),
                   } as any));
@@ -2124,7 +2124,7 @@ export default function App() {
                       </div>
 
                       <div className="card-footer">
-                        <small style={{ color: '#94a3b8' }}>{r.date || "Just now"}</small>
+                        <small style={{ color: '#94a3b8' }}>{r.date ? new Date(r.date).toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }) : "Just now"}</small>
                         <div className={`badge ${r.claimed ? 'claimed' : r.type}`}>
                           {r.claimed ? "CLAIMED" : r.type.toUpperCase()}
                         </div>
@@ -2170,7 +2170,7 @@ export default function App() {
                       <div className="card-footer">
                         <div>
                           <small style={{ display: 'block', color: '#64748b' }}>{r.location || "Unknown location"}</small>
-                          <small style={{ color: '#94a3b8' }}>{r.date || "Just now"}</small>
+                          <small style={{ color: '#94a3b8' }}>{r.date ? new Date(r.date).toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }) : "Just now"}</small>
                         </div>
                         <div className={`badge ${r.claimed ? 'claimed' : r.type}`}>
                           {r.claimed ? "CLAIMED" : r.type.toUpperCase()}
