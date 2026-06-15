@@ -586,14 +586,16 @@ export default function App() {
       setReportImageFile(null);
       setReportSecurityQuestion('');
 
-      // Auto redirect to Search to view entries
-      setActiveTab('search');
+      // Auto redirect to home feed out of form
+      setActiveTab('home');
     } catch (err) {
       console.error("Firestore creation error:", err);
       triggerToast("❌ Submission rejected by security parameters.", "error");
       try {
         handleFirestoreError(err, OperationType.CREATE, `items/${payloadId}`);
       } catch (e) {}
+    } finally {
+      setIsUploading(false);
     }
   };
 
@@ -1691,7 +1693,7 @@ export default function App() {
                   </div>
 
                   <div className="form-group bg-slate-50 border border-slate-205 rounded-xl p-4 my-2" style={{ backgroundColor: '#f8fafc', border: '1px solid #e2e8f0', borderRadius: '12px', padding: '16px', margin: '8px 0' }}>
-                    <label htmlFor="r_securityQuestion" className="text-slate-800 font-bold" style={{ fontWeight: 'bold', color: '#1e293b' }}>🔑 Prove It! Verification Question (Optional)</label>
+                    <label htmlFor="r_securityQuestion" className="text-slate-800 font-bold" style={{ fontWeight: 'bold', color: '#1e293b' }}>🔑 OWNER SECRET QUESTION (OPTIONAL)</label>
                     <div style={{ position: 'relative' }}>
                       <input 
                         id="r_securityQuestion" 
@@ -1713,7 +1715,7 @@ export default function App() {
                       )}
                     </div>
                     <p className="text-[10px] text-slate-500 mt-1" style={{ fontSize: '10px', color: '#64748b', marginTop: '4px', lineHeight: '1.4' }}>
-                      Add an optional verification question to protect this item. To claim it, other users will be requested to provide a matching answer.
+                      Set a secret question only the real owner would know. Claimers must answer this correctly.
                     </p>
                   </div>
 

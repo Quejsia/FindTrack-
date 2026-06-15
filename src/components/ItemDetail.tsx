@@ -101,7 +101,11 @@ export default function ItemDetail({
     return () => unsubscribe();
   }, [item.id, currentUserUid, isOwner]);
 
-  const formattedDate = new Date(item.date).toLocaleDateString('en-US', {
+  const dateToParse = item.date && !isNaN(new Date(item.date).getTime()) 
+    ? item.date 
+    : (item.createdAt ? item.createdAt : new Date().toISOString());
+
+  const formattedDate = new Date(dateToParse).toLocaleDateString('en-US', {
     weekday: 'long',
     month: 'long',
     day: 'numeric',
