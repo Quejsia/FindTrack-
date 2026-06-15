@@ -233,23 +233,6 @@ export default function ItemDetail({
               <p className="text-xs text-slate-500 mt-1">{item.location} · {formattedDate}</p>
             </div>
 
-            <div className="bg-amber-50 rounded-2xl shadow-sm p-4 border-l-4 border-amber-400">
-              <p className="text-xs font-bold text-amber-600 uppercase tracking-wide mb-2">
-                ⚠️ Ownership Challenge
-              </p>
-              <p className="text-sm font-semibold text-gray-800 leading-relaxed">
-                {item.securityQuestion && item.securityQuestion.trim()
-                  ? item.securityQuestion
-                  : "Describe how we can verify that this item belongs to you."}
-              </p>
-              <p className="text-sm text-gray-600 mt-1 leading-relaxed">
-                {item.securityQuestion && item.securityQuestion.trim()
-                  ? "Please answer the verification question above set by the owner."
-                  : "Specify any unique decals, stickers, contents, or circumstances where it was lost/found."}
-              </p>
-            </div>
-
-            {/* RESTORED ANSWER INPUT: Bring back the label and the spacious text input area. */}
             <div className={`flex flex-col gap-2 ${isShaking ? 'animate-shake border-red-500' : ''}`}>
               {/* VERIFICATION QUESTION - Read Only */}
               <div className="mb-4">
@@ -279,7 +262,7 @@ export default function ItemDetail({
                   setAnswer(e.target.value); 
                   if (error) setError(''); 
                 }}
-                placeholder="Type your answer here..."
+                placeholder="Provide your exact verification answer or physical proof details here..."
                 className="w-full px-4 py-3 border border-[#008080] rounded-[3px] bg-white text-gray-700 focus:outline-none focus:border-[#008080]"
               />
               {error && <p className="text-xs font-bold text-red-500 mt-1 animate-pulse">{error}</p>}
@@ -776,7 +759,7 @@ export default function ItemDetail({
                       setAnswer(e.target.value); 
                       if (error) setError(''); 
                     }}
-                    placeholder="Type your answer here..."
+                    placeholder="Provide your exact verification answer or physical proof details here..."
                     className="w-full rounded-md border border-slate-250 bg-white p-4 font-sans text-xs font-medium text-slate-900 focus:border-teal-600 focus:outline-none focus:ring-2 focus:ring-teal-100 leading-relaxed placeholder:text-slate-400"
                     rows={4}
                   />
@@ -784,6 +767,14 @@ export default function ItemDetail({
                   <p className="font-sans text-[10px] text-slate-400 italic">
                     The finder will inspect this proof and action your contact credentials request.
                   </p>
+                </div>
+
+                {/* TIPS CARD */}
+                <div className="p-4 border border-teal-600/30 rounded-md bg-teal-50/50 space-y-1">
+                  <span className="text-[10px] font-bold text-teal-700 uppercase tracking-widest block mb-1">💡 Tips for a strong claim</span>
+                  <p className="text-xs text-slate-650 leading-relaxed">• State items inside (e.g. specific cards, quantity of cash, etc.)</p>
+                  <p className="text-xs text-slate-650 leading-relaxed">• Mention distinct scratches, custom keychains, stickers, or wallpaper setups</p>
+                  <p className="text-xs text-slate-650 leading-relaxed">• State the exact date, time range and place you lost or found it</p>
                 </div>
 
                 {claimErrorObj && (
