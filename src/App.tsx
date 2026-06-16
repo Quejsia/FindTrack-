@@ -1889,6 +1889,8 @@ export default function App() {
                     date: r.date || new Date().toISOString(),
                     createdAt: r.createdAt ? (r.createdAt.seconds ? new Date(r.createdAt.seconds * 1000).toISOString() : String(r.createdAt)) : new Date().toISOString(),
                     updatedAt: r.createdAt ? (r.createdAt.seconds ? new Date(r.createdAt.seconds * 1000).toISOString() : String(r.createdAt)) : new Date().toISOString(),
+                    securityQuestion: (r as any).securityQuestion || '',
+                    securityAnswer: (r as any).securityAnswer || '',
                   };
 
                   const oppositeItemsMapped = items.filter(x => x.type !== r.type).map(x => ({
@@ -1906,6 +1908,8 @@ export default function App() {
                     date: x.date || new Date().toISOString(),
                     createdAt: x.createdAt ? (x.createdAt.seconds ? new Date(x.createdAt.seconds * 1000).toISOString() : String(x.createdAt)) : new Date().toISOString(),
                     updatedAt: x.createdAt ? (x.createdAt.seconds ? new Date(x.createdAt.seconds * 1000).toISOString() : String(x.createdAt)) : new Date().toISOString(),
+                    securityQuestion: (x as any).securityQuestion || '',
+                    securityAnswer: (x as any).securityAnswer || '',
                   } as any));
 
                   return (

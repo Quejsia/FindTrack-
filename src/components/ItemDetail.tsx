@@ -212,7 +212,7 @@ export default function ItemDetail({
 
   if (claimView) {
     return (
-      <div className="fixed inset-0 z-50 flex items-center justify-center p-4 pt-24 bg-slate-900/60 backdrop-blur-sm" id="dedicated-claim-page">
+      <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm" id="dedicated-claim-page">
         <style>{`
           @keyframes shake {
             0%, 100% { transform: translateX(0); }
@@ -223,7 +223,7 @@ export default function ItemDetail({
             animation: shake 0.4s cubic-bezier(.36,.07,.19,.97) both;
           }
         `}</style>
-        <div className="relative w-full max-w-2xl mt-16 bg-white rounded-md shadow-2xl flex flex-col overflow-hidden max-h-[90vh]">
+        <div className="relative w-full max-w-2xl bg-white rounded-md shadow-2xl flex flex-col overflow-hidden max-h-[90vh]">
           
           {/* THE HEADER: Keep the teal "Log Ownership Claim / Prove-It Verification Layer" header clean and isolated at the top. */}
           <div className="flex items-center justify-between px-6 py-4 bg-gradient-to-r from-teal-700 to-teal-500 text-white shrink-0">
@@ -289,7 +289,7 @@ export default function ItemDetail({
             </div>
 
             {/* TIPS CARD */}
-            <div className="mt-[40px] p-4 border border-[#008080] rounded-[3px] bg-white space-y-1">
+            <div className="p-4 border border-[#008080] rounded-[3px] bg-white space-y-1">
               <span className="text-[10px] font-bold text-[#008080] uppercase tracking-widest block mb-1">💡 Tips for a strong claim</span>
               <p className="text-xs text-slate-650 leading-relaxed">• State items inside (e.g. specific cards, quantity of cash, etc.)</p>
               <p className="text-xs text-slate-650 leading-relaxed">• Mention distinct scratches, custom keychains, stickers, or wallpaper setups</p>
@@ -303,7 +303,7 @@ export default function ItemDetail({
             )}
 
             {/* CLEAN BUTTON LAYOUT: Move the "Cancel" and "✅ Submit Answer" buttons BELOW the text input area. */}
-            <div className="flex items-center gap-3 mt-[30px]">
+            <div className="flex items-center gap-3">
               <button
                 type="button"
                 onClick={() => setClaimView(false)}
