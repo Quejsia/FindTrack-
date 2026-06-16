@@ -153,6 +153,15 @@ export default function ItemDetail({
     const claimsPath = `claims/${claimId}`;
 
     try {
+      const normalizedUserAnswer = answer.trim().toLowerCase();
+      const normalizedCorrectAnswer = item.securityAnswer?.trim().toLowerCase() || '';
+
+      // Prevent auto-approval if no answer was set by owner
+      // '' === '' must NOT auto-approve
+      const autoApproved =
+        !!normalizedCorrectAnswer &&
+        normalizedUserAnswer === normalizedCorrectAnswer;
+
       const claimPayload: Claim = {
         id: claimId,
         itemId: item.id,
@@ -165,7 +174,9 @@ export default function ItemDetail({
         finderId: item.userId,
         securityQuestion: item.securityQuestion || 'Please verify physical details for item ownership confirmation.',
         providedAnswer: answer.trim(),
-        status: 'pending',
+        status: autoApproved ? 'approved' : 'pending',
+        autoVerified: autoApproved,
+        manualOverride: false,
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString()
       };
@@ -175,6 +186,12 @@ export default function ItemDetail({
         createdAt: serverTimestamp(),
         updatedAt: serverTimestamp()
       });
+
+      if (autoApproved) {
+        alert('✅ Ownership verified successfully! Contact details unlocked.');
+      } else {
+        alert('⏳ Claim submitted for manual review by the owner.');
+      }
 
       setAnswer('');
       setOpenClaimModal(false);

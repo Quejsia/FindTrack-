@@ -19,6 +19,7 @@ export interface Item {
   createdAt: string; // Date or Firestore sub-timestamp
   updatedAt: string;
   securityQuestion?: string; // Prove it question
+  securityAnswer?: string;
 }
 
 export interface Claim {
@@ -34,6 +35,8 @@ export interface Claim {
   securityQuestion: string;
   providedAnswer: string;
   status: 'pending' | 'approved' | 'rejected';
+  autoVerified?: boolean;
+  manualOverride?: boolean;
   createdAt: any;
   updatedAt: any;
 }

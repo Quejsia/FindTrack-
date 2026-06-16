@@ -117,6 +117,7 @@ export default function App() {
   const [reportImageFile, setReportImageFile] = useState<File | null>(null);
   const [isUploading, setIsUploading] = useState(false);
   const [reportSecurityQuestion, setReportSecurityQuestion] = useState('');
+  const [reportSecurityAnswer, setReportSecurityAnswer] = useState('');
   const [incomingClaims, setIncomingClaims] = useState<Claim[]>([]);
 
   // Dashboard Search state
@@ -570,7 +571,8 @@ export default function App() {
       createdAt: serverTimestamp(),
       updatedAt: serverTimestamp(),
       claimed: false,
-      securityQuestion: reportSecurityQuestion.trim()
+      securityQuestion: reportSecurityQuestion.trim(),
+      securityAnswer: reportSecurityAnswer.trim().toLowerCase()
     };
 
     try {
@@ -585,6 +587,7 @@ export default function App() {
       setReportImage('');
       setReportImageFile(null);
       setReportSecurityQuestion('');
+      setReportSecurityAnswer('');
 
       // Auto redirect to home feed out of form
       setActiveTab('home');
@@ -1716,6 +1719,22 @@ export default function App() {
                     </div>
                     <p className="text-[10px] text-slate-500 mt-1" style={{ fontSize: '10px', color: '#64748b', marginTop: '4px', lineHeight: '1.4' }}>
                       Set a secret question only the real owner would know. Claimers must answer this correctly.
+                    </p>
+                  </div>
+
+                  <div className="space-y-2">
+                    <label className="block text-sm font-semibold text-slate-700">
+                      Secret Verification Answer
+                    </label>
+                    <input
+                      type="text"
+                      value={reportSecurityAnswer}
+                      onChange={(e) => setReportSecurityAnswer(e.target.value)}
+                      placeholder="Example: blue sticker"
+                      className="w-full rounded-md border border-slate-300 px-4 py-3 focus:outline-none focus:ring-2 focus:ring-teal-500"
+                    />
+                    <p className="text-xs text-slate-500">
+                      This answer will be hidden and used for automatic ownership verification.
                     </p>
                   </div>
 
