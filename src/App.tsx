@@ -112,6 +112,7 @@ export default function App() {
   const [reportTitle, setReportTitle] = useState('');
   const [reportLocation, setReportLocation] = useState('');
   const [reportDesc, setReportDesc] = useState('');
+  const [reportEmail, setReportEmail] = useState('');
   const [reportType, setReportType] = useState<'lost' | 'found'>('lost');
   const [reportImage, setReportImage] = useState<string>('');
   const [reportImageFile, setReportImageFile] = useState<File | null>(null);
@@ -575,7 +576,7 @@ export default function App() {
       location: reportLocation.trim() || 'Unknown Location',
       status: 'active',
       contactName: profileName || 'Student',
-      contactInfo: profileContact || profileEmail || 'No contact provided',
+      contactInfo: `${profileContact || 'No contact provided'} | Email: ${reportEmail.trim() || profileEmail || 'No email provided'}`,
       date: new Date().toISOString(),
       imageUrl: finalImageUrl,
       createdAt: serverTimestamp(),
@@ -593,6 +594,7 @@ export default function App() {
       setReportTitle('');
       setReportLocation('');
       setReportDesc('');
+      setReportEmail('');
       setReportType('lost');
       setReportImage('');
       setReportImageFile(null);
@@ -1675,6 +1677,16 @@ export default function App() {
                       value={reportDesc}
                       onChange={(e) => setReportDesc(e.target.value)}
                     ></textarea>
+                  </div>
+                  <div className="form-group">
+                    <label htmlFor="r_email">Contact Email</label>
+                    <input 
+                      id="r_email" 
+                      type="email" 
+                      placeholder="e.g., mail@example.com (so people can reach you)" 
+                      value={reportEmail}
+                      onChange={(e) => setReportEmail(e.target.value)}
+                    />
                   </div>
                   <div className="form-group">
                     <label htmlFor="r_image">Upload Photo</label>
