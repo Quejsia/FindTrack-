@@ -271,13 +271,13 @@ export default function ItemDetail({
           </div>
 
           {/* MAIN WRAPPER: Use a clean vertical flex container with proper padding so elements don't collide */}
-          <div className="p-6 flex flex-col gap-6 w-full overflow-y-auto bg-slate-50">
+          <div className="p-6 flex flex-col gap-6 w-full bg-slate-50 rounded-b-md">
             
             {/* ITEM SUMMARY CARD */}
             <div className="bg-white rounded-lg p-5 border border-slate-200 shadow-sm border-l-4 border-l-teal-500 hover:shadow-md transition">
               <span className="text-[11px] font-extrabold text-teal-600 uppercase tracking-widest block mb-1.5 flex items-center gap-1.5"><span className="text-sm">🏷️</span> Current Claim Item</span>
-              <h4 className="text-xl font-black text-slate-800">{item.title}</h4>
-              <p className="text-sm font-medium text-slate-500 mt-1">{item.location} · {formattedDate}</p>
+              <h4 className="text-xl font-black text-slate-800">{item?.title || 'Unknown Item'}</h4>
+              <p className="text-sm font-medium text-slate-500 mt-1">{item?.location || 'Unknown Location'} · {formattedDate || 'Unknown Date'}</p>
             </div>
 
             <div className={`flex flex-col gap-3 ${isShaking ? 'animate-shake border-red-500' : ''}`}>
@@ -286,10 +286,10 @@ export default function ItemDetail({
                 <label className="text-sm font-bold tracking-wider text-gray-500 uppercase">
                   VERIFICATION QUESTION
                 </label>
-                {item.securityQuestion && item.securityQuestion.trim() ? (
+                {item?.securityQuestion && item.securityQuestion.trim() ? (
                   <div className="w-full mt-2 p-[16px] border-2 border-[#008080] rounded-md bg-[#fefce8] text-black shadow-sm">
                     <p className="font-bold text-sm mb-2 text-[#854d0e] uppercase tracking-wide">🔑 OWNER'S SECRET QUESTION</p>
-                    <p className="italic text-[#713f12] text-lg font-medium tracking-tight">e.g. "{item.securityQuestion}"</p>
+                    <p className="italic text-[#713f12] text-lg font-medium tracking-tight">e.g. "{item?.securityQuestion}"</p>
                   </div>
                 ) : (
                   <div className="w-full mt-2 p-[16px] border-2 border-[#008080] rounded-md bg-white text-black cursor-default select-text font-medium shadow-sm">
