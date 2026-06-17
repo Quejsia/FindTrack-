@@ -112,6 +112,7 @@ export default function App() {
   const [reportTitle, setReportTitle] = useState('');
   const [reportLocation, setReportLocation] = useState('');
   const [reportDesc, setReportDesc] = useState('');
+  const [reportEmail, setReportEmail] = useState('');
   const [reportType, setReportType] = useState<'lost' | 'found'>('lost');
   const [reportImage, setReportImage] = useState<string>('');
   const [reportImageFile, setReportImageFile] = useState<File | null>(null);
@@ -196,16 +197,23 @@ export default function App() {
       if (currentUser) {
         // Automatically sync initial profile credentials
         setProfileEmail(currentUser.email || "");
-        setProfileName(currentUser.displayName || "Dela Cruz");
         
         // Sync profile data from localStorage context if exists
         try {
           const lProfile = localStorage.getItem("userProfile");
           if (lProfile) {
             const parsed = JSON.parse(lProfile);
-            if (parsed.name) setProfileName(parsed.name);
+            if (parsed.name && parsed.name !== 'Guest') {
+              setProfileName(parsed.name);
+            } else {
+              setProfileName(currentUser.displayName || currentUser.email?.split('@')[0] || "User");
+            }
             if (parsed.contact) setProfileContact(parsed.contact);
-            if (parsed.avatar) setProfileAvatar(parsed.avatar);
+            if (parsed.avatar && !parsed.avatar.includes('guest')) {
+              setProfileAvatar(parsed.avatar);
+            }
+          } else {
+            setProfileName(currentUser.displayName || currentUser.email?.split('@')[0] || "User");
           }
         } catch (e) {
           console.error(e);
@@ -428,9 +436,12 @@ export default function App() {
       setProfileEmail(authEmail.trim().toLowerCase());
 
       // Automatically send a verification email using Firebase sendEmailVerification()
-      await sendEmailVerification(credentials.user);
-
-      triggerToast("✅ Account created! Please check your email to verify.", "success");
+      try {
+        await sendEmailVerification(credentials.user);
+        triggerToast("✅ Account created! Please check your email to verify.", "success");
+      } catch (err: any) {
+        console.error("Verification email sending failed:", err);
+      }
       
       setSignupFirst('');
       setSignupLast('');
@@ -451,7 +462,7 @@ export default function App() {
   // Handle Logout
   const handleLogoutAction = async () => {
     localStorage.removeItem('sessionUser');
-    localStorage.removeItem('userProfile');
+    // Keeping userProfile locally since we do not currently sync names/avatars to a users collection.
     try {
       await logOut();
     } catch (er) {}
@@ -565,7 +576,7 @@ export default function App() {
       location: reportLocation.trim() || 'Unknown Location',
       status: 'active',
       contactName: profileName || 'Student',
-      contactInfo: profileContact || profileEmail || 'No contact provided',
+      contactInfo: `${profileContact || 'No contact provided'} | Email: ${reportEmail.trim() || profileEmail || 'No email provided'}`,
       date: new Date().toISOString(),
       imageUrl: finalImageUrl,
       createdAt: serverTimestamp(),
@@ -583,6 +594,7 @@ export default function App() {
       setReportTitle('');
       setReportLocation('');
       setReportDesc('');
+      setReportEmail('');
       setReportType('lost');
       setReportImage('');
       setReportImageFile(null);
@@ -1527,7 +1539,7 @@ export default function App() {
                       <div style={{ display: 'flex', gap: '8px', alignSelf: 'flex-start' }}>
                         <button 
                           onClick={() => {
-                            setCurrentView('landing');
+                            setCurrentView('login');
                           }}
                           style={{ padding: '8px 16px', backgroundColor: '#ca8a04', color: 'white', fontSize: '13px', fontWeight: 'bold', borderRadius: '8px', border: 'none', cursor: 'pointer' }}
                         >
@@ -1665,6 +1677,16 @@ export default function App() {
                       value={reportDesc}
                       onChange={(e) => setReportDesc(e.target.value)}
                     ></textarea>
+                  </div>
+                  <div className="form-group">
+                    <label htmlFor="r_email">Contact Email</label>
+                    <input 
+                      id="r_email" 
+                      type="email" 
+                      placeholder="e.g., mail@example.com (so people can reach you)" 
+                      value={reportEmail}
+                      onChange={(e) => setReportEmail(e.target.value)}
+                    />
                   </div>
                   <div className="form-group">
                     <label htmlFor="r_image">Upload Photo</label>

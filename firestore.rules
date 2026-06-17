@@ -77,7 +77,7 @@ service cloud.firestore {
     // --- Items Collection Rules ---
     match /items/{itemId} {
       // Allow all registered active users to view listings to find matches
-      allow read, list: if isSignedIn() && isEmailVerified();
+      allow read, list: if isSignedIn() ;
 
       // Creating a new item
       allow create: if isSignedIn()

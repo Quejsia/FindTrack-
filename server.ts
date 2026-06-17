@@ -220,6 +220,66 @@ Filter and return ONLY matches having a confidence score of 35% or higher. Sort 
   }
 });
 
+/**
+ * API Route: Verify Claim
+ * Uses Gemini to evaluate if the claimer's answer matches the owner's secret answer.
+ */
+app.post('/api/verify-claim', apiLimiter, requireAuth, async (req, res) => {
+  try {
+    const { claimerAnswer, secretAnswer, securityQuestion } = req.body;
+    if (!claimerAnswer || !secretAnswer) {
+      res.status(400).json({ error: 'Missing required fields.' });
+      return;
+    }
+
+    const ai = getGeminiClient();
+    
+    // Prompt Gemini to determine if it is a match
+    const promptString = `You are a verification engine for a Lost and Found system. 
+The owner has set a secret question (optional) and a secret answer for their item.
+A claimant is trying to claim the item. Your job is to verify if their answer is correct.
+
+Owner's Secret Question: ${securityQuestion || "N/A"}
+Owner's Expected Answer: ${secretAnswer}
+Claimant's Answer: ${claimerAnswer}
+
+INSTRUCTIONS:
+1. Determine if the Claimant's Answer reasonably matches the Owner's Expected Answer logically or factually.
+2. Account for typos, phrasing differences, or synonymous interpretations.
+3. If the claimant's answer is complete gibberish, clearly random words, or an obvious prank, or if it radically contradicts the expected answer, REJECT it.
+4. If it's a plausible match, ACCEPT it.
+
+Return ONLY a raw JSON object matching the following schema.`;
+
+    const response = await ai.models.generateContent({
+      model: 'gemini-2.0-flash',
+      contents: [{ role: 'user', parts: [{ text: promptString }] }],
+      config: {
+        responseMimeType: 'application/json',
+        responseSchema: {
+          type: Type.OBJECT,
+          properties: {
+            match: { type: Type.BOOLEAN, description: 'True if it reasonably matches, false otherwise' },
+            reason: { type: Type.STRING, description: 'Brief explanation why it was accepted or rejected (max 1 sentence)' }
+          },
+          required: ['match', 'reason']
+        }
+      }
+    });
+
+    const outputText = response.text;
+    if (!outputText) {
+      throw new Error('No output from Gemini');
+    }
+
+    const parsed = JSON.parse(outputText.trim());
+    res.json(parsed);
+  } catch (error) {
+    console.error('Claim verification error:', error);
+    res.status(500).json({ error: 'Internal server error verifying claim.' });
+  }
+});
+
 // Configure Vite or Serve Static build
 async function setupViteMiddleware() {
   if (process.env.NODE_ENV !== 'production') {

@@ -153,14 +153,44 @@ export default function ItemDetail({
     const claimsPath = `claims/${claimId}`;
 
     try {
+      let autoApproved = false;
       const normalizedUserAnswer = answer.trim().toLowerCase();
       const normalizedCorrectAnswer = item.securityAnswer?.trim().toLowerCase() || '';
 
-      // Prevent auto-approval if no answer was set by owner
-      // '' === '' must NOT auto-approve
-      const autoApproved =
-        !!normalizedCorrectAnswer &&
-        normalizedUserAnswer === normalizedCorrectAnswer;
+      if (normalizedCorrectAnswer) {
+        try {
+          const token = await auth.currentUser?.getIdToken();
+          const response = await fetch('/api/verify-claim', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${token}`
+            },
+            body: JSON.stringify({
+              claimerAnswer: answer.trim(),
+              secretAnswer: item.securityAnswer?.trim() || '',
+              securityQuestion: item.securityQuestion || ''
+            })
+          });
+
+          if (response.ok) {
+            const data = await response.json();
+            
+            // If the AI rejected it, show the error immediately to the user and don't submit
+            if (data.match === false && data.reason) {
+              setClaimErrorObj(`Verification Failed: ${data.reason}`);
+              setSubmittingClaim(false);
+              return; // Stop the claim submission
+            }
+            
+            autoApproved = !!data.match; // set true if match
+          }
+        } catch (e) {
+          console.error("AI Verification Error:", e);
+          // Fallback to exact match if API fails
+          autoApproved = normalizedUserAnswer === normalizedCorrectAnswer;
+        }
+      }
 
       const claimPayload: Claim = {
         id: claimId,
@@ -212,7 +242,11 @@ export default function ItemDetail({
 
   if (claimView) {
     return (
+<<<<<<< HEAD
       <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm" id="dedicated-claim-page">
+=======
+      <div className="fixed inset-0 z-[1000] flex items-start justify-center p-4 pt-6 pb-6 overflow-y-auto bg-slate-900/80 backdrop-blur-sm" id="dedicated-claim-page">
+>>>>>>> origin/main
         <style>{`
           @keyframes shake {
             0%, 100% { transform: translateX(0); }
@@ -223,91 +257,114 @@ export default function ItemDetail({
             animation: shake 0.4s cubic-bezier(.36,.07,.19,.97) both;
           }
         `}</style>
+<<<<<<< HEAD
         <div className="relative w-full max-w-2xl bg-white rounded-md shadow-2xl flex flex-col overflow-hidden max-h-[90vh]">
+=======
+        <div className="relative w-full max-w-2xl bg-white rounded-md shadow-2xl flex flex-col shrink-0 mt-auto mb-auto border border-slate-700">
+>>>>>>> origin/main
           
           {/* THE HEADER: Keep the teal "Log Ownership Claim / Prove-It Verification Layer" header clean and isolated at the top. */}
-          <div className="flex items-center justify-between px-6 py-4 bg-gradient-to-r from-teal-700 to-teal-500 text-white shrink-0">
+          <div className="flex items-center justify-between px-6 py-5 bg-gradient-to-r from-teal-800 to-teal-600 text-white shrink-0 rounded-t-md shadow-md z-10 border-b border-teal-900/30">
             <div className="flex flex-col">
-              <span className="text-base font-bold text-white leading-tight">Log Ownership Claim</span>
-              <span className="text-teal-105 text-xs font-mono">Prove-It Verification Layer</span>
+              <span className="text-2xl font-black text-white leading-tight tracking-tight">Log Ownership Claim</span>
+              <span className="text-teal-100 text-[10px] font-mono font-bold tracking-widest mt-1 uppercase text-opacity-90 mt-1">Prove-It Verification Layer</span>
             </div>
             <button
               type="button"
               onClick={() => setClaimView(false)}
-              className="text-white hover:text-teal-100 bg-teal-800/40 hover:bg-teal-800/60 px-3 py-1.5 rounded-md text-xs font-semibold uppercase tracking-wider transition cursor-pointer"
+              className="text-white hover:text-teal-50 bg-teal-900/40 hover:bg-teal-900/70 px-4 py-2 rounded border border-teal-500/30 text-xs font-bold uppercase tracking-wider transition cursor-pointer shadow-sm active:scale-95"
             >
               ← Back
             </button>
           </div>
 
           {/* MAIN WRAPPER: Use a clean vertical flex container with proper padding so elements don't collide */}
-          <div className="p-5 flex flex-col gap-4 w-full overflow-y-auto bg-slate-50">
+          <div className="p-6 flex flex-col gap-6 w-full bg-slate-50 rounded-b-md">
             
             {/* ITEM SUMMARY CARD */}
-            <div className="bg-white rounded-md p-4 border border-slate-200 shadow-sm border-l-4 border-l-teal-500">
-              <span className="text-[10px] font-bold text-teal-600 uppercase tracking-widest block mb-1">🏷️ Current Claim Item</span>
-              <h4 className="text-base font-bold text-slate-800">{item.title}</h4>
-              <p className="text-xs text-slate-500 mt-1">{item.location} · {formattedDate}</p>
+            <div className="bg-white rounded-lg p-5 border border-slate-200 shadow-sm border-l-4 border-l-teal-500 hover:shadow-md transition">
+              <span className="text-[11px] font-extrabold text-teal-600 uppercase tracking-widest block mb-1.5 flex items-center gap-1.5"><span className="text-sm">🏷️</span> Current Claim Item</span>
+              <h4 className="text-xl font-black text-slate-800">{item?.title || 'Unknown Item'}</h4>
+              <p className="text-sm font-medium text-slate-500 mt-1">{item?.location || 'Unknown Location'} · {formattedDate || 'Unknown Date'}</p>
             </div>
 
-            <div className={`flex flex-col gap-2 ${isShaking ? 'animate-shake border-red-500' : ''}`}>
+            <div className={`flex flex-col gap-3 ${isShaking ? 'animate-shake border-red-500' : ''}`}>
               {/* VERIFICATION QUESTION - Read Only */}
               <div className="mb-4">
-                <label className="text-xs font-semibold tracking-wider text-gray-500 uppercase">
+                <label className="text-sm font-bold tracking-wider text-gray-500 uppercase">
                   VERIFICATION QUESTION
                 </label>
-                {item.securityQuestion && item.securityQuestion.trim() ? (
-                  <div className="w-full mt-1 p-[12px] border border-[#008080] rounded bg-white text-black">
-                    <p className="font-bold text-xs mb-1">🔑 OWNER'S SECRET QUESTION</p>
-                    <p className="italic">"{item.securityQuestion}"</p>
+                {item?.securityQuestion && item.securityQuestion.trim() ? (
+                  <div className="w-full mt-2 p-[16px] border-2 border-[#008080] rounded-md bg-[#fefce8] text-black shadow-sm">
+                    <p className="font-bold text-sm mb-2 text-[#854d0e] uppercase tracking-wide">🔑 OWNER'S SECRET QUESTION</p>
+                    <p className="italic text-[#713f12] text-lg font-medium tracking-tight">e.g. "{item?.securityQuestion}"</p>
                   </div>
                 ) : (
-                  <div className="w-full mt-1 p-[12px] border border-[#008080] rounded bg-white text-black cursor-default select-text">
-                    Describe how we can verify that this item belongs to you. Specify any unique decals, stickers, contents, or circumstances where it was lost/found.
+                  <div className="w-full mt-2 p-[16px] border-2 border-[#008080] rounded-md bg-white text-black cursor-default select-text font-medium shadow-sm">
+                    <p className="text-lg text-slate-800 leading-relaxed font-semibold">How can we verify that this is your item? Describe it in detail.</p>
                   </div>
                 )}
               </div>
 
-              <label htmlFor="claim-answer-textarea" className="text-[10px] font-bold text-slate-600 uppercase tracking-widest mt-2">
+              <label htmlFor="claim-answer-textarea" className="text-sm font-bold text-slate-600 uppercase tracking-widest mt-2 block">
                 YOUR ANSWER
               </label>
               <textarea
                 id="claim-answer-textarea"
-                rows={5}
+                rows={6}
                 value={answer}
                 onChange={(e) => { 
                   setAnswer(e.target.value); 
                   if (error) setError(''); 
                 }}
                 placeholder="Provide your exact verification answer or physical proof details here..."
-                className="w-full px-4 py-3 border border-[#008080] rounded-[3px] bg-white text-gray-700 focus:outline-none focus:border-[#008080]"
+                className="w-full px-4 py-4 border-2 border-[#008080] rounded-md bg-white text-gray-800 focus:outline-none focus:ring-4 focus:ring-teal-500/20 text-base md:text-lg min-h-[160px] shadow-inner font-medium placeholder-slate-400"
               />
-              {error && <p className="text-xs font-bold text-red-500 mt-1 animate-pulse">{error}</p>}
-              <p className="text-[10px] text-[#008080] italic mt-1">
+              {error && <p className="text-sm font-bold text-red-500 mt-2 animate-pulse">{error}</p>}
+              <p className="text-xs text-[#008080] italic mt-2 font-medium">
                 The finder will inspect this proof and action your contact credentials request.
               </p>
             </div>
 
             {/* TIPS CARD */}
+<<<<<<< HEAD
             <div className="p-4 border border-[#008080] rounded-[3px] bg-white space-y-1">
               <span className="text-[10px] font-bold text-[#008080] uppercase tracking-widest block mb-1">💡 Tips for a strong claim</span>
               <p className="text-xs text-slate-650 leading-relaxed">• State items inside (e.g. specific cards, quantity of cash, etc.)</p>
               <p className="text-xs text-slate-650 leading-relaxed">• Mention distinct scratches, custom keychains, stickers, or wallpaper setups</p>
               <p className="text-xs text-slate-650 leading-relaxed">• State the exact date, time range and place you lost or found it</p>
+=======
+            <div className="mt-[20px] p-5 border-2 border-teal-600/30 rounded-md bg-teal-50/50 space-y-2 shadow-sm">
+              <span className="text-sm font-bold text-teal-800 uppercase tracking-widest block mb-2 flex items-center gap-2">
+                <span className="text-lg">💡</span> Tips for a strong claim
+              </span>
+              <p className="text-sm text-slate-700 leading-relaxed font-medium pb-1">• State items inside (e.g. specific cards, quantity of cash, etc.)</p>
+              <p className="text-sm text-slate-700 leading-relaxed font-medium pb-1">• Mention distinct scratches, custom keychains, stickers, or wallpaper setups</p>
+              <p className="text-sm text-slate-700 leading-relaxed font-medium">• State the exact date, time range and place you lost or found it</p>
+>>>>>>> origin/main
             </div>
 
             {claimErrorObj && (
-              <div className="p-3 bg-red-50 border border-red-200 rounded-md text-red-700 text-xs font-semibold">
-                ❌ {claimErrorObj}
+              <div className="p-4 bg-red-50 border-2 border-red-200 rounded-md flex flex-col gap-2 shadow-sm mt-2">
+                <div className="text-red-800 text-sm font-bold flex items-center gap-2">
+                  <span className="text-lg">❌</span> Verification Failed
+                </div>
+                <div className="text-red-700 text-sm font-medium pl-7">
+                  {claimErrorObj}
+                </div>
               </div>
             )}
 
             {/* CLEAN BUTTON LAYOUT: Move the "Cancel" and "✅ Submit Answer" buttons BELOW the text input area. */}
+<<<<<<< HEAD
             <div className="flex items-center gap-3">
+=======
+            <div className="flex items-center gap-3 mt-[20px]">
+>>>>>>> origin/main
               <button
                 type="button"
                 onClick={() => setClaimView(false)}
-                className="px-6 py-3 border border-[#008080] rounded text-[#008080] bg-white text-sm font-medium transition shadow-sm hover:bg-slate-50"
+                className="px-6 py-4 border-2 border-[#008080] rounded-md text-[#008080] bg-white text-base font-bold transition shadow-sm hover:bg-slate-50 active:scale-95"
               >
                 Cancel
               </button>
@@ -315,11 +372,11 @@ export default function ItemDetail({
                 type="button"
                 disabled={submittingClaim}
                 onClick={() => handleSubmit()}
-                className="flex-1 px-6 py-3 border border-[#008080] rounded bg-[#008080] hover:bg-teal-700 disabled:bg-teal-400 disabled:border-teal-400 text-white font-medium text-sm flex items-center justify-center gap-2 shadow-md transition"
+                className="flex-1 px-6 py-4 border-2 border-[#008080] rounded-md bg-[#008080] hover:bg-teal-700 disabled:bg-teal-400 disabled:border-teal-400 text-white font-bold text-base flex items-center justify-center gap-2 shadow-md transition active:scale-95"
               >
                 {submittingClaim ? (
                   <>
-                    <Loader2 className="h-4 w-4 animate-spin shrink-0" />
+                    <Loader2 className="h-5 w-5 animate-spin shrink-0" />
                     <span>Submitting...</span>
                   </>
                 ) : (
@@ -716,12 +773,12 @@ export default function ItemDetail({
       {/* ── CLAIMS VERIFICATION MODAL COHESIVE WITH OUR STYLE (Item 2) ── */}
       <AnimatePresence>
         {openClaimModal && (
-          <div className="fixed inset-0 z-[60] flex items-center justify-center bg-slate-950/80 backdrop-blur-md p-4" id="claims-verification-modal">
+          <div className="fixed inset-0 z-[60] flex items-start justify-center bg-slate-950/80 backdrop-blur-md p-4 overflow-y-auto pt-16 pb-16" id="claims-verification-modal">
             <motion.div
               initial={{ opacity: 0, y: 15, scale: 0.95 }}
               animate={{ opacity: 1, y: 0, scale: 1 }}
               exit={{ opacity: 0, y: 15, scale: 0.95 }}
-              className="w-full max-w-md overflow-hidden rounded-md bg-white shadow-2xl border border-slate-150"
+              className="w-full max-w-md bg-white shadow-2xl border border-slate-150 rounded-md shrink-0 mt-auto mb-auto flex flex-col items-stretch"
             >
               <div className="bg-gradient-to-tr from-teal-800 to-indigo-950 p-6 text-white relative">
                 <button 
@@ -754,12 +811,12 @@ export default function ItemDetail({
                   {hasSecurityQuestion ? (
                     <div className="bg-amber-50 border border-amber-200 rounded-md p-4 text-amber-900">
                       <p className="font-bold text-xs mb-1">🔑 OWNER'S SECRET QUESTION</p>
-                      <p className="font-sans text-xs italic leading-relaxed">"{item.securityQuestion}"</p>
+                      <p className="font-sans text-xs italic leading-relaxed">e.g. "{item.securityQuestion}"</p>
                     </div>
                   ) : (
                     <div className="bg-slate-50 border border-slate-205/65 rounded-md p-4">
-                      <p className="font-sans text-xs text-slate-800 leading-relaxed">
-                        Describe how we can verify that this item belongs to you. Specify any unique decals, stickers, contents, or circumstances where it was lost/found.
+                      <p className="font-sans text-xs text-slate-800 leading-relaxed font-medium">
+                        How can we verify that this is your item? Describe it in detail.
                       </p>
                     </div>
                   )}
