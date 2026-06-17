@@ -153,14 +153,44 @@ export default function ItemDetail({
     const claimsPath = `claims/${claimId}`;
 
     try {
+      let autoApproved = false;
       const normalizedUserAnswer = answer.trim().toLowerCase();
       const normalizedCorrectAnswer = item.securityAnswer?.trim().toLowerCase() || '';
 
-      // Prevent auto-approval if no answer was set by owner
-      // '' === '' must NOT auto-approve
-      const autoApproved =
-        !!normalizedCorrectAnswer &&
-        normalizedUserAnswer === normalizedCorrectAnswer;
+      if (normalizedCorrectAnswer) {
+        try {
+          const token = await auth.currentUser?.getIdToken();
+          const response = await fetch('/api/verify-claim', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${token}`
+            },
+            body: JSON.stringify({
+              claimerAnswer: answer.trim(),
+              secretAnswer: item.securityAnswer?.trim() || '',
+              securityQuestion: item.securityQuestion || ''
+            })
+          });
+
+          if (response.ok) {
+            const data = await response.json();
+            
+            // If the AI rejected it, show the error immediately to the user and don't submit
+            if (data.match === false && data.reason) {
+              setClaimErrorObj(`Verification Failed: ${data.reason}`);
+              setSubmittingClaim(false);
+              return; // Stop the claim submission
+            }
+            
+            autoApproved = !!data.match; // set true if match
+          }
+        } catch (e) {
+          console.error("AI Verification Error:", e);
+          // Fallback to exact match if API fails
+          autoApproved = normalizedUserAnswer === normalizedCorrectAnswer;
+        }
+      }
 
       const claimPayload: Claim = {
         id: claimId,
@@ -212,7 +242,7 @@ export default function ItemDetail({
 
   if (claimView) {
     return (
-      <div className="fixed inset-0 z-50 flex items-center justify-center p-4 pt-24 bg-slate-900/60 backdrop-blur-sm" id="dedicated-claim-page">
+      <div className="fixed inset-0 z-50 flex items-start justify-center p-4 pt-16 pb-16 overflow-y-auto bg-slate-900/60 backdrop-blur-sm" id="dedicated-claim-page">
         <style>{`
           @keyframes shake {
             0%, 100% { transform: translateX(0); }
@@ -223,10 +253,10 @@ export default function ItemDetail({
             animation: shake 0.4s cubic-bezier(.36,.07,.19,.97) both;
           }
         `}</style>
-        <div className="relative w-full max-w-2xl mt-16 bg-white rounded-md shadow-2xl flex flex-col overflow-hidden max-h-[90vh]">
+        <div className="relative w-full max-w-2xl bg-white rounded-md shadow-2xl flex flex-col shrink-0 mt-auto mb-auto">
           
           {/* THE HEADER: Keep the teal "Log Ownership Claim / Prove-It Verification Layer" header clean and isolated at the top. */}
-          <div className="flex items-center justify-between px-6 py-4 bg-gradient-to-r from-teal-700 to-teal-500 text-white shrink-0">
+          <div className="flex items-center justify-between px-6 py-4 bg-gradient-to-r from-teal-700 to-teal-500 text-white shrink-0 rounded-t-md">
             <div className="flex flex-col">
               <span className="text-base font-bold text-white leading-tight">Log Ownership Claim</span>
               <span className="text-teal-105 text-xs font-mono">Prove-It Verification Layer</span>
@@ -241,7 +271,7 @@ export default function ItemDetail({
           </div>
 
           {/* MAIN WRAPPER: Use a clean vertical flex container with proper padding so elements don't collide */}
-          <div className="p-5 flex flex-col gap-4 w-full overflow-y-auto bg-slate-50">
+          <div className="p-5 flex flex-col gap-4 w-full bg-slate-50 rounded-b-md">
             
             {/* ITEM SUMMARY CARD */}
             <div className="bg-white rounded-md p-4 border border-slate-200 shadow-sm border-l-4 border-l-teal-500">
@@ -257,13 +287,13 @@ export default function ItemDetail({
                   VERIFICATION QUESTION
                 </label>
                 {item.securityQuestion && item.securityQuestion.trim() ? (
-                  <div className="w-full mt-1 p-[12px] border border-[#008080] rounded bg-white text-black">
-                    <p className="font-bold text-xs mb-1">🔑 OWNER'S SECRET QUESTION</p>
-                    <p className="italic">"{item.securityQuestion}"</p>
+                  <div className="w-full mt-1 p-[12px] border border-[#008080] rounded bg-[#fefce8] text-black">
+                    <p className="font-bold text-xs mb-1 text-[#854d0e]">🔑 OWNER'S SECRET QUESTION</p>
+                    <p className="italic text-[#713f12]">e.g. "{item.securityQuestion}"</p>
                   </div>
                 ) : (
-                  <div className="w-full mt-1 p-[12px] border border-[#008080] rounded bg-white text-black cursor-default select-text">
-                    Describe how we can verify that this item belongs to you. Specify any unique decals, stickers, contents, or circumstances where it was lost/found.
+                  <div className="w-full mt-1 p-[12px] border border-[#008080] rounded bg-white text-black cursor-default select-text font-medium">
+                    How can we verify that this is your item? Describe it in detail.
                   </div>
                 )}
               </div>
@@ -716,12 +746,12 @@ export default function ItemDetail({
       {/* ── CLAIMS VERIFICATION MODAL COHESIVE WITH OUR STYLE (Item 2) ── */}
       <AnimatePresence>
         {openClaimModal && (
-          <div className="fixed inset-0 z-[60] flex items-center justify-center bg-slate-950/80 backdrop-blur-md p-4" id="claims-verification-modal">
+          <div className="fixed inset-0 z-[60] flex items-start justify-center bg-slate-950/80 backdrop-blur-md p-4 overflow-y-auto pt-16 pb-16" id="claims-verification-modal">
             <motion.div
               initial={{ opacity: 0, y: 15, scale: 0.95 }}
               animate={{ opacity: 1, y: 0, scale: 1 }}
               exit={{ opacity: 0, y: 15, scale: 0.95 }}
-              className="w-full max-w-md overflow-hidden rounded-md bg-white shadow-2xl border border-slate-150"
+              className="w-full max-w-md bg-white shadow-2xl border border-slate-150 rounded-md shrink-0 mt-auto mb-auto flex flex-col items-stretch"
             >
               <div className="bg-gradient-to-tr from-teal-800 to-indigo-950 p-6 text-white relative">
                 <button 
@@ -754,12 +784,12 @@ export default function ItemDetail({
                   {hasSecurityQuestion ? (
                     <div className="bg-amber-50 border border-amber-200 rounded-md p-4 text-amber-900">
                       <p className="font-bold text-xs mb-1">🔑 OWNER'S SECRET QUESTION</p>
-                      <p className="font-sans text-xs italic leading-relaxed">"{item.securityQuestion}"</p>
+                      <p className="font-sans text-xs italic leading-relaxed">e.g. "{item.securityQuestion}"</p>
                     </div>
                   ) : (
                     <div className="bg-slate-50 border border-slate-205/65 rounded-md p-4">
-                      <p className="font-sans text-xs text-slate-800 leading-relaxed">
-                        Describe how we can verify that this item belongs to you. Specify any unique decals, stickers, contents, or circumstances where it was lost/found.
+                      <p className="font-sans text-xs text-slate-800 leading-relaxed font-medium">
+                        How can we verify that this is your item? Describe it in detail.
                       </p>
                     </div>
                   )}
