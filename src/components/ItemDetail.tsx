@@ -271,73 +271,80 @@ export default function ItemDetail({
           </div>
 
           {/* MAIN WRAPPER: Use a clean vertical flex container with proper padding so elements don't collide */}
-          <div className="p-5 flex flex-col gap-4 w-full bg-slate-50 rounded-b-md">
+          <div className="p-5 flex flex-col gap-5 w-full overflow-y-auto bg-slate-50">
             
             {/* ITEM SUMMARY CARD */}
             <div className="bg-white rounded-md p-4 border border-slate-200 shadow-sm border-l-4 border-l-teal-500">
-              <span className="text-[10px] font-bold text-teal-600 uppercase tracking-widest block mb-1">🏷️ Current Claim Item</span>
-              <h4 className="text-base font-bold text-slate-800">{item.title}</h4>
-              <p className="text-xs text-slate-500 mt-1">{item.location} · {formattedDate}</p>
+              <span className="text-xs font-bold text-teal-600 uppercase tracking-widest block mb-1">🏷️ Current Claim Item</span>
+              <h4 className="text-lg font-bold text-slate-800">{item.title}</h4>
+              <p className="text-sm text-slate-500 mt-1">{item.location} · {formattedDate}</p>
             </div>
 
-            <div className={`flex flex-col gap-2 ${isShaking ? 'animate-shake border-red-500' : ''}`}>
+            <div className={`flex flex-col gap-3 ${isShaking ? 'animate-shake border-red-500' : ''}`}>
               {/* VERIFICATION QUESTION - Read Only */}
               <div className="mb-4">
-                <label className="text-xs font-semibold tracking-wider text-gray-500 uppercase">
+                <label className="text-sm font-bold tracking-wider text-gray-500 uppercase">
                   VERIFICATION QUESTION
                 </label>
                 {item.securityQuestion && item.securityQuestion.trim() ? (
-                  <div className="w-full mt-1 p-[12px] border border-[#008080] rounded bg-[#fefce8] text-black">
-                    <p className="font-bold text-xs mb-1 text-[#854d0e]">🔑 OWNER'S SECRET QUESTION</p>
-                    <p className="italic text-[#713f12]">e.g. "{item.securityQuestion}"</p>
+                  <div className="w-full mt-2 p-[16px] border-2 border-[#008080] rounded-md bg-[#fefce8] text-black shadow-sm">
+                    <p className="font-bold text-sm mb-2 text-[#854d0e] uppercase tracking-wide">🔑 OWNER'S SECRET QUESTION</p>
+                    <p className="italic text-[#713f12] text-lg font-medium tracking-tight">e.g. "{item.securityQuestion}"</p>
                   </div>
                 ) : (
-                  <div className="w-full mt-1 p-[12px] border border-[#008080] rounded bg-white text-black cursor-default select-text font-medium">
-                    How can we verify that this is your item? Describe it in detail.
+                  <div className="w-full mt-2 p-[16px] border-2 border-[#008080] rounded-md bg-white text-black cursor-default select-text font-medium shadow-sm">
+                    <p className="text-lg text-slate-800 leading-relaxed font-semibold">How can we verify that this is your item? Describe it in detail.</p>
                   </div>
                 )}
               </div>
 
-              <label htmlFor="claim-answer-textarea" className="text-[10px] font-bold text-slate-600 uppercase tracking-widest mt-2">
+              <label htmlFor="claim-answer-textarea" className="text-sm font-bold text-slate-600 uppercase tracking-widest mt-2 block">
                 YOUR ANSWER
               </label>
               <textarea
                 id="claim-answer-textarea"
-                rows={5}
+                rows={6}
                 value={answer}
                 onChange={(e) => { 
                   setAnswer(e.target.value); 
                   if (error) setError(''); 
                 }}
                 placeholder="Provide your exact verification answer or physical proof details here..."
-                className="w-full px-4 py-3 border border-[#008080] rounded-[3px] bg-white text-gray-700 focus:outline-none focus:border-[#008080]"
+                className="w-full px-4 py-4 border-2 border-[#008080] rounded-md bg-white text-gray-800 focus:outline-none focus:ring-4 focus:ring-teal-500/20 text-base md:text-lg min-h-[160px] shadow-inner font-medium placeholder-slate-400"
               />
-              {error && <p className="text-xs font-bold text-red-500 mt-1 animate-pulse">{error}</p>}
-              <p className="text-[10px] text-[#008080] italic mt-1">
+              {error && <p className="text-sm font-bold text-red-500 mt-2 animate-pulse">{error}</p>}
+              <p className="text-xs text-[#008080] italic mt-2 font-medium">
                 The finder will inspect this proof and action your contact credentials request.
               </p>
             </div>
 
             {/* TIPS CARD */}
-            <div className="mt-[40px] p-4 border border-[#008080] rounded-[3px] bg-white space-y-1">
-              <span className="text-[10px] font-bold text-[#008080] uppercase tracking-widest block mb-1">💡 Tips for a strong claim</span>
-              <p className="text-xs text-slate-650 leading-relaxed">• State items inside (e.g. specific cards, quantity of cash, etc.)</p>
-              <p className="text-xs text-slate-650 leading-relaxed">• Mention distinct scratches, custom keychains, stickers, or wallpaper setups</p>
-              <p className="text-xs text-slate-650 leading-relaxed">• State the exact date, time range and place you lost or found it</p>
+            <div className="mt-[20px] p-5 border-2 border-teal-600/30 rounded-md bg-teal-50/50 space-y-2 shadow-sm">
+              <span className="text-sm font-bold text-teal-800 uppercase tracking-widest block mb-2 flex items-center gap-2">
+                <span className="text-lg">💡</span> Tips for a strong claim
+              </span>
+              <p className="text-sm text-slate-700 leading-relaxed font-medium pb-1">• State items inside (e.g. specific cards, quantity of cash, etc.)</p>
+              <p className="text-sm text-slate-700 leading-relaxed font-medium pb-1">• Mention distinct scratches, custom keychains, stickers, or wallpaper setups</p>
+              <p className="text-sm text-slate-700 leading-relaxed font-medium">• State the exact date, time range and place you lost or found it</p>
             </div>
 
             {claimErrorObj && (
-              <div className="p-3 bg-red-50 border border-red-200 rounded-md text-red-700 text-xs font-semibold">
-                ❌ {claimErrorObj}
+              <div className="p-4 bg-red-50 border-2 border-red-200 rounded-md flex flex-col gap-2 shadow-sm mt-2">
+                <div className="text-red-800 text-sm font-bold flex items-center gap-2">
+                  <span className="text-lg">❌</span> Verification Failed
+                </div>
+                <div className="text-red-700 text-sm font-medium pl-7">
+                  {claimErrorObj}
+                </div>
               </div>
             )}
 
             {/* CLEAN BUTTON LAYOUT: Move the "Cancel" and "✅ Submit Answer" buttons BELOW the text input area. */}
-            <div className="flex items-center gap-3 mt-[30px]">
+            <div className="flex items-center gap-3 mt-[20px]">
               <button
                 type="button"
                 onClick={() => setClaimView(false)}
-                className="px-6 py-3 border border-[#008080] rounded text-[#008080] bg-white text-sm font-medium transition shadow-sm hover:bg-slate-50"
+                className="px-6 py-4 border-2 border-[#008080] rounded-md text-[#008080] bg-white text-base font-bold transition shadow-sm hover:bg-slate-50 active:scale-95"
               >
                 Cancel
               </button>
@@ -345,11 +352,11 @@ export default function ItemDetail({
                 type="button"
                 disabled={submittingClaim}
                 onClick={() => handleSubmit()}
-                className="flex-1 px-6 py-3 border border-[#008080] rounded bg-[#008080] hover:bg-teal-700 disabled:bg-teal-400 disabled:border-teal-400 text-white font-medium text-sm flex items-center justify-center gap-2 shadow-md transition"
+                className="flex-1 px-6 py-4 border-2 border-[#008080] rounded-md bg-[#008080] hover:bg-teal-700 disabled:bg-teal-400 disabled:border-teal-400 text-white font-bold text-base flex items-center justify-center gap-2 shadow-md transition active:scale-95"
               >
                 {submittingClaim ? (
                   <>
-                    <Loader2 className="h-4 w-4 animate-spin shrink-0" />
+                    <Loader2 className="h-5 w-5 animate-spin shrink-0" />
                     <span>Submitting...</span>
                   </>
                 ) : (
