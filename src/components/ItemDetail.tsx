@@ -242,7 +242,7 @@ export default function ItemDetail({
 
   if (claimView) {
     return (
-      <div className="fixed inset-0 z-50 flex items-start justify-center p-4 pt-16 pb-16 overflow-y-auto bg-slate-900/60 backdrop-blur-sm" id="dedicated-claim-page">
+      <div className="fixed inset-0 z-[1000] flex items-start justify-center p-4 pt-6 pb-6 overflow-y-auto bg-slate-900/80 backdrop-blur-sm" id="dedicated-claim-page">
         <style>{`
           @keyframes shake {
             0%, 100% { transform: translateX(0); }
@@ -253,31 +253,31 @@ export default function ItemDetail({
             animation: shake 0.4s cubic-bezier(.36,.07,.19,.97) both;
           }
         `}</style>
-        <div className="relative w-full max-w-2xl bg-white rounded-md shadow-2xl flex flex-col shrink-0 mt-auto mb-auto">
+        <div className="relative w-full max-w-2xl bg-white rounded-md shadow-2xl flex flex-col shrink-0 mt-auto mb-auto border border-slate-700">
           
           {/* THE HEADER: Keep the teal "Log Ownership Claim / Prove-It Verification Layer" header clean and isolated at the top. */}
-          <div className="flex items-center justify-between px-6 py-4 bg-gradient-to-r from-teal-700 to-teal-500 text-white shrink-0 rounded-t-md">
+          <div className="flex items-center justify-between px-6 py-5 bg-gradient-to-r from-teal-800 to-teal-600 text-white shrink-0 rounded-t-md shadow-md z-10 border-b border-teal-900/30">
             <div className="flex flex-col">
-              <span className="text-base font-bold text-white leading-tight">Log Ownership Claim</span>
-              <span className="text-teal-105 text-xs font-mono">Prove-It Verification Layer</span>
+              <span className="text-2xl font-black text-white leading-tight tracking-tight">Log Ownership Claim</span>
+              <span className="text-teal-100 text-[10px] font-mono font-bold tracking-widest mt-1 uppercase text-opacity-90 mt-1">Prove-It Verification Layer</span>
             </div>
             <button
               type="button"
               onClick={() => setClaimView(false)}
-              className="text-white hover:text-teal-100 bg-teal-800/40 hover:bg-teal-800/60 px-3 py-1.5 rounded-md text-xs font-semibold uppercase tracking-wider transition cursor-pointer"
+              className="text-white hover:text-teal-50 bg-teal-900/40 hover:bg-teal-900/70 px-4 py-2 rounded border border-teal-500/30 text-xs font-bold uppercase tracking-wider transition cursor-pointer shadow-sm active:scale-95"
             >
               ← Back
             </button>
           </div>
 
           {/* MAIN WRAPPER: Use a clean vertical flex container with proper padding so elements don't collide */}
-          <div className="p-5 flex flex-col gap-5 w-full overflow-y-auto bg-slate-50">
+          <div className="p-6 flex flex-col gap-6 w-full overflow-y-auto bg-slate-50">
             
             {/* ITEM SUMMARY CARD */}
-            <div className="bg-white rounded-md p-4 border border-slate-200 shadow-sm border-l-4 border-l-teal-500">
-              <span className="text-xs font-bold text-teal-600 uppercase tracking-widest block mb-1">🏷️ Current Claim Item</span>
-              <h4 className="text-lg font-bold text-slate-800">{item.title}</h4>
-              <p className="text-sm text-slate-500 mt-1">{item.location} · {formattedDate}</p>
+            <div className="bg-white rounded-lg p-5 border border-slate-200 shadow-sm border-l-4 border-l-teal-500 hover:shadow-md transition">
+              <span className="text-[11px] font-extrabold text-teal-600 uppercase tracking-widest block mb-1.5 flex items-center gap-1.5"><span className="text-sm">🏷️</span> Current Claim Item</span>
+              <h4 className="text-xl font-black text-slate-800">{item.title}</h4>
+              <p className="text-sm font-medium text-slate-500 mt-1">{item.location} · {formattedDate}</p>
             </div>
 
             <div className={`flex flex-col gap-3 ${isShaking ? 'animate-shake border-red-500' : ''}`}>
