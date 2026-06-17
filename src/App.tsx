@@ -156,8 +156,13 @@ export default function App() {
 
   const handleBackToSafety = () => {
     if (auth.currentUser) {
-      setCurrentView('dashboard');
-      window.history.pushState(null, '', '/');
+      if (auth.currentUser.email && !auth.currentUser.emailVerified) {
+        setCurrentView('verify-email');
+        window.history.pushState(null, '', '/verify-email');
+      } else {
+        setCurrentView('dashboard');
+        window.history.pushState(null, '', '/');
+      }
     } else {
       try {
         const guestSession = localStorage.getItem("sessionUser");
@@ -210,6 +215,8 @@ export default function App() {
         const path = window.location.pathname;
         if (path === '/privacy' || path === '/terms') {
           setCurrentView(path === '/privacy' ? 'privacy' : 'terms');
+        } else if (currentUser.email && !currentUser.emailVerified) {
+          setCurrentView('verify-email');
         } else {
           // Switch view to dashboard on successful load
           setCurrentView('dashboard');
@@ -264,7 +271,11 @@ export default function App() {
         setCurrentView('signup');
       } else if (path === '/' || path === '') {
         if (auth.currentUser) {
-          setCurrentView('dashboard');
+          if (auth.currentUser.email && !auth.currentUser.emailVerified) {
+            setCurrentView('verify-email');
+          } else {
+            setCurrentView('dashboard');
+          }
         } else {
           setCurrentView('landing');
         }
@@ -329,7 +340,12 @@ export default function App() {
     return unsubscribe;
   }, [user]);
 
-  // Removed unverified user block that broke existing accounts
+  // Safeguard: Block unverified users from accessing protected views (dashboard) and redirect them to verify screen
+  useEffect(() => {
+    if (auth.currentUser && auth.currentUser.email && !auth.currentUser.emailVerified && currentView === 'dashboard') {
+      setCurrentView('verify-email');
+    }
+  }, [currentView, user]);
 
   // 3. Initiate Onboarding trigger
   useEffect(() => {
@@ -361,7 +377,11 @@ export default function App() {
       triggerToast("✅ Login successful! Redirecting...", "success");
       setAuthEmail('');
       setAuthPass('');
-      setCurrentView('dashboard');
+      if (credentials.user.email && !credentials.user.emailVerified) {
+        setCurrentView('verify-email');
+      } else {
+        setCurrentView('dashboard');
+      }
     } catch (err: any) {
       console.error("SignIn error:", err);
       triggerToast("❌ Invalid email or password. Please try again.", "error");
@@ -410,7 +430,7 @@ export default function App() {
       // Automatically send a verification email using Firebase sendEmailVerification()
       try {
         await sendEmailVerification(credentials.user);
-        triggerToast("✅ Account created! Welcome to FindTrack.", "success");
+        triggerToast("✅ Account created! Please check your email to verify.", "success");
       } catch (err: any) {
         console.error("Verification email sending failed:", err);
       }
@@ -420,7 +440,7 @@ export default function App() {
       setSignupContact('');
       setAuthEmail('');
       setAuthPass('');
-      setCurrentView('dashboard');
+      setCurrentView('verify-email');
     } catch (err: any) {
       console.error("SignUp error:", err);
       if (err.code === 'auth/email-already-in-use') {

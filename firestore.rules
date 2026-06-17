@@ -14,7 +14,7 @@ service cloud.firestore {
 
     // Checking email verification helper (only verified users can write items and transact)
     function isEmailVerified() {
-      return true;
+      return request.auth.token.email_verified == true;
     }
 
     function isValidId(id) {
