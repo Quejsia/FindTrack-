@@ -196,16 +196,23 @@ export default function App() {
       if (currentUser) {
         // Automatically sync initial profile credentials
         setProfileEmail(currentUser.email || "");
-        setProfileName(currentUser.displayName || "Dela Cruz");
         
         // Sync profile data from localStorage context if exists
         try {
           const lProfile = localStorage.getItem("userProfile");
           if (lProfile) {
             const parsed = JSON.parse(lProfile);
-            if (parsed.name) setProfileName(parsed.name);
+            if (parsed.name && parsed.name !== 'Guest') {
+              setProfileName(parsed.name);
+            } else {
+              setProfileName(currentUser.displayName || currentUser.email?.split('@')[0] || "User");
+            }
             if (parsed.contact) setProfileContact(parsed.contact);
-            if (parsed.avatar) setProfileAvatar(parsed.avatar);
+            if (parsed.avatar && !parsed.avatar.includes('guest')) {
+              setProfileAvatar(parsed.avatar);
+            }
+          } else {
+            setProfileName(currentUser.displayName || currentUser.email?.split('@')[0] || "User");
           }
         } catch (e) {
           console.error(e);
