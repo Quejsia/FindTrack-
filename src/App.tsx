@@ -1530,7 +1530,7 @@ export default function App() {
                       <div style={{ display: 'flex', gap: '8px', alignSelf: 'flex-start' }}>
                         <button 
                           onClick={() => {
-                            setCurrentView('landing');
+                            setCurrentView('login');
                           }}
                           style={{ padding: '8px 16px', backgroundColor: '#ca8a04', color: 'white', fontSize: '13px', fontWeight: 'bold', borderRadius: '8px', border: 'none', cursor: 'pointer' }}
                         >
