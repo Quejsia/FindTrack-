@@ -242,7 +242,11 @@ export default function ItemDetail({
 
   if (claimView) {
     return (
+<<<<<<< HEAD
+      <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm" id="dedicated-claim-page">
+=======
       <div className="fixed inset-0 z-[1000] flex items-start justify-center p-4 pt-6 pb-6 overflow-y-auto bg-slate-900/80 backdrop-blur-sm" id="dedicated-claim-page">
+>>>>>>> origin/main
         <style>{`
           @keyframes shake {
             0%, 100% { transform: translateX(0); }
@@ -253,7 +257,11 @@ export default function ItemDetail({
             animation: shake 0.4s cubic-bezier(.36,.07,.19,.97) both;
           }
         `}</style>
+<<<<<<< HEAD
+        <div className="relative w-full max-w-2xl bg-white rounded-md shadow-2xl flex flex-col overflow-hidden max-h-[90vh]">
+=======
         <div className="relative w-full max-w-2xl bg-white rounded-md shadow-2xl flex flex-col shrink-0 mt-auto mb-auto border border-slate-700">
+>>>>>>> origin/main
           
           {/* THE HEADER: Keep the teal "Log Ownership Claim / Prove-It Verification Layer" header clean and isolated at the top. */}
           <div className="flex items-center justify-between px-6 py-5 bg-gradient-to-r from-teal-800 to-teal-600 text-white shrink-0 rounded-t-md shadow-md z-10 border-b border-teal-900/30">
@@ -319,6 +327,13 @@ export default function ItemDetail({
             </div>
 
             {/* TIPS CARD */}
+<<<<<<< HEAD
+            <div className="p-4 border border-[#008080] rounded-[3px] bg-white space-y-1">
+              <span className="text-[10px] font-bold text-[#008080] uppercase tracking-widest block mb-1">💡 Tips for a strong claim</span>
+              <p className="text-xs text-slate-650 leading-relaxed">• State items inside (e.g. specific cards, quantity of cash, etc.)</p>
+              <p className="text-xs text-slate-650 leading-relaxed">• Mention distinct scratches, custom keychains, stickers, or wallpaper setups</p>
+              <p className="text-xs text-slate-650 leading-relaxed">• State the exact date, time range and place you lost or found it</p>
+=======
             <div className="mt-[20px] p-5 border-2 border-teal-600/30 rounded-md bg-teal-50/50 space-y-2 shadow-sm">
               <span className="text-sm font-bold text-teal-800 uppercase tracking-widest block mb-2 flex items-center gap-2">
                 <span className="text-lg">💡</span> Tips for a strong claim
@@ -326,6 +341,7 @@ export default function ItemDetail({
               <p className="text-sm text-slate-700 leading-relaxed font-medium pb-1">• State items inside (e.g. specific cards, quantity of cash, etc.)</p>
               <p className="text-sm text-slate-700 leading-relaxed font-medium pb-1">• Mention distinct scratches, custom keychains, stickers, or wallpaper setups</p>
               <p className="text-sm text-slate-700 leading-relaxed font-medium">• State the exact date, time range and place you lost or found it</p>
+>>>>>>> origin/main
             </div>
 
             {claimErrorObj && (
@@ -340,7 +356,11 @@ export default function ItemDetail({
             )}
 
             {/* CLEAN BUTTON LAYOUT: Move the "Cancel" and "✅ Submit Answer" buttons BELOW the text input area. */}
+<<<<<<< HEAD
+            <div className="flex items-center gap-3">
+=======
             <div className="flex items-center gap-3 mt-[20px]">
+>>>>>>> origin/main
               <button
                 type="button"
                 onClick={() => setClaimView(false)}
