@@ -1,0 +1,6 @@
+{
+  "name": "FindTrack",
+  "description": "Lost & Found helper app that manages missing items and found matches securely.",
+  "requestFramePermissions": ["camera"],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
