@@ -4,7 +4,8 @@ import {
   onAuthStateChanged,
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
-  sendEmailVerification
+  sendEmailVerification,
+  applyActionCode
 } from 'firebase/auth';
 import { 
   collection, 
@@ -354,6 +355,28 @@ export default function App() {
       setCurrentView('verify-email');
     }
   }, [currentView, user]);
+
+    // If the app is opened with an email verification oobCode, attempt to apply it when on the verify-email view
+    useEffect(() => {
+      if (currentView !== 'verify-email') return;
+
+      const params = new URLSearchParams(window.location.search);
+      const oobCode = params.get('oobCode');
+      if (!oobCode) return;
+
+      (async () => {
+        try {
+          await applyActionCode(auth, oobCode);
+          await auth.currentUser?.reload();
+          triggerToast("✅ Email verified! Redirecting...", "success");
+          setCurrentView('dashboard');
+          window.history.pushState(null, '', '/');
+        } catch (err: any) {
+          console.error('Email verification (applyActionCode) failed:', err);
+          triggerToast('❌ Verification failed or link expired.', 'error');
+        }
+      })();
+    }, [currentView]);
 
   // 3. Initiate Onboarding trigger
   useEffect(() => {

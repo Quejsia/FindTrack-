@@ -63,8 +63,8 @@ export const registerWithEmail = async (email: string, password: string, display
     const result = await createUserWithEmailAndPassword(auth, email, password);
     await updateProfile(result.user, { displayName });
     await sendEmailVerification(result.user, {
-      url: 'https://find-track-6kzf.vercel.app/',
-      handleCodeInApp: false
+      url: 'https://find-track-6kzf.vercel.app/verify-email',
+      handleCodeInApp: true
     });
     return result.user;
   } catch (error) {
