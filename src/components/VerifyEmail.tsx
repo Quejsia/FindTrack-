@@ -39,7 +39,7 @@ export default function VerifyEmail() {
 
         {status === 'success' && (
           <div>
-            <Link to="/" className="inline-block mt-2 px-4 py-2 bg-teal-600 text-white rounded">Go to Home / Sign In</Link>
+            <Link to="/" className="inline-block mt-2 px-4 py-2 bg-[#0038A8] hover:bg-[#FCD116] hover:text-slate-950 text-white rounded transition">Go to Home / Sign In</Link>
           </div>
         )}
 

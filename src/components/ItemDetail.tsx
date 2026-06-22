@@ -255,16 +255,16 @@ export default function ItemDetail({
         `}</style>
         <div className="relative w-full max-w-2xl bg-white rounded-md shadow-2xl flex flex-col shrink-0 border border-slate-700 max-h-[85dvh]">
           
-          {/* THE HEADER: Keep the teal "Log Ownership Claim / Prove-It Verification Layer" header clean and isolated at the top. */}
-          <div className="flex items-center justify-between px-6 py-5 bg-gradient-to-r from-teal-800 to-teal-600 text-white shrink-0 rounded-t-md shadow-md z-10 border-b border-teal-900/30">
+          {/* THE HEADER: Keep the claim verification header clean and isolated at the top. */}
+          <div className="flex items-center justify-between px-6 py-5 bg-gradient-to-r from-[#0038A8] to-[#002370] text-white shrink-0 rounded-t-md shadow-md z-10 border-b border-[#002370]/30">
             <div className="flex flex-col">
               <span className="text-xl md:text-2xl font-black text-white leading-tight tracking-tight">Log Ownership Claim</span>
-              <span className="text-teal-100 text-[10px] font-mono font-bold tracking-widest mt-1 uppercase text-opacity-90">Prove-It Verification Layer</span>
+              <span className="text-blue-100 text-[10px] font-mono font-bold tracking-widest mt-1 uppercase text-opacity-90">Prove-It Verification Layer</span>
             </div>
             <button
               type="button"
               onClick={() => setClaimView(false)}
-              className="text-white hover:text-teal-50 bg-teal-900/40 hover:bg-teal-900/70 px-4 py-2 rounded border border-teal-500/30 text-xs font-bold uppercase tracking-wider transition cursor-pointer shadow-sm active:scale-95 shrink-0 ml-4"
+              className="text-white hover:text-blue-50 bg-blue-900/40 hover:bg-blue-900/70 px-4 py-2 rounded border border-blue-500/30 text-xs font-bold uppercase tracking-wider transition cursor-pointer shadow-sm active:scale-95 shrink-0 ml-4"
             >
               ← Back
             </button>
@@ -274,8 +274,8 @@ export default function ItemDetail({
           <div className="p-6 flex flex-col gap-6 w-full bg-slate-50 flex-1 overflow-y-auto rounded-b-md">
             
             {/* ITEM SUMMARY CARD */}
-            <div className="bg-white rounded-lg p-5 border border-slate-200 shadow-sm border-l-4 border-l-teal-500 hover:shadow-md transition">
-              <span className="text-[11px] font-extrabold text-teal-600 uppercase tracking-widest block mb-1.5 flex items-center gap-1.5"><span className="text-sm">🏷️</span> Current Claim Item</span>
+            <div className="bg-white rounded-lg p-5 border border-slate-200 shadow-sm border-l-4 border-l-[#0038A8] hover:shadow-md transition">
+              <span className="text-[11px] font-extrabold text-blue-600 uppercase tracking-widest block mb-1.5 flex items-center gap-1.5"><span className="text-sm">🏷️</span> Current Claim Item</span>
               <h4 className="text-xl font-black text-slate-800">{item?.title || 'Unknown Item'}</h4>
               <p className="text-sm font-medium text-slate-500 mt-1">{item?.location || 'Unknown Location'} · {formattedDate || 'Unknown Date'}</p>
             </div>
@@ -287,12 +287,12 @@ export default function ItemDetail({
                   VERIFICATION QUESTION
                 </label>
                 {item?.securityQuestion && item.securityQuestion.trim() ? (
-                  <div className="w-full mt-2 p-[16px] border-2 border-[#008080] rounded-md bg-[#fefce8] text-black shadow-sm">
+                  <div className="w-full mt-2 p-[16px] border-2 border-[#0038A8] rounded-md bg-[#fefce8] text-black shadow-sm">
                     <p className="font-bold text-sm mb-2 text-[#854d0e] uppercase tracking-wide">🔑 OWNER'S SECRET QUESTION</p>
                     <p className="italic text-[#713f12] text-lg font-medium tracking-tight">e.g. "{item?.securityQuestion}"</p>
                   </div>
                 ) : (
-                  <div className="w-full mt-2 p-[16px] border-2 border-[#008080] rounded-md bg-white text-black cursor-default select-text font-medium shadow-sm">
+                  <div className="w-full mt-2 p-[16px] border-2 border-[#0038A8] rounded-md bg-white text-black cursor-default select-text font-medium shadow-sm">
                     <p className="text-lg text-slate-800 leading-relaxed font-semibold">How can we verify that this is your item? Describe it in detail.</p>
                   </div>
                 )}
@@ -310,17 +310,17 @@ export default function ItemDetail({
                   if (error) setError(''); 
                 }}
                 placeholder="Provide your exact verification answer or physical proof details here..."
-                className="w-full px-4 py-4 border-2 border-[#008080] rounded-md bg-white text-gray-800 focus:outline-none focus:ring-4 focus:ring-teal-500/20 text-base md:text-lg min-h-[160px] shadow-inner font-medium placeholder-slate-400"
+                className="w-full px-4 py-4 border-2 border-[#0038A8] rounded-md bg-white text-gray-800 focus:outline-none focus:ring-4 focus:ring-[#0038A8]/20 text-base md:text-lg min-h-[160px] shadow-inner font-medium placeholder-slate-400"
               />
               {error && <p className="text-sm font-bold text-red-500 mt-2 animate-pulse">{error}</p>}
-              <p className="text-xs text-[#008080] italic mt-2 font-medium">
+              <p className="text-xs text-[#0038A8] italic mt-2 font-medium">
                 The finder will inspect this proof and action your contact credentials request.
               </p>
             </div>
 
             {/* TIPS CARD */}
-            <div className="mt-[20px] p-5 border-2 border-teal-600/30 rounded-md bg-teal-50/50 space-y-2 shadow-sm">
-              <span className="text-sm font-bold text-teal-800 uppercase tracking-widest block mb-2 flex items-center gap-2">
+            <div className="mt-[20px] p-5 border-2 border-[#0038A8]/30 rounded-md bg-blue-50/60 space-y-2 shadow-sm">
+              <span className="text-sm font-bold text-blue-800 uppercase tracking-widest block mb-2 flex items-center gap-2">
                 <span className="text-lg">💡</span> Tips for a strong claim
               </span>
               <p className="text-sm text-slate-700 leading-relaxed font-medium pb-1">• State items inside (e.g. specific cards, quantity of cash, etc.)</p>
@@ -344,7 +344,7 @@ export default function ItemDetail({
               <button
                 type="button"
                 onClick={() => setClaimView(false)}
-                className="px-6 py-4 border-2 border-[#008080] rounded-md text-[#008080] bg-white text-base font-bold transition shadow-sm hover:bg-slate-50 active:scale-95"
+                className="px-6 py-4 border-2 border-[#0038A8] rounded-md text-[#0038A8] bg-white text-base font-bold transition shadow-sm hover:bg-slate-50 active:scale-95"
               >
                 Cancel
               </button>
@@ -352,7 +352,7 @@ export default function ItemDetail({
                 type="button"
                 disabled={submittingClaim}
                 onClick={() => handleSubmit()}
-                className="flex-1 px-6 py-4 border-2 border-[#008080] rounded-md bg-[#008080] hover:bg-teal-700 disabled:bg-teal-400 disabled:border-teal-400 text-white font-bold text-base flex items-center justify-center gap-2 shadow-md transition active:scale-95"
+                className="flex-1 px-6 py-4 border-2 border-[#CE1126] rounded-md bg-[#CE1126] hover:bg-[#FCD116] hover:text-slate-950 disabled:bg-rose-300 disabled:border-rose-300 text-white font-bold text-base flex items-center justify-center gap-2 shadow-md transition active:scale-95"
               >
                 {submittingClaim ? (
                   <>
@@ -390,7 +390,7 @@ export default function ItemDetail({
           <>
             <button
               onClick={onClose}
-              className="flex items-center gap-2 text-teal-600 font-semibold text-sm px-4 py-3"
+              className="flex items-center gap-2 text-blue-600 font-semibold text-sm px-4 py-3"
             >
               ← Back to Results
             </button>
@@ -490,7 +490,7 @@ export default function ItemDetail({
                       /* OWNER VIEW */
                       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 items-center">
                         <div className="flex items-center space-x-2">
-                          <div className="flex h-8 w-8 items-center justify-center rounded-md bg-indigo-50 border border-indigo-100 text-indigo-600 font-bold text-sm shrink-0">
+                          <div className="flex h-8 w-8 items-center justify-center rounded-md bg-blue-50 border border-blue-100 text-[#0038A8] font-bold text-sm shrink-0">
                             {item.contactName.charAt(0).toUpperCase()}
                           </div>
                           <div>
@@ -515,7 +515,7 @@ export default function ItemDetail({
                           /* Mask PII Details behind claims block */
                           <div className="space-y-4">
                             <div className="flex items-start space-x-3 bg-white p-3.5 rounded-md border border-slate-200/60 shadow-sm">
-                              <div className="flex h-8 w-8 items-center justify-center rounded-md bg-indigo-50 text-indigo-600 shrink-0 border border-indigo-100">
+                              <div className="flex h-8 w-8 items-center justify-center rounded-md bg-blue-50 text-[#0038A8] shrink-0 border border-blue-100">
                                 <Lock className="h-4 w-4" />
                               </div>
                               <div className="flex-1">
@@ -566,7 +566,7 @@ export default function ItemDetail({
                                         onClose();
                                       }
                                     }}
-                                    className="w-full flex items-center justify-center space-x-1.5 bg-teal-850 hover:bg-teal-900 border border-teal-800 text-white font-sans text-xs font-bold py-3.5 px-4 rounded-md shadow-md cursor-pointer transition active:scale-95 duration-200"
+                                    className="w-full flex items-center justify-center space-x-1.5 bg-[#0038A8] hover:bg-[#FCD116] hover:text-slate-950 border border-[#002370] text-white font-sans text-xs font-bold py-3.5 px-4 rounded-md shadow-md cursor-pointer transition active:scale-95 duration-200"
                                   >
                                     <MessageSquare className="h-4 w-4 shrink-0 text-white/90" />
                                     <span>Message Finder</span>
@@ -576,9 +576,9 @@ export default function ItemDetail({
                                     <button
                                       type="button"
                                       onClick={() => setClaimView(true)}
-                                      className="w-full flex items-center justify-center space-x-1.5 py-3.5 px-4 rounded-md bg-slate-900 text-white font-sans text-xs font-bold hover:bg-slate-800 transition active:scale-95 duration-200 cursor-pointer shadow-md"
+                                      className="w-full flex items-center justify-center space-x-1.5 py-3.5 px-4 rounded-md bg-[#CE1126] text-white font-sans text-xs font-bold hover:bg-[#FCD116] hover:text-slate-950 transition active:scale-95 duration-200 cursor-pointer shadow-md"
                                     >
-                                      <ShieldQuestion className="h-4 w-4 text-emerald-400 shrink-0" />
+                                      <ShieldQuestion className="h-4 w-4 text-[#FCD116] shrink-0" />
                                       <span>Submit Custom Proof</span>
                                     </button>
                                   )}
@@ -595,7 +595,7 @@ export default function ItemDetail({
                                       onClose();
                                     }
                                   }}
-                                  className="w-full flex items-center justify-center space-x-1.5 bg-teal-850 hover:bg-teal-900 border border-teal-800 text-white font-sans text-xs font-bold py-3.5 px-4 rounded-md shadow-md cursor-pointer transition active:scale-95 duration-200"
+                                  className="w-full flex items-center justify-center space-x-1.5 bg-[#0038A8] hover:bg-[#FCD116] hover:text-slate-950 border border-[#002370] text-white font-sans text-xs font-bold py-3.5 px-4 rounded-md shadow-md cursor-pointer transition active:scale-95 duration-200"
                                 >
                                   <MessageSquare className="h-4 w-4 shrink-0 text-white/90" />
                                   <span>Message Finder</span>
@@ -606,7 +606,7 @@ export default function ItemDetail({
                                   onClick={() => setClaimView(true)}
                                   className="w-full flex items-center justify-center space-x-1.5 bg-white border border-slate-300 hover:bg-slate-50/50 text-slate-700 font-sans text-xs font-bold py-3.5 px-4 rounded-md shadow-sm cursor-pointer transition active:scale-95 duration-200"
                                 >
-                                  <CheckCircle2 className="h-4 w-4 shrink-0 text-teal-600" />
+                                  <CheckCircle2 className="h-4 w-4 shrink-0 text-blue-600" />
                                   <span>Prove Ownership & Claim</span>
                                 </button>
                               </div>
@@ -617,7 +617,7 @@ export default function ItemDetail({
                           <div className="space-y-4">
                             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 items-center">
                               <div className="flex items-center space-x-2">
-                                <div className="flex h-8 w-8 items-center justify-center rounded-md bg-indigo-50 border border-indigo-100 text-indigo-600 font-bold text-sm shrink-0">
+                                <div className="flex h-8 w-8 items-center justify-center rounded-md bg-blue-50 border border-blue-100 text-[#0038A8] font-bold text-sm shrink-0">
                                   {item.contactName.charAt(0).toUpperCase()}
                                 </div>
                                 <div>
@@ -655,9 +655,9 @@ export default function ItemDetail({
                                     onClose();
                                   }
                                 }}
-                                className="w-full flex items-center justify-center space-x-1.5 bg-teal-850 hover:bg-teal-900 border border-teal-800 text-[#1a1a1a] font-sans text-xs font-bold py-3.5 px-4 rounded-md shadow-md cursor-pointer transition active:scale-95 duration-200"
+                               className="w-full flex items-center justify-center space-x-1.5 bg-blue-900 hover:bg-blue-950 border border-blue-800 text-white font-sans text-xs font-bold py-3.5 px-4 rounded-md shadow-md cursor-pointer transition active:scale-95 duration-200"
                               >
-                                <MessageSquare className="h-4 w-4 shrink-0 text-[#1a1a1a]" />
+                                <MessageSquare className="h-4 w-4 shrink-0" />
                                 <span>Direct Chat Room</span>
                               </button>
 
@@ -667,7 +667,7 @@ export default function ItemDetail({
                                   onClick={() => setClaimView(true)}
                                   className="w-full flex items-center justify-center space-x-1.5 bg-white border border-slate-300 hover:bg-slate-50/50 text-slate-700 font-sans text-xs font-bold py-3.5 px-4 rounded-md shadow-sm cursor-pointer transition active:scale-95 duration-200"
                                 >
-                                  <CheckCircle2 className="h-4 w-4 shrink-0 text-teal-600" />
+                                  <CheckCircle2 className="h-4 w-4 shrink-0 text-blue-600" />
                                   <span>Log Ownership Claim</span>
                                 </button>
                               )}
@@ -760,7 +760,7 @@ export default function ItemDetail({
               exit={{ opacity: 0, y: 15, scale: 0.95 }}
               className="w-full max-w-md bg-white shadow-2xl border border-slate-150 rounded-md shrink-0 mt-auto mb-auto flex flex-col items-stretch"
             >
-              <div className="bg-gradient-to-tr from-teal-800 to-indigo-950 p-6 text-white relative">
+              <div className="bg-gradient-to-tr from-[#0038A8] to-[#002370] p-6 text-white relative">
                 <button 
                   type="button"
                   onClick={() => setOpenClaimModal(false)}
@@ -769,15 +769,15 @@ export default function ItemDetail({
                   <X className="h-4.5 w-4.5" />
                 </button>
                 
-                <div className="flex items-center space-x-2 text-teal-300 font-mono text-[9px] font-bold tracking-wider uppercase mb-1.5">
-                  <ShieldCheck className="h-3.5 w-3.5 text-teal-400" />
+                <div className="flex items-center space-x-2 text-blue-300 font-mono text-[9px] font-bold tracking-wider uppercase mb-1.5">
+                  <ShieldCheck className="h-3.5 w-3.5 text-blue-400" />
                   <span>Interactive Proof Shield</span>
-                  <span className="h-1 w-1 rounded-full bg-teal-400"></span>
+                  <span className="h-1 w-1 rounded-full bg-[#FCD116]"></span>
                   <span>Prove Ownership</span>
                 </div>
                 
                 <h3 className="font-sans text-lg font-bold">"Prove It" Identity Verification</h3>
-                <p className="font-sans text-[11px] text-teal-100/90 leading-relaxed mt-1">
+                <p className="font-sans text-[11px] text-blue-100/90 leading-relaxed mt-1">
                   Authenticate your claims ownership details below for <strong>{item.title}</strong> so the listing recorder can verify securely.
                 </p>
               </div>
@@ -814,7 +814,7 @@ export default function ItemDetail({
                       if (error) setError(''); 
                     }}
                     placeholder="Provide your exact verification answer or physical proof details here..."
-                    className="w-full rounded-md border border-slate-250 bg-white p-4 font-sans text-xs font-medium text-slate-900 focus:border-teal-600 focus:outline-none focus:ring-2 focus:ring-teal-100 leading-relaxed placeholder:text-slate-400"
+                    className="w-full rounded-md border border-slate-250 bg-white p-4 font-sans text-xs font-medium text-slate-900 focus:border-[#0038A8] focus:outline-none focus:ring-2 focus:ring-blue-100 leading-relaxed placeholder:text-slate-400"
                     rows={4}
                   />
                   {error && <p className="text-xs font-bold text-red-500 mt-1 animate-pulse">{error}</p>}
@@ -824,8 +824,8 @@ export default function ItemDetail({
                 </div>
 
                 {/* TIPS CARD */}
-                <div className="p-4 border border-teal-600/30 rounded-md bg-teal-50/50 space-y-1">
-                  <span className="text-[10px] font-bold text-teal-700 uppercase tracking-widest block mb-1">💡 Tips for a strong claim</span>
+                <div className="p-4 border border-[#0038A8]/30 rounded-md bg-blue-50/60 space-y-1">
+                  <span className="text-[10px] font-bold text-blue-700 uppercase tracking-widest block mb-1">💡 Tips for a strong claim</span>
                   <p className="text-xs text-slate-650 leading-relaxed">• State items inside (e.g. specific cards, quantity of cash, etc.)</p>
                   <p className="text-xs text-slate-650 leading-relaxed">• Mention distinct scratches, custom keychains, stickers, or wallpaper setups</p>
                   <p className="text-xs text-slate-650 leading-relaxed">• State the exact date, time range and place you lost or found it</p>
@@ -842,7 +842,7 @@ export default function ItemDetail({
                   <button
                     type="submit"
                     disabled={submittingClaim}
-                    className="w-full py-3.5 px-4 rounded-md bg-gradient-to-tr from-teal-850 to-indigo-950 text-white font-sans text-xs font-bold shadow-md hover:from-teal-900 hover:to-indigo-900 transition disabled:opacity-50 active:scale-95 duration-200 flex items-center justify-center space-x-1.5 cursor-pointer"
+                    className="w-full py-3.5 px-4 rounded-md bg-gradient-to-tr from-[#CE1126] to-[#A80920] text-white font-sans text-xs font-bold shadow-md hover:from-[#FCD116] hover:to-[#E6B800] hover:text-slate-950 transition disabled:opacity-50 active:scale-95 duration-200 flex items-center justify-center space-x-1.5 cursor-pointer"
                   >
                     {submittingClaim ? (
                       <>
@@ -851,7 +851,7 @@ export default function ItemDetail({
                       </>
                     ) : (
                       <>
-                        <CheckCircle2 className="h-4 w-4 text-teal-300" />
+                        <CheckCircle2 className="h-4 w-4 text-blue-300" />
                         <span>Submit Answer</span>
                       </>
                     )}
@@ -966,7 +966,7 @@ function ChatView({ chatId, currentUserUid, itemTitle, otherUserId, reporterName
   return (
     <div className="h-full flex flex-col justify-between bg-white text-slate-800 overflow-hidden" id="item-conversation-container">
       {/* 1. Rigid Header Box shrink-0 */}
-      <div className="w-full bg-gradient-to-r from-teal-800 to-slate-900 p-4 flex items-center gap-4 text-white shrink-0">
+      <div className="w-full bg-gradient-to-r from-[#0038A8] to-[#002370] p-4 flex items-center gap-4 text-white shrink-0">
         <button
           type="button"
           onClick={onBack}
@@ -979,12 +979,12 @@ function ChatView({ chatId, currentUserUid, itemTitle, otherUserId, reporterName
           <span className="text-sm font-bold truncate block w-full">
             {reporterName}
           </span>
-          <span className="text-[10px] text-teal-300 font-medium block">
+          <span className="text-[10px] text-blue-300 font-medium block">
             Direct Message Stream
           </span>
         </div>
 
-        <div className="flex h-8 w-8 items-center justify-center rounded-md bg-teal-500/20 text-teal-300 ring-1 ring-teal-400/30 shrink-0">
+        <div className="flex h-8 w-8 items-center justify-center rounded-md bg-blue-500/20 text-blue-300 ring-1 ring-blue-400/30 shrink-0">
           <Radio className="h-4 w-4 animate-pulse" />
         </div>
       </div>
@@ -993,12 +993,12 @@ function ChatView({ chatId, currentUserUid, itemTitle, otherUserId, reporterName
       <div className="flex-1 overflow-y-auto bg-slate-50/50 p-4 space-y-4 font-sans text-xs">
         {loading ? (
           <div className="flex h-full flex-col items-center justify-center space-y-2 text-slate-400">
-            <Loader2 className="h-6 w-6 animate-spin text-teal-600" />
+            <Loader2 className="h-6 w-6 animate-spin text-blue-600" />
             <span className="font-sans text-xs font-medium">Connecting SECURE server channels...</span>
           </div>
         ) : messages.length === 0 ? (
           <div className="flex h-full flex-col items-center justify-center text-center p-6 space-y-3">
-            <div className="flex h-12 w-12 items-center justify-center rounded-full bg-teal-50 text-teal-600">
+            <div className="flex h-12 w-12 items-center justify-center rounded-full bg-blue-50 text-blue-600">
               <MessageSquare className="h-6 w-6" />
             </div>
             <div>
@@ -1016,7 +1016,7 @@ function ChatView({ chatId, currentUserUid, itemTitle, otherUserId, reporterName
                 <div className="max-w-[80%] flex flex-col space-y-1">
                   <div className={`px-4 py-2.5 rounded-md text-xs font-sans shadow-sm break-words ${
                     isMe 
-                      ? 'bg-gradient-to-tr from-teal-800 to-indigo-900 text-white' 
+                      ? 'bg-gradient-to-tr from-[#0038A8] to-[#002370] text-white' 
                       : 'bg-white border border-slate-200 text-slate-800'
                   }`}>
                     {msg.text}
@@ -1039,17 +1039,17 @@ function ChatView({ chatId, currentUserUid, itemTitle, otherUserId, reporterName
           value={inputText}
           onChange={(e) => setInputText(e.target.value)}
           placeholder="Type secure handoff messages..."
-          className="flex-1 rounded-md border border-slate-200 bg-slate-50/50 px-3.5 py-2.5 text-xs font-sans focus:border-indigo-500 focus:bg-white focus:outline-none transition placeholder:text-slate-400 duration-155"
+          className="flex-1 rounded-md border border-slate-200 bg-slate-50/50 px-3.5 py-2.5 text-xs font-sans focus:border-[#0038A8] focus:bg-white focus:outline-none transition placeholder:text-slate-400 duration-155"
         />
         <button
           type="submit"
           disabled={!inputText.trim() || sending}
-          className="flex h-9 w-9 shrink-0 items-center justify-center rounded-md bg-gradient-to-tr from-teal-850 to-indigo-950 text-white shadow-md transition-all active:scale-95 duration-150 disabled:opacity-50 cursor-pointer"
+          className="flex h-9 w-9 shrink-0 items-center justify-center rounded-md bg-gradient-to-tr from-[#0038A8] to-[#002370] text-white shadow-md transition-all active:scale-95 duration-150 disabled:opacity-50 cursor-pointer"
         >
           {sending ? (
             <Loader2 className="h-4 w-4 animate-spin" />
           ) : (
-            <Send className="h-4 w-4 transform rotate-45 text-teal-300" />
+            <Send className="h-4 w-4 transform rotate-45 text-blue-300" />
           )}
         </button>
       </form>

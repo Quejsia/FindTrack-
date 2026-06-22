@@ -23,21 +23,21 @@ export default function Header({ user, loadingAuth, onOpenNewItemModal, onOpenAu
           
           {/* Left Brand Area (Custom original style.css layout & branding logo tags) */}
             <div className="flex items-center space-x-3">
-              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-tr from-indigo-600 to-indigo-500 text-white shadow-md shadow-indigo-100">
+              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-tr from-[#0038A8] to-[#002370] text-white shadow-md shadow-blue-100">
                 <Radio className="h-6 w-6 animate-pulse" />
               </div>
               <div className="text-left">
                 <h1 className="font-sans text-lg font-bold tracking-tight text-slate-950">Lost & Found System</h1>
-                <p className="font-mono text-[8px] tracking-wider text-indigo-600 font-bold uppercase leading-tight">AI-Matched Search & Reunite</p>
+                <p className="font-mono text-[8px] tracking-wider text-[#0038A8] font-bold uppercase leading-tight">AI-Matched Search & Reunite</p>
               </div>
             </div>
 
           {/* Center / Navigation Links for Desktop (Original Custom index.html Navigation Items) */}
           <nav className="hidden md:flex items-center space-x-6 text-xs font-semibold text-slate-650" id="desktop-nav-links">
-            <a href="#items-grid-section" className="text-slate-600 hover:text-indigo-600 hover:bg-slate-50 px-3 py-1.5 rounded-lg transition-colors">
+            <a href="#items-grid-section" className="text-slate-600 hover:text-[#0038A8] hover:bg-slate-50 px-3 py-1.5 rounded-lg transition-colors">
               Registry Feed
             </a>
-            <a href="#filters-panel" className="text-slate-600 hover:text-indigo-600 hover:bg-slate-50 px-3 py-1.5 rounded-lg transition-colors">
+            <a href="#filters-panel" className="text-slate-600 hover:text-[#0038A8] hover:bg-slate-50 px-3 py-1.5 rounded-lg transition-colors">
               Database Search
             </a>
             {user && (
@@ -51,15 +51,15 @@ export default function Header({ user, loadingAuth, onOpenNewItemModal, onOpenAu
           {/* Right Desktop Authorization & Controls (Original custom styling) */}
           <div className="hidden md:flex items-center space-x-4">
             {loadingAuth ? (
-              <Loader2 className="h-5 w-5 animate-spin text-indigo-600" />
+              <Loader2 className="h-5 w-5 animate-spin text-[#0038A8]" />
             ) : user ? (
               <div className="flex items-center space-x-3">
                 <button
                   onClick={onOpenNewItemModal}
-                  className="inline-flex items-center space-x-1.5 rounded-xl bg-slate-950 hover:bg-slate-800 px-4 py-2 font-sans text-xs font-bold text-white shadow-md hover:shadow-lg transition-all active:scale-98"
+                  className="inline-flex items-center space-x-1.5 rounded-xl bg-[#CE1126] hover:bg-[#FCD116] hover:text-slate-950 px-4 py-2 font-sans text-xs font-bold text-white shadow-md hover:shadow-lg transition-all active:scale-98"
                   id="btn-register-item"
                 >
-                  <PlusCircle className="h-4 w-4 text-indigo-400" />
+                  <PlusCircle className="h-4 w-4 text-[#FCD116]" />
                   <span>Submit Item</span>
                 </button>
 
@@ -74,7 +74,7 @@ export default function Header({ user, loadingAuth, onOpenNewItemModal, onOpenAu
                       referrerPolicy="no-referrer"
                     />
                   ) : (
-                    <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-indigo-100 text-indigo-700 font-bold font-sans text-xs">
+                    <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-blue-100 text-[#0038A8] font-bold font-sans text-xs">
                       {user.displayName?.charAt(0) || user.email?.charAt(0).toUpperCase()}
                     </div>
                   )}
@@ -109,10 +109,10 @@ export default function Header({ user, loadingAuth, onOpenNewItemModal, onOpenAu
                 </button>
                 <button
                   onClick={() => onOpenAuthModal('signup')}
-                  className="inline-flex items-center space-x-1.5 rounded-xl bg-indigo-600 px-3.5 py-2 font-sans text-xs font-bold text-white shadow-sm hover:bg-indigo-500 transition"
+                  className="inline-flex items-center space-x-1.5 rounded-xl bg-[#CE1126] px-3.5 py-2 font-sans text-xs font-bold text-white shadow-sm hover:bg-[#FCD116] hover:text-slate-950 transition"
                   id="btn-register-trigger"
                 >
-                  <UserPlus className="h-3.5 w-3.5 text-indigo-200" />
+                  <UserPlus className="h-3.5 w-3.5 text-[#FCD116]" />
                   <span>Register</span>
                 </button>
               </div>
@@ -175,7 +175,7 @@ export default function Header({ user, loadingAuth, onOpenNewItemModal, onOpenAu
                         referrerPolicy="no-referrer"
                       />
                     ) : (
-                      <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-indigo-100 text-indigo-700 font-bold text-xs">
+                      <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-blue-100 text-[#0038A8] font-bold text-xs">
                         {user.displayName?.charAt(0) || user.email?.charAt(0).toUpperCase()}
                       </div>
                     )}
@@ -191,9 +191,9 @@ export default function Header({ user, loadingAuth, onOpenNewItemModal, onOpenAu
                         setMobileMenuOpen(false);
                         onOpenNewItemModal();
                       }}
-                      className="inline-flex items-center justify-center space-x-1 py-2 px-3 rounded-xl bg-slate-950 font-sans text-xs font-bold text-white shadow"
+                      className="inline-flex items-center justify-center space-x-1 py-2 px-3 rounded-xl bg-[#CE1126] font-sans text-xs font-bold text-white shadow"
                     >
-                      <PlusCircle className="h-3.5 w-3.5 text-indigo-400" />
+                      <PlusCircle className="h-3.5 w-3.5 text-[#FCD116]" />
                       <span>Submit Item</span>
                     </button>
                     
@@ -232,9 +232,9 @@ export default function Header({ user, loadingAuth, onOpenNewItemModal, onOpenAu
                         setMobileMenuOpen(false);
                         onOpenAuthModal('signup');
                       }}
-                      className="inline-flex items-center justify-center space-x-1 py-2 px-3 rounded-xl bg-indigo-600 font-sans text-xs font-bold text-white shadow-sm"
+                      className="inline-flex items-center justify-center space-x-1 py-2 px-3 rounded-xl bg-[#CE1126] font-sans text-xs font-bold text-white shadow-sm"
                     >
-                      <UserPlus className="h-3.5 w-3.5 text-indigo-200" />
+                      <UserPlus className="h-3.5 w-3.5 text-[#FCD116]" />
                       <span>Register</span>
                     </button>
                   </div>

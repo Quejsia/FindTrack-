@@ -58,7 +58,7 @@ export default function ItemCard({ item, onSelect }: ItemCardProps) {
     <motion.div
       layoutId={`card-container-${item.id}`}
       onClick={() => onSelect(item)}
-      className="group relative flex flex-col justify-between overflow-hidden rounded-xl border border-slate-250 bg-white p-4 shadow-sm transition-all duration-300 hover:border-indigo-200 hover:shadow-md hover:shadow-indigo-50/50 cursor-pointer"
+      className="group relative flex flex-col justify-between overflow-hidden rounded-xl border border-slate-250 bg-white p-4 shadow-sm transition-all duration-300 hover:border-blue-200 hover:shadow-md hover:shadow-blue-50/50 cursor-pointer"
       whileHover={{ y: -2 }}
       whileTap={{ scale: 0.98 }}
       initial={{ opacity: 0, y: 12 }}
@@ -107,7 +107,7 @@ export default function ItemCard({ item, onSelect }: ItemCardProps) {
 
         {/* Info */}
         <div className="flex-1 min-w-0">
-          <h3 className="font-sans text-sm font-semibold text-slate-900 group-hover:text-indigo-600 transition-colors line-clamp-1">
+          <h3 className="font-sans text-sm font-semibold text-slate-900 group-hover:text-[#0038A8] transition-colors line-clamp-1">
             {item.title}
           </h3>
           <p className="font-sans text-xs text-slate-500 line-clamp-2 mt-1 leading-relaxed">

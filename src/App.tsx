@@ -881,7 +881,7 @@ export default function App() {
               <span className="badge-dot"></span>
               FindTrack Lost &amp; Found Platform
             </div>
-            <h1>Find What's<br /><span className="text-gradient">Lost, Fast.</span></h1>
+            <h1>Find What's Lost.<br /><span className="text-gradient">Reunite What Matters.</span></h1>
             <p>Report missing items, browse found belongings, and reunite with your stuff — all in one smart platform built for your Things.</p>
 
             <div className="hero-actions">
@@ -1024,7 +1024,7 @@ export default function App() {
               </form>
 
               <div className="auth-footer">
-                Don't have an account? <button onClick={() => setCurrentView('signup')} className="text-[#38bdf8] font-bold hover:underline">Create one →</button>
+                Don't have an account? <button onClick={() => setCurrentView('signup')} className="text-[#FCD116] font-bold hover:underline">Create one →</button>
               </div>
             </div>
           </div>
@@ -1131,7 +1131,7 @@ export default function App() {
               </form>
 
               <div className="auth-footer">
-                Already have an account? <button onClick={() => setCurrentView('login')} className="text-[#38bdf8] font-bold hover:underline">Sign in →</button>
+                Already have an account? <button onClick={() => setCurrentView('login')} className="text-[#FCD116] font-bold hover:underline">Sign in →</button>
               </div>
             </div>
           </div>
@@ -1155,7 +1155,7 @@ export default function App() {
             <div className="auth-card" style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
               <div className="card-title" style={{ fontSize: '20px', fontWeight: 'bold', color: 'white', marginBottom: '4px' }}>Verify Your Email ✉️</div>
               <div className="card-sub" style={{ fontSize: '13px', color: 'rgba(255,255,255,0.7)', lineHeight: '1.6', marginBottom: '8px' }}>
-                We've sent a verification email to <strong style={{ color: '#38bdf8' }}>{auth.currentUser?.email || profileEmail || "your email address"}</strong>. 
+                We've sent a verification email to <strong style={{ color: '#FCD116' }}>{auth.currentUser?.email || profileEmail || "your email address"}</strong>. 
                 Please check your inbox (including your spam folder) and click the verification link.
               </div>
 
@@ -1239,12 +1239,12 @@ export default function App() {
 
             <div style={{ display: 'flex', flexDirection: 'column', gap: '24px', fontSize: '14px', lineHeight: '1.7', color: 'rgba(255, 255, 255, 0.85)' }}>
               <section>
-                <h3 style={{ fontSize: '16px', fontWeight: '700', color: '#38bdf8', marginBottom: '8px' }}>1. Introduction</h3>
+                <h3 style={{ fontSize: '16px', fontWeight: '700', color: '#FCD116', marginBottom: '8px' }}>1. Introduction</h3>
                 <p>Welcome to FindTrack. We are dedicated to protecting your personal information and your right to privacy. This Privacy Policy describes how we collect, use, and process your information when you use our lost and found platform.</p>
               </section>
 
               <section>
-                <h3 style={{ fontSize: '16px', fontWeight: '700', color: '#38bdf8', marginBottom: '8px' }}>2. Information We Collect</h3>
+                <h3 style={{ fontSize: '16px', fontWeight: '700', color: '#FCD116', marginBottom: '8px' }}>2. Information We Collect</h3>
                 <p>To provide our services, facilitate claiming, and enable safe communications, we collect the following personal details:</p>
                 <ul style={{ listStyleType: 'disc', paddingLeft: '20px', marginTop: '8px', display: 'flex', flexDirection: 'column', gap: '6px' }}>
                   <li><strong>Account Credentials:</strong> Full name, verified email address, and profile pictures when you register.</li>
@@ -1254,7 +1254,7 @@ export default function App() {
               </section>
 
               <section>
-                <h3 style={{ fontSize: '16px', fontWeight: '700', color: '#38bdf8', marginBottom: '8px' }}>3. How We Use Your Information</h3>
+                <h3 style={{ fontSize: '16px', fontWeight: '700', color: '#FCD116', marginBottom: '8px' }}>3. How We Use Your Information</h3>
                 <p>We process your personal information for purposes based on legitimate interests, the fulfillment of our services, and user convenience:</p>
                 <ul style={{ listStyleType: 'disc', paddingLeft: '20px', marginTop: '8px', display: 'flex', flexDirection: 'column', gap: '6px' }}>
                   <li>To facilitate user account creation, profile management, and authentication check-ins.</li>
@@ -1265,12 +1265,12 @@ export default function App() {
               </section>
 
               <section>
-                <h3 style={{ fontSize: '16px', fontWeight: '700', color: '#38bdf8', marginBottom: '8px' }}>4. Data Security &amp; Storage</h3>
+                <h3 style={{ fontSize: '16px', fontWeight: '700', color: '#FCD116', marginBottom: '8px' }}>4. Data Security &amp; Storage</h3>
                 <p>Your account, contact profile information, and reported item details are safely stored using secure Cloud Firebase/Firestore infrastructure. Only authorized users can update their profiles or manage active items. We implement security protocols to protect your personal information against unauthorized retrieval, alteration, or disclosure.</p>
               </section>
 
               <section>
-                <h3 style={{ fontSize: '16px', fontWeight: '700', color: '#38bdf8', marginBottom: '8px' }}>5. Your Rights &amp; Data Deletion</h3>
+                <h3 style={{ fontSize: '16px', fontWeight: '700', color: '#FCD116', marginBottom: '8px' }}>5. Your Rights &amp; Data Deletion</h3>
                 <p>You can access, modify, or delete your personal contact coordinates at any time directly through the <strong>My Profile</strong> or <strong>My Items</strong> dashboards. If you wish to completely close your account or wipe your listing data, please reach out to our team or use the direct profile purge settings.</p>
               </section>
             </div>
@@ -1305,12 +1305,12 @@ export default function App() {
 
             <div style={{ display: 'flex', flexDirection: 'column', gap: '24px', fontSize: '14px', lineHeight: '1.7', color: 'rgba(255, 255, 255, 0.85)' }}>
               <section>
-                <h3 style={{ fontSize: '16px', fontWeight: '700', color: '#38bdf8', marginBottom: '8px' }}>1. Agreement to Terms</h3>
+                <h3 style={{ fontSize: '16px', fontWeight: '700', color: '#FCD116', marginBottom: '8px' }}>1. Agreement to Terms</h3>
                 <p>By registering, logging in, browsing as a guest, or submitting reports on FindTrack, you accept and agree to follow these Terms of Service. If you do not agree to all of these Terms, you are prohibited from using the application.</p>
               </section>
 
               <section>
-                <h3 style={{ fontSize: '16px', fontWeight: '700', color: '#38bdf8', marginBottom: '8px' }}>2. User Responsibilities &amp; Acceptable Use</h3>
+                <h3 style={{ fontSize: '16px', fontWeight: '700', color: '#FCD116', marginBottom: '8px' }}>2. User Responsibilities &amp; Acceptable Use</h3>
                 <p>When posting lost or found items and interacting with other community members, you agree to:</p>
                 <ul style={{ listStyleType: 'disc', paddingLeft: '20px', marginTop: '8px', display: 'flex', flexDirection: 'column', gap: '6px' }}>
                   <li>Provide accurate, genuine, and reliable details regarding found objects, locations, and descriptions.</li>
@@ -1321,7 +1321,7 @@ export default function App() {
               </section>
 
               <section>
-                <h3 style={{ fontSize: '16px', fontWeight: '700', color: '#38bdf8', marginBottom: '8px' }}>3. Verification of Ownership &amp; Meetups</h3>
+                <h3 style={{ fontSize: '16px', fontWeight: '700', color: '#FCD116', marginBottom: '8px' }}>3. Verification of Ownership &amp; Meetups</h3>
                 <p>FindTrack provides verification mechanisms (such as custom security confirmation questions) to help confirm proof of ownership prior to release. However:</p>
                 <ul style={{ listStyleType: 'disc', paddingLeft: '20px', marginTop: '8px', display: 'flex', flexDirection: 'column', gap: '6px' }}>
                   <li>Users are solely responsible for thoroughly vetting proof of ownership before handing over items.</li>
@@ -1330,12 +1330,12 @@ export default function App() {
               </section>
 
               <section>
-                <h3 style={{ fontSize: '16px', fontWeight: '700', color: '#38bdf8', marginBottom: '8px' }}>4. Disclaimer of Warrant &amp; Limitation of Liability</h3>
+                <h3 style={{ fontSize: '16px', fontWeight: '700', color: '#FCD116', marginBottom: '8px' }}>4. Disclaimer of Warrant &amp; Limitation of Liability</h3>
                 <p>FindTrack is provided "as is" and "as available". We do not guarantee that your lost items will be found, or that matches suggested by the system are 100% correct. Under no circumstances shall FindTrack, our developers, or our affiliates be liable for damages, item damage, theft, fraud, or any conflicts arising from physical item exchange coordinates.</p>
               </section>
 
               <section>
-                <h3 style={{ fontSize: '16px', fontWeight: '700', color: '#38bdf8', marginBottom: '8px' }}>5. Modifications to Service</h3>
+                <h3 style={{ fontSize: '16px', fontWeight: '700', color: '#FCD116', marginBottom: '8px' }}>5. Modifications to Service</h3>
                 <p>We reserves the right to modify or adjust the features, layouts, database rules, or services of FindTrack at any time. Continued use of the platform after updates indicates consent to all revised guidelines.</p>
               </section>
             </div>
@@ -1776,7 +1776,7 @@ export default function App() {
                       value={reportSecurityAnswer}
                       onChange={(e) => setReportSecurityAnswer(e.target.value)}
                       placeholder="Example: blue sticker"
-                      className="w-full rounded-md border border-slate-300 px-4 py-3 focus:outline-none focus:ring-2 focus:ring-teal-500"
+                      className="w-full rounded-md border border-slate-300 px-4 py-3 focus:outline-none focus:ring-2 focus:ring-[#0038A8]"
                     />
                     <p className="text-xs text-slate-500">
                       This answer will be hidden and used for automatic ownership verification.
@@ -1841,7 +1841,7 @@ export default function App() {
 
               {/* Dynamic Categories highlight info bar */}
               {categoryKeywords && (
-                <div className="mb-4 bg-indigo-50 border border-indigo-200 text-indigo-700 py-2 px-4 rounded-xl flex items-center justify-between text-xs">
+                <div className="mb-4 bg-blue-50 border border-blue-200 text-[#0038A8] py-2 px-4 rounded-xl flex items-center justify-between text-xs">
                   <span>Filtered: Category Mode Active</span>
                   <button onClick={() => setCategoryKeywords(null)} className="font-bold underline">Show all files</button>
                 </div>
@@ -1983,12 +1983,12 @@ export default function App() {
                   <div className="p-5 bg-slate-50/50 border border-slate-200/60 rounded-3xl space-y-4" id="finder-claims-review-panel">
                     <div className="flex flex-col gap-1.5 items-start sm:flex-row sm:items-center sm:justify-between">
                       <span className="text-sm font-bold text-slate-800 font-sans flex items-center gap-1.5 flex-wrap">🔑 Incoming Ownership Claims ({incomingClaims.filter(c => c.status === 'pending').length} pending)</span>
-                      <span className="font-mono text-[10px] px-2 py-0.5 bg-indigo-50 border border-indigo-100 text-indigo-700 font-bold uppercase rounded-full inline-block whitespace-nowrap shrink-0">Prove-it Verification Layer</span>
+                      <span className="font-mono text-[10px] px-2 py-0.5 bg-blue-50 border border-blue-100 text-[#0038A8] font-bold uppercase rounded-full inline-block whitespace-nowrap shrink-0">Prove-it Verification Layer</span>
                     </div>
 
                     {incomingClaims.length === 0 ? (
                       <div className="text-center py-10 bg-white border border-slate-200 border-dashed rounded-3xl flex flex-col items-center justify-center text-slate-450 p-6 shadow-sm">
-                        <div className="h-10 w-10 bg-indigo-50 border border-indigo-100 rounded-full flex items-center justify-center text-indigo-500 mb-2">
+                        <div className="h-10 w-10 bg-blue-50 border border-blue-100 rounded-full flex items-center justify-center text-[#0038A8] mb-2">
                           <ShieldCheck className="h-5 w-5" />
                         </div>
                         <p className="font-sans text-xs font-extrabold text-slate-700">No claims registered yet.</p>
@@ -2007,7 +2007,7 @@ export default function App() {
                               className={`bg-white border rounded-2xl p-4 shadow-sm relative transition hover:shadow-md ${
                                 claim.status === 'approved' ? 'border-emerald-200 bg-emerald-50/5' :
                                 claim.status === 'rejected' ? 'border-rose-200 bg-rose-50/5' :
-                                'border-slate-200/80 hover:border-indigo-200'
+                                'border-slate-200/80 hover:border-blue-200'
                               }`}
                               id={`claim-review-card-${claim.id}`}
                             >
@@ -2015,7 +2015,7 @@ export default function App() {
                                 <div className="space-y-0.5">
                                   <h4 className="font-sans text-xs font-bold text-slate-900 flex items-center gap-1.5">
                                     <span>Claim on:</span>
-                                    <span className="text-indigo-600 font-extrabold">{claim.itemTitle}</span>
+                                    <span className="text-[#0038A8] font-extrabold">{claim.itemTitle}</span>
                                   </h4>
                                   <span className="font-mono text-[9px] text-slate-400 block mt-0.5">
                                     Claimer: <strong className="text-slate-600 font-bold">{claim.claimerName}</strong> ({claim.claimerEmail || 'anonymous_email'})
@@ -2054,9 +2054,9 @@ export default function App() {
                                   </button>
                                   <button
                                     onClick={() => handleApproveClaim(claim.id, claim.itemId)}
-                                    className="px-3.5 py-1.5 rounded-lg bg-gradient-to-tr from-teal-850 to-indigo-950 text-white font-sans text-[11px] font-bold cursor-pointer transition hover:from-teal-900 hover:to-indigo-900 active:scale-95 flex items-center gap-1 shadow-sm"
+                                    className="px-3.5 py-1.5 rounded-lg bg-gradient-to-tr from-[#CE1126] to-[#A80920] text-white font-sans text-[11px] font-bold cursor-pointer transition hover:from-[#FCD116] hover:to-[#E6B800] hover:text-slate-950 active:scale-95 flex items-center gap-1 shadow-sm"
                                   >
-                                    <ShieldCheck className="h-3.5 w-3.5 text-teal-300" />
+                                    <ShieldCheck className="h-3.5 w-3.5 text-blue-300" />
                                     <span>Approve & Unlock PII</span>
                                   </button>
                                 </div>
@@ -2076,7 +2076,7 @@ export default function App() {
 
                   <div className="section-title flex items-center justify-between">
                     <span className="flex items-center gap-1.5">💬 Active Chats Inbox</span>
-                    <span className="font-mono text-[9px] bg-teal-100 text-teal-850 font-bold uppercase rounded-full px-2 py-0.5 animate-pulse">Live Messaging</span>
+                    <span className="font-mono text-[9px] bg-blue-100 text-blue-900 font-bold uppercase rounded-full px-2 py-0.5 animate-pulse">Live Messaging</span>
                   </div>
                   <ChatInboxList 
                     currentUserUid={user ? user.uid : null}
@@ -2291,7 +2291,7 @@ export default function App() {
                   <div className="big-label">Active Lost</div>
                 </div>
                 <div className="analytics-card">
-                  <div className="big-num" style={{ color: '#0ea5e9' }}>{stats.found}</div>
+                  <div className="big-num" style={{ color: '#0038A8' }}>{stats.found}</div>
                   <div className="big-label">Found Items</div>
                 </div>
                 <div className="analytics-card">
