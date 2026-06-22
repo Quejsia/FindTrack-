@@ -30,7 +30,8 @@ import ItemDetail from './components/ItemDetail';
 import { Item, Claim } from './types';
 import { 
   ShieldCheck, Search, Lock, UserPlus, ArrowRight, Tag, Lightbulb, Key, Smartphone,
-  Home, Package, Bell, User, MapPin, CheckCircle2, Info, Navigation, Hand, Inbox, PenTool
+  Home, Package, Bell, User, MapPin, CheckCircle2, Info, Navigation, Hand, Inbox, PenTool,
+  Camera, MessageCircle, Mail, Eye, EyeOff
 } from 'lucide-react';
 import { uploadToCloudinary } from './lib/cloudinary';
 
@@ -973,7 +974,7 @@ export default function App() {
                 <div className="field">
                   <label>Email Address</label>
                   <div className="field-wrap">
-                    <span className="field-icon">✉️</span>
+                    <span className="field-icon"><Mail className="h-5 w-5 text-slate-400" /></span>
                     <input 
                       type="email" 
                       placeholder="you@example.com" 
@@ -987,7 +988,7 @@ export default function App() {
                 <div className="field">
                   <label>Password</label>
                   <div className="field-wrap">
-                    <span className="field-icon">🔒</span>
+                    <span className="field-icon"><Lock className="h-5 w-5 text-slate-400" /></span>
                     <input 
                       type={showPass ? "text" : "password"} 
                       placeholder="Enter your password" 
@@ -998,9 +999,10 @@ export default function App() {
                     <button 
                       type="button" 
                       onClick={() => setShowPass(!showPass)} 
-                      className={`eye-btn ${!showPass ? 'closed' : ''}`}
+                      className="eye-btn text-slate-400 hover:text-slate-600 transition-colors"
+                      style={{ background: 'none', border: 'none', padding: '0 12px', cursor: 'pointer' }}
                     >
-                      <span className="text-lg">👁️</span>
+                      {showPass ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
                     </button>
                   </div>
                 </div>
@@ -1039,7 +1041,7 @@ export default function App() {
                   <div className="field">
                     <label>First Name</label>
                     <div className="field-wrap">
-                      <span className="field-icon">👤</span>
+                      <span className="field-icon"><User className="h-5 w-5 text-slate-400" /></span>
                       <input 
                         type="text" 
                         placeholder="Juan" 
@@ -1052,7 +1054,7 @@ export default function App() {
                   <div className="field">
                     <label>Last Name</label>
                     <div className="field-wrap">
-                      <span className="field-icon">👤</span>
+                      <span className="field-icon"><User className="h-5 w-5 text-slate-400" /></span>
                       <input 
                         type="text" 
                         placeholder="Dela Cruz" 
@@ -1067,7 +1069,7 @@ export default function App() {
                 <div className="field">
                   <label>Email Address</label>
                   <div className="field-wrap">
-                    <span className="field-icon">✉️</span>
+                    <span className="field-icon"><Mail className="h-5 w-5 text-slate-400" /></span>
                     <input 
                       type="email" 
                       placeholder="you@example.com" 
@@ -1094,7 +1096,7 @@ export default function App() {
                 <div className="field">
                   <label>Password</label>
                   <div className="field-wrap">
-                    <span className="field-icon">🔒</span>
+                    <span className="field-icon"><Lock className="h-5 w-5 text-slate-400" /></span>
                     <input 
                       type={showPass ? "text" : "password"} 
                       placeholder="Min. 6 characters" 
@@ -1105,9 +1107,10 @@ export default function App() {
                     <button 
                       type="button" 
                       onClick={() => setShowPass(!showPass)} 
-                      className={`eye-btn ${!showPass ? 'closed' : ''}`}
+                      className="eye-btn text-slate-400 hover:text-slate-600 transition-colors"
+                      style={{ background: 'none', border: 'none', padding: '0 12px', cursor: 'pointer' }}
                     >
-                      <span className="text-lg">👁️</span>
+                      {showPass ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
                     </button>
                   </div>
                 </div>

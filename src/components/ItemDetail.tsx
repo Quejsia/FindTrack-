@@ -35,9 +35,9 @@ import {
   Sparkles,
   Send,
   Radio,
-  X,
   Tag,
-  Lightbulb
+  Lightbulb,
+  Key
 } from 'lucide-react';
 
 interface ItemDetailProps {
@@ -221,9 +221,9 @@ export default function ItemDetail({
       });
 
       if (autoApproved) {
-        alert('✅ Ownership verified successfully! Contact details unlocked.');
+        alert('Ownership verified successfully! Contact details unlocked.');
       } else {
-        alert('⏳ Claim submitted for manual review by the owner.');
+        alert('Claim submitted for manual review by the owner.');
       }
 
       setAnswer('');
@@ -291,7 +291,7 @@ export default function ItemDetail({
                 </label>
                 {item?.securityQuestion && item.securityQuestion.trim() ? (
                   <div className="w-full mt-2 p-[16px] border-2 border-sky-500 rounded-md bg-[#fefce8] text-black shadow-sm">
-                    <p className="font-bold text-sm mb-2 text-[#854d0e] uppercase tracking-wide">🔑 OWNER'S SECRET QUESTION</p>
+                    <p className="font-bold text-sm mb-2 text-[#854d0e] uppercase tracking-wide"><Key className="h-4 w-4 inline mr-1" /> OWNER'S SECRET QUESTION</p>
                     <p className="italic text-[#713f12] text-lg font-medium tracking-tight">e.g. "{item?.securityQuestion}"</p>
                   </div>
                 ) : (
@@ -342,7 +342,7 @@ export default function ItemDetail({
               </div>
             )}
 
-            {/* CLEAN BUTTON LAYOUT: Move the "Cancel" and "✅ Submit Answer" buttons BELOW the text input area. */}
+            {/* CLEAN BUTTON LAYOUT: Move the "Cancel" and "Submit Answer" buttons BELOW the text input area. */}
             <div className="flex items-center gap-3 mt-[20px]">
               <button
                 type="button"
@@ -364,7 +364,7 @@ export default function ItemDetail({
                   </>
                 ) : (
                   <>
-                    <span>✅ Submit Answer</span>
+                    <span className="flex items-center gap-1.5"><CheckCircle2 className="h-4 w-4" /> Submit Answer</span>
                   </>
                 )}
               </button>
@@ -548,7 +548,7 @@ export default function ItemDetail({
                                 </p>
                                 
                                 <p className="text-[11px] text-slate-600 font-semibold font-sans">
-                                  🔑 Your submitted answer: <span className="font-normal font-sans italic text-slate-500">"{existingClaim.providedAnswer}"</span>
+                                  <Key className="h-3 w-3 inline text-slate-400 mr-1" /> Your submitted answer: <span className="font-normal font-sans italic text-slate-500">"{existingClaim.providedAnswer}"</span>
                                 </p>
 
                                 <div className="flex items-center space-x-2 pt-1 border-t border-slate-100">
@@ -793,7 +793,7 @@ export default function ItemDetail({
                   </label>
                   {hasSecurityQuestion ? (
                     <div className="bg-amber-50 border border-amber-200 rounded-md p-4 text-amber-900">
-                      <p className="font-bold text-xs mb-1">🔑 OWNER'S SECRET QUESTION</p>
+                      <p className="font-bold text-xs mb-1"><Key className="h-3 w-3 inline" /> OWNER'S SECRET QUESTION</p>
                       <p className="font-sans text-xs italic leading-relaxed">e.g. "{item.securityQuestion}"</p>
                     </div>
                   ) : (
@@ -828,7 +828,7 @@ export default function ItemDetail({
 
                 {/* TIPS CARD */}
                 <div className="p-4 border border-teal-600/30 rounded-md bg-teal-50/50 space-y-1">
-                  <span className="text-[10px] font-bold text-teal-700 uppercase tracking-widest block mb-1">💡 Tips for a strong claim</span>
+                  <span className="text-[10px] font-bold text-teal-700 uppercase tracking-widest flex items-center gap-1 mb-1"><Lightbulb className="h-3 w-3" /> Tips for a strong claim</span>
                   <p className="text-xs text-slate-650 leading-relaxed">• State items inside (e.g. specific cards, quantity of cash, etc.)</p>
                   <p className="text-xs text-slate-650 leading-relaxed">• Mention distinct scratches, custom keychains, stickers, or wallpaper setups</p>
                   <p className="text-xs text-slate-650 leading-relaxed">• State the exact date, time range and place you lost or found it</p>
@@ -836,7 +836,7 @@ export default function ItemDetail({
 
                 {claimErrorObj && (
                   <div className="p-3 bg-red-50 border border-red-100 rounded-md text-red-750 font-sans text-[11px]">
-                    ❌ {claimErrorObj}
+                    <X className="h-3 w-3 inline text-red-500 mr-1" /> {claimErrorObj}
                   </div>
                 )}
 
