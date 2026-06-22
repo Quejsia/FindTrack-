@@ -105,6 +105,15 @@ export default function App() {
   const [toasts, setToasts] = useState<{ id: string; msg: string; type: 'success' | 'error' }[]>([]);
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [showPass, setShowPass] = useState(false);
+  const [resendCooldown, setResendCooldown] = useState(0);
+
+  useEffect(() => {
+    if (resendCooldown > 0) {
+      const timer = setTimeout(() => setResendCooldown(resendCooldown - 1), 1000);
+      return () => clearTimeout(timer);
+    }
+  }, [resendCooldown]);
+
   const [showOnboarding, setShowOnboarding] = useState(false);
   const [onboardStep, setOnboardStep] = useState(0);
   const [zoomImg, setZoomImg] = useState<string | null>(null);
@@ -379,11 +388,13 @@ export default function App() {
   // Handle Firebase Sign In
   const handleLoginSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (loadingAuth) return;
     if (!authEmail || !authPassword) {
       triggerToast("❌ Please enter your email and password.", "error");
       return;
     }
 
+    setLoadingAuth(true);
     try {
       const credentials = await signInWithEmailAndPassword(auth, authEmail.trim(), authPassword);
       localStorage.setItem('sessionUser', JSON.stringify({
@@ -401,12 +412,15 @@ export default function App() {
     } catch (err: any) {
       console.error("SignIn error:", err);
       triggerToast("❌ Invalid email or password. Please try again.", "error");
+    } finally {
+      setLoadingAuth(false);
     }
   };
 
   // Handle Firebase Sign Up
   const handleSignupSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (loadingAuth) return;
     if (!signupFirst.trim() || !signupLast.trim()) {
       triggerToast("❌ First and Last names are required.", "error");
       return;
@@ -421,6 +435,7 @@ export default function App() {
       return;
     }
 
+    setLoadingAuth(true);
     try {
       const credentials = await createUserWithEmailAndPassword(auth, authEmail.trim().toLowerCase(), authPassword);
       const fullName = `${signupFirst.trim()} ${signupLast.trim()}`;
@@ -445,7 +460,11 @@ export default function App() {
 
       // Automatically send a verification email using Firebase sendEmailVerification()
       try {
-        await sendEmailVerification(credentials.user);
+        const actionCodeSettings = {
+          url: "https://findtrack-6kzf.vercel.app",
+          handleCodeInApp: false,
+        };
+        await sendEmailVerification(credentials.user, actionCodeSettings);
         triggerToast("✅ Account created! Please check your email to verify.", "success");
       } catch (err: any) {
         console.error("Verification email sending failed:", err);
@@ -465,6 +484,8 @@ export default function App() {
       } else {
         triggerToast("❌ Signup failed. Try again.", "error");
       }
+    } finally {
+      setLoadingAuth(false);
     }
   };
 
@@ -1007,7 +1028,9 @@ export default function App() {
                   </div>
                 </div>
 
-                <button type="submit" className="btn-submit"><Lock className="h-5 w-5 inline" /> Sign In</button>
+                <button type="submit" className="btn-submit" disabled={loadingAuth} style={loadingAuth ? {opacity: 0.7, cursor: 'not-allowed'} : {}}>
+                  {loadingAuth ? 'Wait...' : <><Lock className="h-5 w-5 inline" /> Sign In</>}
+                </button>
               </form>
 
               <div className="auth-footer">
@@ -1115,7 +1138,9 @@ export default function App() {
                   </div>
                 </div>
 
-                <button type="submit" className="btn-submit"><UserPlus className="h-5 w-5 inline" /> Create Account</button>
+                <button type="submit" className="btn-submit" disabled={loadingAuth} style={loadingAuth ? {opacity: 0.7, cursor: 'not-allowed'} : {}}>
+                  {loadingAuth ? 'Creating Account...' : <><UserPlus className="h-5 w-5 inline" /> Create Account</>}
+                </button>
               </form>
 
               <div className="auth-footer">
@@ -1148,7 +1173,7 @@ export default function App() {
               </div>
               
               <div className="card-sub bg-slate-800/50 p-3 rounded-md border border-slate-700 text-left" style={{ fontSize: '12px', color: '#94a3b8', lineHeight: '1.5', marginBottom: '2px' }}>
-                <strong className="text-slate-300">💡 Hint:</strong> If the link says it's <em>"expired or already used"</em>, your email app might have auto-scanned it. Your email is likely already verified! Just click the check button below.
+                <strong className="text-slate-300">💡 Hint:</strong> If the link says it's <em>"expired or already used"</em>, make sure you are clicking the <strong>most recent</strong> link if you requested multiple. Also, your email app might have auto-scanned it—meaning it's already verified. Just click "Check Verification Status" below.
               </div>
 
               <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
@@ -1182,23 +1207,35 @@ export default function App() {
 
                 <button 
                   onClick={async () => {
+                    if (resendCooldown > 0) return;
                     try {
                       if (auth.currentUser) {
-                        await sendEmailVerification(auth.currentUser);
+                        const actionCodeSettings = {
+                          url: "https://findtrack-6kzf.vercel.app",
+                          handleCodeInApp: false,
+                        };
+                        await sendEmailVerification(auth.currentUser, actionCodeSettings);
                         triggerToast("✅ Verification email resent!", "success");
+                        setResendCooldown(30);
                       } else {
                         triggerToast("❌ Session lost. Please log in again.", "error");
                         setCurrentView('login');
                       }
                     } catch (e: any) {
                       console.error(e);
-                      triggerToast("❌ " + (e.message || "Failed to resend email."), "error");
+                      if (e.message?.includes('too-many-requests')) {
+                        triggerToast("❌ Too many requests. Please wait a minute and try again.", "error");
+                        setResendCooldown(60);
+                      } else {
+                        triggerToast("❌ " + (e.message || "Failed to resend email."), "error");
+                      }
                     }
                   }}
+                  disabled={resendCooldown > 0}
                   className="btn-submit"
-                  style={{ width: '100%', padding: '10px', borderRadius: '8px', fontWeight: '500', fontSize: '13px', background: 'rgba(255, 255, 255, 0.15)', border: '1px solid rgba(255, 255, 255, 0.2)', cursor: 'pointer' }}
+                  style={{ width: '100%', padding: '10px', borderRadius: '8px', fontWeight: '500', fontSize: '13px', background: resendCooldown > 0 ? 'rgba(255, 255, 255, 0.05)' : 'rgba(255, 255, 255, 0.15)', border: '1px solid rgba(255, 255, 255, 0.2)', cursor: resendCooldown > 0 ? 'not-allowed' : 'pointer', color: resendCooldown > 0 ? 'rgba(255, 255, 255, 0.5)' : '#fff' }}
                 >
-                  📨 Resend Verification Email
+                  {resendCooldown > 0 ? `⏳ Wait ${resendCooldown}s to Resend` : '📨 Resend Verification Email'}
                 </button>
               </div>
 
