@@ -1146,6 +1146,10 @@ export default function App() {
                 We've sent a verification email to <strong style={{ color: '#38bdf8' }}>{auth.currentUser?.email || profileEmail || "your email address"}</strong>. 
                 Please check your inbox (including your spam folder) and click the verification link.
               </div>
+              
+              <div className="card-sub bg-slate-800/50 p-3 rounded-md border border-slate-700 text-left" style={{ fontSize: '12px', color: '#94a3b8', lineHeight: '1.5', marginBottom: '2px' }}>
+                <strong className="text-slate-300">💡 Hint:</strong> If the link says it's <em>"expired or already used"</em>, your email app might have auto-scanned it. Your email is likely already verified! Just click the check button below.
+              </div>
 
               <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
                 <button 
