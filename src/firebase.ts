@@ -6,8 +6,7 @@ import {
   signOut,
   signInWithEmailAndPassword,
   createUserWithEmailAndPassword,
-  updateProfile,
-  sendEmailVerification
+  updateProfile
 } from 'firebase/auth';
 import { getFirestore, doc, getDocFromServer } from 'firebase/firestore';
 import appletConfig from '../firebase-applet-config.json';
@@ -62,10 +61,6 @@ export const registerWithEmail = async (email: string, password: string, display
   try {
     const result = await createUserWithEmailAndPassword(auth, email, password);
     await updateProfile(result.user, { displayName });
-    await sendEmailVerification(result.user, {
-      url: 'https://find-track-6kzf.vercel.app/auth',
-      handleCodeInApp: false
-    });
     return result.user;
   } catch (error) {
     console.error('Email Registration Error:', error);

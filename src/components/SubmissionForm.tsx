@@ -190,17 +190,17 @@ export default function SubmissionForm({ onSubmit, onClose, defaultContactName =
         </div>
 
         {/* AI Photo Scan Section */}
-        <div className="relative rounded-xl border border-dashed border-blue-200 bg-blue-50/60 p-4" id="ai-photo-scanner">
+        <div className="relative rounded-xl border border-dashed border-indigo-200 bg-indigo-50/20 p-4" id="ai-photo-scanner">
           <div className="flex items-start justify-between gap-3/2 mb-3">
             <div className="flex items-center space-x-2">
-              <Sparkles className="h-4 w-4 text-[#0038A8] animate-pulse" />
+              <Sparkles className="h-4 w-4 text-indigo-600 animate-pulse" />
               <h4 className="font-sans text-xs font-bold text-slate-900 leading-tight">
                 Gemini AI Image Autofill (Saves Time)
               </h4>
             </div>
 
             {scanningImage && (
-              <span className="flex items-center space-x-1.5 font-sans text-[10px] font-bold text-[#0038A8]">
+              <span className="flex items-center space-x-1.5 font-sans text-[10px] font-bold text-indigo-600">
                 <Loader2 className="h-3 w-3 animate-spin" />
                 <span>Scanning pixels...</span>
               </span>
@@ -213,7 +213,7 @@ export default function SubmissionForm({ onSubmit, onClose, defaultContactName =
 
           <div
             onClick={() => fileInputRef.current?.click()}
-            className="flex flex-col items-center justify-center cursor-pointer py-4 px-2 hover:bg-blue-50 rounded-lg border border-slate-200 bg-white transition"
+            className="flex flex-col items-center justify-center cursor-pointer py-4 px-2 hover:bg-indigo-50/50 rounded-lg border border-slate-200 bg-white transition"
           >
             {imageUrl ? (
               <div className="flex items-center space-x-3 w-full px-3">
@@ -223,13 +223,13 @@ export default function SubmissionForm({ onSubmit, onClose, defaultContactName =
                   className="h-14 w-14 object-cover rounded-md border border-slate-200"
                 />
                 <div className="flex-1 min-w-0 text-left">
-                  <p className="font-sans text-xs font-bold text-[#0038A8] truncate">Photo Attachment Uploaded</p>
+                  <p className="font-sans text-xs font-bold text-indigo-600 truncate">Photo Attachment Uploaded</p>
                   <p className="font-sans text-[10px] text-slate-400">Click to change or replace photo</p>
                 </div>
               </div>
             ) : (
               <>
-                <Upload className="h-6 w-6 text-[#0038A8] mb-1" />
+                <Upload className="h-6 w-6 text-indigo-500 mb-1" />
                 <span className="font-sans text-xs font-semibold text-slate-700">Click to upload photo</span>
                 <span className="font-sans text-[9px] text-slate-400 mt-0.5">PNG, JPG up to 8MB</span>
               </>
@@ -262,7 +262,7 @@ export default function SubmissionForm({ onSubmit, onClose, defaultContactName =
               value={title}
               onChange={(e) => setTitle(e.target.value)}
               placeholder="e.g. Broken House Key with red ring"
-              className="w-full rounded-lg border border-slate-250 bg-white px-3.5 py-2 font-sans text-xs font-medium text-slate-900 focus:border-[#0038A8] focus:outline-none"
+              className="w-full rounded-lg border border-slate-250 bg-white px-3.5 py-2 font-sans text-xs font-medium text-slate-900 focus:border-indigo-500 focus:outline-none"
               required
             />
           </div>
@@ -274,7 +274,7 @@ export default function SubmissionForm({ onSubmit, onClose, defaultContactName =
             <select
               value={category}
               onChange={(e) => setCategory(e.target.value as Category)}
-              className="w-full rounded-lg border border-slate-250 bg-white px-3.5 py-2 font-sans text-xs font-semibold text-slate-900 focus:border-[#0038A8] focus:outline-none capitalize"
+              className="w-full rounded-lg border border-slate-250 bg-white px-3.5 py-2 font-sans text-xs font-semibold text-slate-900 focus:border-indigo-500 focus:outline-none capitalize"
             >
               {CATEGORIES.map((cat) => (
                 <option key={cat} value={cat}>
@@ -293,7 +293,7 @@ export default function SubmissionForm({ onSubmit, onClose, defaultContactName =
               value={location}
               onChange={(e) => setLocation(e.target.value)}
               placeholder="e.g. Central Park East Ground near bench"
-              className="w-full rounded-lg border border-slate-250 bg-white px-3.5 py-2 font-sans text-xs font-medium text-slate-900 focus:border-[#0038A8] focus:outline-none"
+              className="w-full rounded-lg border border-slate-250 bg-white px-3.5 py-2 font-sans text-xs font-medium text-slate-900 focus:border-indigo-500 focus:outline-none"
               required
             />
           </div>
@@ -306,7 +306,7 @@ export default function SubmissionForm({ onSubmit, onClose, defaultContactName =
               type="datetime-local"
               value={date}
               onChange={(e) => setDate(e.target.value)}
-              className="w-full rounded-lg border border-slate-250 bg-white px-3.5 py-2 font-sans text-xs font-semibold text-slate-900 focus:border-[#0038A8] focus:outline-none"
+              className="w-full rounded-lg border border-slate-250 bg-white px-3.5 py-2 font-sans text-xs font-semibold text-slate-900 focus:border-indigo-500 focus:outline-none"
               required
             />
           </div>
@@ -321,7 +321,7 @@ export default function SubmissionForm({ onSubmit, onClose, defaultContactName =
             onChange={(e) => setDescription(e.target.value)}
             rows={3}
             placeholder="Introduce specific markings, brands, tags, texture shapes, material details (e.g. brass keys, engraved 'Home' on back)..."
-            className="w-full rounded-lg border border-slate-250 bg-white px-3.5 py-2 font-sans text-xs font-medium text-slate-900 focus:border-[#0038A8] focus:outline-none leading-relaxed"
+            className="w-full rounded-lg border border-slate-250 bg-white px-3.5 py-2 font-sans text-xs font-medium text-slate-900 focus:border-indigo-500 focus:outline-none leading-relaxed"
             required
           />
         </div>
@@ -339,7 +339,7 @@ export default function SubmissionForm({ onSubmit, onClose, defaultContactName =
               className={`w-full rounded-lg border px-3.5 py-2 font-sans text-xs font-medium text-slate-900 focus:outline-none transition-colors ${
                 securityQuestion.trim().length >= 4 
                   ? 'border-emerald-500 bg-emerald-50 focus:border-emerald-500 pr-10' 
-                  : 'border-slate-250 bg-white focus:border-[#0038A8]'
+                  : 'border-slate-250 bg-white focus:border-indigo-500'
               }`}
             />
             {securityQuestion.trim().length >= 4 && (
@@ -363,7 +363,7 @@ export default function SubmissionForm({ onSubmit, onClose, defaultContactName =
               value={contactName}
               onChange={(e) => setContactName(e.target.value)}
               placeholder="e.g. Jane Doe"
-              className="w-full rounded-lg border border-slate-250 bg-white px-3.5 py-2 font-sans text-xs font-medium text-slate-900 focus:border-[#0038A8] focus:outline-none"
+              className="w-full rounded-lg border border-slate-250 bg-white px-3.5 py-2 font-sans text-xs font-medium text-slate-900 focus:border-indigo-500 focus:outline-none"
               required
             />
           </div>
@@ -377,7 +377,7 @@ export default function SubmissionForm({ onSubmit, onClose, defaultContactName =
               value={contactInfo}
               onChange={(e) => setContactInfo(e.target.value)}
               placeholder="e.g. janedoe@email.com or +1 (555) 019-2831"
-              className="w-full rounded-lg border border-slate-250 bg-white px-3.5 py-2 font-sans text-xs font-medium text-slate-900 focus:border-[#0038A8] focus:outline-none"
+              className="w-full rounded-lg border border-slate-250 bg-white px-3.5 py-2 font-sans text-xs font-medium text-slate-900 focus:border-indigo-500 focus:outline-none"
               required
             />
           </div>
@@ -403,7 +403,7 @@ export default function SubmissionForm({ onSubmit, onClose, defaultContactName =
           <button
             type="submit"
             disabled={submitting || scanningImage}
-            className="inline-flex items-center space-x-1.5 rounded-lg bg-[#0038A8] px-4 py-2 font-sans text-xs font-bold text-white shadow-sm hover:bg-[#FCD116] hover:text-slate-950 transition disabled:opacity-50"
+            className="inline-flex items-center space-x-1.5 rounded-lg bg-indigo-600 px-4 py-2 font-sans text-xs font-bold text-white shadow-sm hover:bg-indigo-500 transition disabled:opacity-50"
           >
             {submitting ? (
               <>
