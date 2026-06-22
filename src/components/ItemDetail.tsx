@@ -34,7 +34,10 @@ import {
   ShieldQuestion,
   Sparkles,
   Send,
-  Radio
+  Radio,
+  X,
+  Tag,
+  Lightbulb
 } from 'lucide-react';
 
 interface ItemDetailProps {
@@ -275,7 +278,7 @@ export default function ItemDetail({
             
             {/* ITEM SUMMARY CARD */}
             <div className="bg-white rounded-lg p-5 border border-slate-200 shadow-sm border-l-4 border-l-teal-500 hover:shadow-md transition">
-              <span className="text-[11px] font-extrabold text-teal-600 uppercase tracking-widest block mb-1.5 flex items-center gap-1.5"><span className="text-sm">🏷️</span> Current Claim Item</span>
+              <span className="text-[11px] font-extrabold text-sky-600 uppercase tracking-widest block mb-1.5 flex items-center gap-1.5"><Tag className="h-4 w-4" /> Current Claim Item</span>
               <h4 className="text-xl font-black text-slate-800">{item?.title || 'Unknown Item'}</h4>
               <p className="text-sm font-medium text-slate-500 mt-1">{item?.location || 'Unknown Location'} · {formattedDate || 'Unknown Date'}</p>
             </div>
@@ -287,12 +290,12 @@ export default function ItemDetail({
                   VERIFICATION QUESTION
                 </label>
                 {item?.securityQuestion && item.securityQuestion.trim() ? (
-                  <div className="w-full mt-2 p-[16px] border-2 border-[#008080] rounded-md bg-[#fefce8] text-black shadow-sm">
+                  <div className="w-full mt-2 p-[16px] border-2 border-sky-500 rounded-md bg-[#fefce8] text-black shadow-sm">
                     <p className="font-bold text-sm mb-2 text-[#854d0e] uppercase tracking-wide">🔑 OWNER'S SECRET QUESTION</p>
                     <p className="italic text-[#713f12] text-lg font-medium tracking-tight">e.g. "{item?.securityQuestion}"</p>
                   </div>
                 ) : (
-                  <div className="w-full mt-2 p-[16px] border-2 border-[#008080] rounded-md bg-white text-black cursor-default select-text font-medium shadow-sm">
+                  <div className="w-full mt-2 p-[16px] border-2 border-sky-500 rounded-md bg-white text-black cursor-default select-text font-medium shadow-sm">
                     <p className="text-lg text-slate-800 leading-relaxed font-semibold">How can we verify that this is your item? Describe it in detail.</p>
                   </div>
                 )}
@@ -310,18 +313,18 @@ export default function ItemDetail({
                   if (error) setError(''); 
                 }}
                 placeholder="Provide your exact verification answer or physical proof details here..."
-                className="w-full px-4 py-4 border-2 border-[#008080] rounded-md bg-white text-gray-800 focus:outline-none focus:ring-4 focus:ring-teal-500/20 text-base md:text-lg min-h-[160px] shadow-inner font-medium placeholder-slate-400"
+                className="w-full px-4 py-4 border-2 border-sky-500 rounded-md bg-white text-gray-800 focus:outline-none focus:ring-4 focus:ring-sky-500/20 text-base md:text-lg min-h-[160px] shadow-inner font-medium placeholder-slate-400"
               />
               {error && <p className="text-sm font-bold text-red-500 mt-2 animate-pulse">{error}</p>}
-              <p className="text-xs text-[#008080] italic mt-2 font-medium">
+              <p className="text-xs text-sky-500 italic mt-2 font-medium">
                 The finder will inspect this proof and action your contact credentials request.
               </p>
             </div>
 
             {/* TIPS CARD */}
             <div className="mt-[20px] p-5 border-2 border-teal-600/30 rounded-md bg-teal-50/50 space-y-2 shadow-sm">
-              <span className="text-sm font-bold text-teal-800 uppercase tracking-widest block mb-2 flex items-center gap-2">
-                <span className="text-lg">💡</span> Tips for a strong claim
+              <span className="text-sm font-bold text-sky-800 uppercase tracking-widest block mb-2 flex items-center gap-2">
+                <Lightbulb className="h-5 w-5 text-amber-500" /> Tips for a strong claim
               </span>
               <p className="text-sm text-slate-700 leading-relaxed font-medium pb-1">• State items inside (e.g. specific cards, quantity of cash, etc.)</p>
               <p className="text-sm text-slate-700 leading-relaxed font-medium pb-1">• Mention distinct scratches, custom keychains, stickers, or wallpaper setups</p>
@@ -331,7 +334,7 @@ export default function ItemDetail({
             {claimErrorObj && (
               <div className="p-4 bg-red-50 border-2 border-red-200 rounded-md flex flex-col gap-2 shadow-sm mt-2">
                 <div className="text-red-800 text-sm font-bold flex items-center gap-2">
-                  <span className="text-lg">❌</span> Verification Failed
+                  <X className="h-5 w-5" /> Verification Failed
                 </div>
                 <div className="text-red-700 text-sm font-medium pl-7">
                   {claimErrorObj}
@@ -344,7 +347,7 @@ export default function ItemDetail({
               <button
                 type="button"
                 onClick={() => setClaimView(false)}
-                className="px-6 py-4 border-2 border-[#008080] rounded-md text-[#008080] bg-white text-base font-bold transition shadow-sm hover:bg-slate-50 active:scale-95"
+                className="px-6 py-4 border-2 border-sky-500 rounded-md text-sky-500 bg-white text-base font-bold transition shadow-sm hover:bg-slate-50 active:scale-95"
               >
                 Cancel
               </button>
@@ -352,7 +355,7 @@ export default function ItemDetail({
                 type="button"
                 disabled={submittingClaim}
                 onClick={() => handleSubmit()}
-                className="flex-1 px-6 py-4 border-2 border-[#008080] rounded-md bg-[#008080] hover:bg-teal-700 disabled:bg-teal-400 disabled:border-teal-400 text-white font-bold text-base flex items-center justify-center gap-2 shadow-md transition active:scale-95"
+                className="flex-1 px-6 py-4 border-2 border-red-500 rounded-md bg-red-500 hover:bg-red-600 disabled:opacity-50 text-white font-bold text-base flex items-center justify-center gap-2 shadow-md transition active:scale-95"
               >
                 {submittingClaim ? (
                   <>

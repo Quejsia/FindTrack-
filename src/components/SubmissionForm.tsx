@@ -1,6 +1,6 @@
 import React, { useState, useRef } from 'react';
 import { Category, ItemType } from '../types';
-import { Camera, RefreshCw, Sparkles, Upload, Loader2, AlertCircle } from 'lucide-react';
+import { Camera, RefreshCw, Sparkles, Upload, Loader2, AlertCircle, Key } from 'lucide-react';
 
 interface SubmissionFormProps {
   onSubmit: (itemData: {
@@ -328,7 +328,7 @@ export default function SubmissionForm({ onSubmit, onClose, defaultContactName =
 
         <div id="form-field-security-question" className="bg-slate-50 border border-slate-200/60 rounded-xl p-4">
           <label className="block text-xs font-bold font-sans text-slate-750 uppercase tracking-wider mb-1.5 flex items-center gap-1">
-            <span>🔑 "Prove It" Security Verification Question (Optional)</span>
+            <span><Key className="h-4 w-4 inline mr-1" /> "Prove It" Security Verification Question (Optional)</span>
           </label>
           <div className="relative">
             <input

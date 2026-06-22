@@ -28,7 +28,7 @@ import {
 import ChatInterface, { ChatInboxList } from './components/ChatInterface';
 import ItemDetail from './components/ItemDetail';
 import { Item, Claim } from './types';
-import { ShieldCheck } from 'lucide-react';
+import { ShieldCheck, Search, Lock, UserPlus, ArrowRight, Tag, Lightbulb, Key, Smartphone } from 'lucide-react';
 import { uploadToCloudinary } from './lib/cloudinary';
 
 interface ItemReport {
@@ -848,7 +848,7 @@ export default function App() {
           {/* Landing NAV */}
           <nav className="landing-nav">
             <div className="nav-logo">
-              <div className="nav-logo-icon">🔎</div>
+              <div className="nav-logo-icon"><Search className="h-6 w-6 text-white" /></div>
               <span>FindTrack</span>
             </div>
             <div className="nav-actions">
@@ -863,15 +863,15 @@ export default function App() {
               <span className="badge-dot"></span>
               FindTrack Lost &amp; Found Platform
             </div>
-            <h1>Find What's<br /><span className="text-gradient">Lost, Fast.</span></h1>
+            <h1>Find What's Lost.<br /><span className="text-gradient">Reunite What Matters.</span></h1>
             <p>Report missing items, browse found belongings, and reunite with your stuff — all in one smart platform built for your Things.</p>
 
             <div className="hero-actions">
-              <button onClick={() => setCurrentView('signup')} className="btn-hero-primary">📝 Get Started Free</button>
-              <button onClick={() => setCurrentView('login')} className="btn-hero-secondary">🔐 Sign In</button>
+              <button onClick={() => setCurrentView('signup')} className="btn-hero-primary"><UserPlus className="h-5 w-5" /> Get Started Free</button>
+              <button onClick={() => setCurrentView('login')} className="btn-hero-secondary"><Lock className="h-5 w-5" /> Sign In</button>
             </div>
             <button onClick={handleGuestBrowse} className="guest-link" id="guestBtn">
-              or <span>browse as guest →</span>
+              or <span>browse as guest <ArrowRight className="h-4 w-4 inline" /></span>
             </button>
           </div>
 
@@ -957,7 +957,7 @@ export default function App() {
             </div>
 
             <div className="auth-logo">
-              <div className="auth-logo-icon">🔎</div>
+              <div className="auth-logo-icon"><Search className="text-white" /></div>
               <h1>FindTrack</h1>
               <p>Lost &amp; Found System</p>
             </div>
@@ -1002,7 +1002,7 @@ export default function App() {
                   </div>
                 </div>
 
-                <button type="submit" className="btn-submit">🔐 Sign In</button>
+                <button type="submit" className="btn-submit"><Lock className="h-5 w-5 inline" /> Sign In</button>
               </form>
 
               <div className="auth-footer">
@@ -1022,7 +1022,7 @@ export default function App() {
             </div>
 
             <div className="auth-logo">
-              <div className="auth-logo-icon">🔎</div>
+              <div className="auth-logo-icon"><Search className="text-white" /></div>
               <h1>FindTrack</h1>
               <p>Lost &amp; Found System</p>
             </div>
@@ -1109,7 +1109,7 @@ export default function App() {
                   </div>
                 </div>
 
-                <button type="submit" className="btn-submit">📝 Create Account</button>
+                <button type="submit" className="btn-submit"><UserPlus className="h-5 w-5 inline" /> Create Account</button>
               </form>
 
               <div className="auth-footer">
@@ -1129,13 +1129,13 @@ export default function App() {
             </div>
 
             <div className="auth-logo">
-              <div className="auth-logo-icon">✉️</div>
+              <div className="auth-logo-icon"><Search className="text-white" /></div>
               <h1>FindTrack</h1>
               <p>Email Verification Required</p>
             </div>
 
             <div className="auth-card" style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-              <div className="card-title" style={{ fontSize: '20px', fontWeight: 'bold', color: 'white', marginBottom: '4px' }}>Verify Your Email ✉️</div>
+              <div className="card-title" style={{ fontSize: '20px', fontWeight: 'bold', color: 'white', marginBottom: '4px' }}>Verify Your Email</div>
               <div className="card-sub" style={{ fontSize: '13px', color: 'rgba(255,255,255,0.7)', lineHeight: '1.6', marginBottom: '8px' }}>
                 We've sent a verification email to <strong style={{ color: '#38bdf8' }}>{auth.currentUser?.email || profileEmail || "your email address"}</strong>. 
                 Please check your inbox (including your spam folder) and click the verification link.
@@ -1348,7 +1348,7 @@ export default function App() {
               </button>
               
               <div className="brand-wrap">
-                <div className="logo">🔎</div>
+                <div className="logo"><Search className="h-4 w-4 text-white" /></div>
                 <div className="brand-text">
                   <div className="brand-title">FindTrack</div>
                   <div className="small-muted">Lost &amp; Found System</div>
@@ -1478,7 +1478,7 @@ export default function App() {
                 onClick={() => { setActiveTab('categories'); setSidebarOpen(false); }} 
                 className="drawer-item"
               >
-                🏷️ Categories
+                <Tag className="h-4 w-4 inline mr-1" /> Categories
               </li>
               <li 
                 onClick={() => { setActiveTab('analytics'); setSidebarOpen(false); }} 
@@ -1512,7 +1512,7 @@ export default function App() {
                 }} 
                 className="drawer-item"
               >
-                📝 Feedback
+                <Lightbulb className="h-4 w-4 inline mr-1" /> Feedback
               </li>
             </ul>
           </aside>
@@ -1617,7 +1617,7 @@ export default function App() {
                     </div>
                   </div>
 
-                  <div className="tip-banner">💡 Tip: Report lost items within 24 hours for the best chance of recovery!</div>
+                  <div className="tip-banner"><Lightbulb className="h-4 w-4 inline text-amber-500 mr-1" /> Tip: Report lost items within 24 hours for the best chance of recovery!</div>
 
                   <footer style={{ marginTop: '32px', paddingTop: '20px', borderTop: '1px solid rgba(0, 0, 0, 0.08)', display: 'flex', flexDirection: 'column', gap: '12px', alignItems: 'center', justifyContent: 'space-between', fontSize: '12px', color: '#64748b' }} className="sm:flex-row">
                     <p>© {new Date().getFullYear()} FindTrack · Lost &amp; Found System</p>
@@ -1725,7 +1725,7 @@ export default function App() {
                   </div>
 
                   <div className="form-group bg-slate-50 border border-slate-205 rounded-xl p-4 my-2" style={{ backgroundColor: '#f8fafc', border: '1px solid #e2e8f0', borderRadius: '12px', padding: '16px', margin: '8px 0' }}>
-                    <label htmlFor="r_securityQuestion" className="text-slate-800 font-bold" style={{ fontWeight: 'bold', color: '#1e293b' }}>🔑 OWNER SECRET QUESTION (OPTIONAL)</label>
+                    <label htmlFor="r_securityQuestion" className="text-slate-800 font-bold" style={{ fontWeight: 'bold', color: '#1e293b' }}><Key className="h-4 w-4 inline mr-1" /> OWNER SECRET QUESTION (OPTIONAL)</label>
                     <div style={{ position: 'relative' }}>
                       <input 
                         id="r_securityQuestion" 
@@ -1966,7 +1966,7 @@ export default function App() {
                   {/* 🛡️ "PROVE IT" LANDING CLAIMS FOR OWNER ITEMS (Item 3) */}
                   <div className="p-5 bg-slate-50/50 border border-slate-200/60 rounded-3xl space-y-4" id="finder-claims-review-panel">
                     <div className="flex flex-col gap-1.5 items-start sm:flex-row sm:items-center sm:justify-between">
-                      <span className="text-sm font-bold text-slate-800 font-sans flex items-center gap-1.5 flex-wrap">🔑 Incoming Ownership Claims ({incomingClaims.filter(c => c.status === 'pending').length} pending)</span>
+                      <span className="text-sm font-bold text-slate-800 font-sans flex items-center gap-1.5 flex-wrap"><Key className="h-4 w-4 inline mr-1 text-sky-500" /> Incoming Ownership Claims ({incomingClaims.filter(c => c.status === 'pending').length} pending)</span>
                       <span className="font-mono text-[10px] px-2 py-0.5 bg-indigo-50 border border-indigo-100 text-indigo-700 font-bold uppercase rounded-full inline-block whitespace-nowrap shrink-0">Prove-it Verification Layer</span>
                     </div>
 
@@ -2238,7 +2238,7 @@ export default function App() {
 
             {/* PANEL: CATEGORIES BROWSER */}
             <section id="categories" className={`panel ${activeTab === 'categories' ? 'active' : ''}`}>
-              <div className="section-title">🏷️ Browse by Category</div>
+              <div className="section-title"><Tag className="h-5 w-5 inline mr-1" /> Browse by Category</div>
               <p className="section-subtitle">Tap a category to filter lost items</p>
               <div className="cards-grid">
                 <div onClick={() => { setCategoryKeywords(["bag", "backpack", "purse", "wallet", "luggage", "suitcase", "handbag"]); setActiveTab('search'); }} className="card-item clickable">
@@ -2247,7 +2247,7 @@ export default function App() {
                   <div className="card-desc">Backpacks, purses, wallets, luggage</div>
                 </div>
                 <div onClick={() => { setCategoryKeywords(["phone", "laptop", "tablet", "charger", "headphone", "earphone", "computer", "iphone", "samsung", "ipad", "macbook"]); setActiveTab('search'); }} className="card-item clickable">
-                  <div className="card-media" style={{ fontSize: '60px' }}>📱</div>
+                  <div className="card-media" style={{ fontSize: '60px' }}><Smartphone className="h-16 w-16 text-slate-400" /></div>
                   <div className="card-title">Electronics</div>
                   <div className="card-desc">Phones, laptops, tablets, chargers</div>
                 </div>
@@ -2333,7 +2333,7 @@ export default function App() {
                   <div className="tip-card">✅ <strong>Claim</strong> — Mark items as found once recovered, or delete your own reports</div>
                   <div className="tip-card">📌 <strong>Pin</strong> — Bookmark items you want quick access to</div>
                 </div>
-                <div className="tip-banner" style={{ marginTop: '16px' }}>💡 Pro Tip: The more detail you add to reports, the faster items get matched!</div>
+                <div className="tip-banner" style={{ marginTop: '16px' }}><Lightbulb className="h-4 w-4 inline mr-1 text-amber-500" /> Pro Tip: The more detail you add to reports, the faster items get matched!</div>
               </div>
             </section>
 
@@ -2439,8 +2439,8 @@ export default function App() {
             <h2>Login Required</h2>
             <p>Please login or sign up to unlock the full features of FindTrack!</p>
             <div className="modal-buttons">
-              <button onClick={() => { setShowGuestModal(false); setCurrentView('login'); }} className="modal-btn primary">🔐 Login</button>
-              <button onClick={() => { setShowGuestModal(false); setCurrentView('signup'); }} className="modal-btn secondary">📝 Sign Up</button>
+              <button onClick={() => { setShowGuestModal(false); setCurrentView('login'); }} className="modal-btn primary"><Lock className="h-4 w-4 inline mr-1" /> Login</button>
+              <button onClick={() => { setShowGuestModal(false); setCurrentView('signup'); }} className="modal-btn secondary"><UserPlus className="h-4 w-4 inline mr-1" /> Sign Up</button>
             </div>
             <button onClick={() => setShowGuestModal(false)} className="modal-close">Maybe later</button>
           </div>
