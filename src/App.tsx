@@ -30,8 +30,8 @@ import ItemDetail from './components/ItemDetail';
 import { Item, Claim } from './types';
 import { 
   ShieldCheck, Search, Lock, UserPlus, ArrowRight, Tag, Lightbulb, Key, Smartphone,
-  Home, Package, Bell, User, MapPin, CheckCircle2, Info, Navigation, Hand, Inbox, PenTool,
-  Camera, MessageCircle, Mail, Eye, EyeOff
+  Home, Package, Bell, User as UserIcon, MapPin, CheckCircle2, Info, Navigation, Hand, Inbox, PenTool,
+  Camera, MessageCircle, Mail, Eye, EyeOff, Dices, Save, LogOut, Send, Zap
 } from 'lucide-react';
 import { uploadToCloudinary } from './lib/cloudinary';
 
@@ -920,7 +920,7 @@ export default function App() {
               <div className="feat-desc">Visual dashboards tracking trends, recovery stats, and item history.</div>
             </div>
             <div className="feat-card">
-              <div className="feat-icon amber">⚡</div>
+              <div className="feat-icon amber"><Zap className="h-6 w-6 text-white" /></div>
               <div className="feat-title">Instant Alerts</div>
               <div className="feat-desc">Get notified immediately when a potential match is found for your item.</div>
             </div>
@@ -1041,7 +1041,7 @@ export default function App() {
                   <div className="field">
                     <label>First Name</label>
                     <div className="field-wrap">
-                      <span className="field-icon"><User className="h-5 w-5 text-slate-400" /></span>
+                      <span className="field-icon"><UserIcon className="h-5 w-5 text-slate-400" /></span>
                       <input 
                         type="text" 
                         placeholder="Juan" 
@@ -1054,7 +1054,7 @@ export default function App() {
                   <div className="field">
                     <label>Last Name</label>
                     <div className="field-wrap">
-                      <span className="field-icon"><User className="h-5 w-5 text-slate-400" /></span>
+                      <span className="field-icon"><UserIcon className="h-5 w-5 text-slate-400" /></span>
                       <input 
                         type="text" 
                         placeholder="Dela Cruz" 
@@ -1399,7 +1399,7 @@ export default function App() {
                 onClick={() => { setActiveTab('profile'); }} 
                 className={`tab-btn ${activeTab === 'profile' ? 'active' : ''}`}
               >
-                <User className="h-4 w-4 inline mr-1.5" /> Profile
+                <UserIcon className="h-4 w-4 inline mr-1.5" /> Profile
               </button>
             </nav>
           </header>
@@ -1457,7 +1457,7 @@ export default function App() {
                 onClick={() => { setActiveTab('profile'); setSidebarOpen(false); }} 
                 className="drawer-item"
               >
-                <User className="h-4 w-4 inline mr-1" /> Profile
+                <UserIcon className="h-4 w-4 inline mr-1" /> Profile
               </li>
               <hr />
               <li 
@@ -1773,8 +1773,8 @@ export default function App() {
                     </p>
                   </div>
 
-                  <button className="primary-btn" type="submit" disabled={isUploading}>
-                    {isUploading ? 'Uploading & Submitting...' : '📤 Submit Report'}
+                  <button className="primary-btn flex items-center justify-center gap-1.5" type="submit" disabled={isUploading}>
+                    {isUploading ? 'Uploading & Submitting...' : <><Send className="h-4 w-4" /> Submit Report</>}
                   </button>
                 </form>
               </div>
@@ -1894,7 +1894,10 @@ export default function App() {
               </div>
 
               {filteredSearchList.length === 0 && (
-                <div id="noResults" className="empty">
+                <div id="noResults" className="empty flex flex-col items-center justify-center text-center">
+                  <div className="w-16 h-16 bg-sky-50 rounded-full flex items-center justify-center mb-4 border border-sky-100 shadow-sm mt-4">
+                     <Search className="h-8 w-8 text-sky-400" />
+                  </div>
                   No items found matching the current criteria.
                 </div>
               )}
@@ -2095,13 +2098,13 @@ export default function App() {
 
             {/* PANEL: PROFILE */}
             <section id="profile" className={`panel ${activeTab === 'profile' ? 'active' : ''}`}>
-              <div className="section-title"><User className="h-5 w-5 inline mr-1 text-sky-500" /> My Profile</div>
+              <div className="section-title"><UserIcon className="h-5 w-5 inline mr-1 text-sky-500" /> My Profile</div>
               <div className="profile-container">
                 <div className="profile-photo">
                   <img id="pf_avatar" src={profileAvatar} alt="Profile" />
                   <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', marginTop: '12px' }}>
-                    <button onClick={handleRandomAvatar} className="secondary-btn" style={{ width: '100%', justifyContent: 'center' }}>
-                      🎲 Random Avatar
+                    <button onClick={handleRandomAvatar} className="secondary-btn flex items-center gap-1.5" style={{ width: '100%', justifyContent: 'center' }}>
+                      <Dices className="h-4 w-4 text-slate-500" /> Random Avatar
                     </button>
                   </div>
                 </div>
@@ -2136,12 +2139,13 @@ export default function App() {
                     />
                   </div>
                   <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap', alignItems: 'center', marginTop: '4px' }}>
-                    <button onClick={handleSaveProfile} className="primary-btn">💾 Save Profile</button>
+                    <button onClick={handleSaveProfile} className="primary-btn flex items-center gap-1.5"><Save className="h-4 w-4" /> Save Profile</button>
                     <button 
                       onClick={handleLogoutAction} 
+                      className="flex items-center gap-1"
                       style={{ fontSize: '13px', color: '#ef4444', background: 'none', border: 'none', cursor: 'pointer', fontWeight: 600 }}
                     >
-                      🚪 Logout
+                      <LogOut className="h-4 w-4" /> Logout
                     </button>
                   </div>
                 </div>
@@ -2357,7 +2361,7 @@ export default function App() {
               <span className="bnav-icon"><Bell className="h-5 w-5" /></span>Alerts
             </button>
             <button onClick={() => { setActiveTab('profile'); }} className={`bnav-btn ${activeTab === 'profile' ? 'active' : ''}`}>
-              <span className="bnav-icon"><User className="h-5 w-5" /></span>Profile
+              <span className="bnav-icon"><UserIcon className="h-5 w-5" /></span>Profile
             </button>
           </nav>
 

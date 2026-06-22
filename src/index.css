@@ -860,7 +860,6 @@ main {
   text-align: center; padding: 56px 20px;
   color: var(--muted); font-size: 15px;
 }
-#noResults.empty::before { content: '🔍'; display: block; font-size: 48px; margin-bottom: 12px; }
 .empty.hidden { display: none; }
 
 /* ── TIPS GRID ── */
