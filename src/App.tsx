@@ -461,7 +461,7 @@ export default function App() {
       // Automatically send a verification email using Firebase sendEmailVerification()
       try {
         const actionCodeSettings = {
-          url: "https://findtrack-6kzf.vercel.app",
+          url: "https://find-track-6kzf.vercel.app",
           handleCodeInApp: false,
         };
         await sendEmailVerification(credentials.user, actionCodeSettings);
@@ -1211,7 +1211,7 @@ export default function App() {
                     try {
                       if (auth.currentUser) {
                         const actionCodeSettings = {
-                          url: "https://findtrack-6kzf.vercel.app",
+                          url: "https://find-track-6kzf.vercel.app",
                           handleCodeInApp: false,
                         };
                         await sendEmailVerification(auth.currentUser, actionCodeSettings);
