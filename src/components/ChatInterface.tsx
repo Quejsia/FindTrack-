@@ -188,7 +188,7 @@ export default function ChatInterface({
         id="chat-system-overlay"
       >
         {/* Chat Header */}
-        <div className="flex items-center gap-3 px-4 py-3 bg-gradient-to-r from-blue-700 to-blue-500 shadow-md flex-shrink-0">
+        <div className="flex items-center gap-3 px-4 py-3 bg-gradient-to-r from-teal-600 to-cyan-500 shadow-md flex-shrink-0">
           <button
             onClick={onClose}
             className="text-white font-bold text-lg leading-none p-1 cursor-pointer"
@@ -205,12 +205,12 @@ export default function ChatInterface({
         <div className="flex-1 overflow-y-auto bg-slate-50/50 p-4 space-y-4">
           {loading ? (
             <div className="flex h-full flex-col items-center justify-center space-y-2 text-slate-400">
-              <Loader2 className="h-8 w-8 animate-spin text-blue-700" />
+              <Loader2 className="h-8 w-8 animate-spin text-teal-600" />
               <span className="font-sans text-xs">Loading secure message logs...</span>
             </div>
           ) : messages.length === 0 ? (
             <div className="flex h-full flex-col items-center justify-center text-center p-6 space-y-3">
-              <div className="flex h-12 w-12 items-center justify-center rounded-full bg-blue-50 text-blue-700">
+              <div className="flex h-12 w-12 items-center justify-center rounded-full bg-teal-50 text-teal-600">
                 <MessageSquare className="h-6 w-6" />
               </div>
               <div>
@@ -233,7 +233,7 @@ export default function ChatInterface({
                     <div 
                       className={`px-4 py-2.5 rounded-2xl text-xs font-sans shadow-xs break-words ${
                         isMe 
-                          ? 'bg-[#0038A8] text-white rounded-tr-none' 
+                          ? 'bg-indigo-600 text-white rounded-tr-none' 
                           : 'bg-white border border-slate-200 text-slate-800 rounded-tl-none'
                       }`}
                     >
@@ -266,12 +266,12 @@ export default function ChatInterface({
               value={inputText}
               onChange={(e) => setInputText(e.target.value)}
               placeholder="Type secure handoff messages..."
-              className="flex-1 px-4 py-2.5 rounded-2xl bg-slate-50 border border-slate-200 text-xs focus:outline-none focus:ring-2 focus:ring-blue-700 focus:bg-white transition"
+              className="flex-1 px-4 py-2.5 rounded-2xl bg-slate-50 border border-slate-200 text-xs focus:outline-none focus:ring-2 focus:ring-teal-600 focus:bg-white transition"
             />
             <button
               type="submit"
               disabled={!inputText.trim() || sending}
-              className="w-10 h-10 rounded-xl bg-red-600 text-white flex items-center justify-center font-bold text-sm hover:bg-red-700 active:scale-95 transition disabled:opacity-40 disabled:pointer-events-none cursor-pointer"
+              className="w-10 h-10 rounded-xl bg-teal-600 text-white flex items-center justify-center font-bold text-sm hover:bg-teal-700 active:scale-95 transition disabled:opacity-40 disabled:pointer-events-none cursor-pointer"
             >
               {sending ? (
                 <Loader2 className="h-4 w-4 animate-spin text-white" />
@@ -349,7 +349,7 @@ export function ChatInboxList({
   if (loading) {
     return (
       <div className="p-8 flex flex-col items-center justify-center space-y-2 text-slate-400">
-        <Loader2 className="h-6 w-6 animate-spin text-blue-700" />
+        <Loader2 className="h-6 w-6 animate-spin text-teal-600" />
         <span className="font-sans text-[11px]">Syncing direct messages...</span>
       </div>
     );
@@ -384,7 +384,7 @@ export function ChatInboxList({
             onClick={() => onSelectChat(chat.chatId)}
             className={`group relative flex items-start justify-between p-3.5 rounded-2xl border transition-all duration-200 cursor-pointer ${
               isActive 
-                ? 'bg-blue-50/50 border-blue-200 shadow-sm ring-1 ring-blue-500/10' 
+                ? 'bg-teal-50/50 border-teal-200 shadow-sm ring-1 ring-teal-500/10' 
                 : 'bg-white border-slate-100 hover:bg-slate-50/40 hover:border-slate-200 hover:shadow-xs'
             }`}
           >
@@ -392,8 +392,8 @@ export function ChatInboxList({
               {/* Launcher conversation Avatar bubble */}
               <div className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-xl font-bold font-sans text-xs ${
                 isActive 
-                  ? 'bg-red-600 text-white' 
-                  : 'bg-blue-50 border border-blue-100 text-[#0038A8]'
+                  ? 'bg-teal-600 text-white' 
+                  : 'bg-indigo-50 border border-indigo-100 text-indigo-600'
               }`}>
                 {chat.itemTitle ? chat.itemTitle.charAt(0).toUpperCase() : 'C'}
               </div>
@@ -415,7 +415,7 @@ export function ChatInboxList({
             {/* Timestamps and open arrows */}
             <div className="flex flex-col items-end justify-between self-stretch shrink-0 ml-3">
               <span className="font-mono text-[9px] text-slate-400 font-semibold">{formattedDate}</span>
-              <span className="opacity-0 group-hover:opacity-100 transition-opacity duration-200 text-blue-700">
+              <span className="opacity-0 group-hover:opacity-100 transition-opacity duration-200 text-teal-600">
                 <ExternalLink className="h-3 w-3" />
               </span>
             </div>

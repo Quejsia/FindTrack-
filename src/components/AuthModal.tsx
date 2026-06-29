@@ -83,7 +83,7 @@ export default function AuthModal({ isOpen, onClose, onAuthSuccess, initialMode 
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/75 backdrop-blur-md overflow-y-auto" style={{ height: '100dvh' }} id="auth-modal-overlay">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/75 backdrop-blur-md overflow-y-auto" id="auth-modal-overlay">
       <motion.div 
         initial={{ opacity: 0, scale: 0.95, y: 15 }}
         animate={{ opacity: 1, scale: 1, y: 0 }}
@@ -92,17 +92,17 @@ export default function AuthModal({ isOpen, onClose, onAuthSuccess, initialMode 
         id="auth-modal-container"
       >
         {/* Left Hand: Branding Desk (Beautiful style reflecting original index.html logo & style.css layouts) */}
-        <div className="w-full md:w-5/12 bg-gradient-to-br from-[#002370] via-[#0038A8] to-[#001B55] p-8 text-white flex flex-col justify-between relative overflow-hidden border-b md:border-b-0 md:border-r border-slate-900" id="auth-panel-branding">
-          <div className="absolute top-0 left-0 w-full h-full opacity-5 pointer-events-none bg-[radial-gradient(circle_at_center,rgba(252,209,22,0.28)_0,transparent_100%)]"></div>
+        <div className="w-full md:w-5/12 bg-gradient-to-br from-indigo-950 via-slate-950 to-indigo-900 p-8 text-white flex flex-col justify-between relative overflow-hidden border-b md:border-b-0 md:border-r border-slate-900" id="auth-panel-branding">
+          <div className="absolute top-0 left-0 w-full h-full opacity-5 pointer-events-none bg-[radial-gradient(circle_at_center,rgba(99,102,241,0.44)_0,transparent_100%)]"></div>
           
           <div className="relative z-10">
             <div className="flex items-center space-x-3 mb-10">
-              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#0038A8] text-white shadow-lg shadow-blue-500/20">
+              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-indigo-600 text-white shadow-lg shadow-indigo-500/20">
                 <Radio className="h-5 w-5 animate-pulse" />
               </div>
               <div>
-                <span className="font-sans text-lg font-bold tracking-tight bg-gradient-to-r from-white via-slate-100 to-[#FCD116] bg-clip-text text-transparent">FindTrack</span>
-                <span className="block font-mono text-[8px] tracking-wider text-[#FCD116] uppercase">Secure Lost & Found</span>
+                <span className="font-sans text-lg font-bold tracking-tight bg-gradient-to-r from-white via-slate-100 to-indigo-200 bg-clip-text text-transparent">FindTrack</span>
+                <span className="block font-mono text-[8px] tracking-wider text-indigo-400 uppercase">Secure Lost & Found</span>
               </div>
             </div>
 
@@ -125,7 +125,7 @@ export default function AuthModal({ isOpen, onClose, onAuthSuccess, initialMode 
               </div>
             </div>
             <div className="flex items-start gap-3">
-              <Sparkles className="h-5 w-5 text-[#FCD116] shrink-0 mt-0.5" />
+              <Sparkles className="h-5 w-5 text-indigo-400 shrink-0 mt-0.5" />
               <div>
                 <h4 className="font-sans text-xs font-semibold text-slate-100">Gemini Match Analysis</h4>
                 <p className="font-sans text-[10px] text-slate-450 text-slate-400 mt-0.5">Calculating exact overlap scores instantly based on visual contours and textual descriptions.</p>
@@ -186,7 +186,7 @@ export default function AuthModal({ isOpen, onClose, onAuthSuccess, initialMode 
                       value={fullName}
                       onChange={(e) => setFullName(e.target.value)}
                       placeholder="e.g. Carl Jaya"
-                      className="w-full rounded-xl border border-slate-200 bg-slate-50 pl-10 pr-3 py-2 font-sans text-xs text-slate-800 transition focus:border-[#0038A8] focus:bg-white focus:outline-none"
+                      className="w-full rounded-xl border border-slate-200 bg-slate-50 pl-10 pr-3 py-2 font-sans text-xs text-slate-800 transition focus:border-indigo-500 focus:bg-white focus:outline-none"
                       id="signup-input-name"
                     />
                   </div>
@@ -203,7 +203,7 @@ export default function AuthModal({ isOpen, onClose, onAuthSuccess, initialMode 
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     placeholder="you@example.com"
-                    className="w-full rounded-xl border border-slate-200 bg-slate-50 pl-10 pr-3 py-2 font-sans text-xs text-slate-800 transition focus:border-[#0038A8] focus:bg-white focus:outline-none"
+                    className="w-full rounded-xl border border-slate-200 bg-slate-50 pl-10 pr-3 py-2 font-sans text-xs text-slate-800 transition focus:border-indigo-500 focus:bg-white focus:outline-none"
                     id="auth-input-email"
                   />
                 </div>
@@ -213,7 +213,7 @@ export default function AuthModal({ isOpen, onClose, onAuthSuccess, initialMode 
                 <div className="flex items-center justify-between">
                   <label className="font-sans text-[10px] font-bold text-slate-500 uppercase tracking-wider block">Password</label>
                   {mode === 'login' && (
-                    <a className="font-sans text-[10px] font-bold text-[#0038A8] hover:text-[#002370] cursor-not-allowed">
+                    <a className="font-sans text-[10px] font-bold text-indigo-600 hover:text-indigo-800 cursor-not-allowed">
                       Forgot Password?
                     </a>
                   )}
@@ -226,19 +226,19 @@ export default function AuthModal({ isOpen, onClose, onAuthSuccess, initialMode 
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     placeholder="••••••••"
-                    className="w-full rounded-xl border border-slate-200 bg-slate-50 pl-10 pr-10 py-2 font-sans text-xs text-slate-800 transition focus:border-[#0038A8] focus:bg-white focus:outline-none"
+                    className="w-full rounded-xl border border-slate-200 bg-slate-50 pl-10 pr-10 py-2 font-sans text-xs text-slate-800 transition focus:border-indigo-500 focus:bg-white focus:outline-none"
                     id="auth-input-password"
                   />
                   <button
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-3 top-2 p-1 text-slate-400 hover:text-[#0038A8] rounded transition-all duration-200 ease-out hover:scale-115 active:scale-90 active:rotate-3 cursor-pointer"
+                    className="absolute right-3 top-2 p-1 text-slate-400 hover:text-indigo-600 rounded transition-all duration-200 ease-out hover:scale-115 active:scale-90 active:rotate-3 cursor-pointer"
                     style={{ transition: 'all 0.2s ease' }}
                     title={showPassword ? 'Hide password' : 'Show password'}
                   >
                     <div className="transition-all duration-200" style={{ transition: 'all 0.2s ease' }}>
                       {showPassword ? (
-                        <EyeOff className="h-4 w-4 text-[#0038A8]" />
+                        <EyeOff className="h-4 w-4 text-indigo-600" />
                       ) : (
                         <Eye className="h-4 w-4" />
                       )}
@@ -250,7 +250,7 @@ export default function AuthModal({ isOpen, onClose, onAuthSuccess, initialMode 
               <button
                 type="submit"
                 disabled={loading}
-                className="w-full inline-flex items-center justify-center gap-1.5 rounded-xl bg-[#CE1126] hover:bg-[#FCD116] hover:text-slate-950 text-white font-sans text-xs font-semibold py-2.5 shadow-md active:scale-98 transition disabled:opacity-50"
+                className="w-full inline-flex items-center justify-center gap-1.5 rounded-xl bg-slate-950 hover:bg-slate-800 text-white font-sans text-xs font-semibold py-2.5 shadow-md active:scale-98 transition disabled:opacity-50"
                 id="auth-submit-btn"
               >
                 {loading ? (
@@ -299,7 +299,7 @@ export default function AuthModal({ isOpen, onClose, onAuthSuccess, initialMode 
                   setMode(mode === 'login' ? 'signup' : 'login');
                   setError(null);
                 }}
-                className="font-semibold text-[#0038A8] hover:text-[#002370] transition"
+                className="font-semibold text-indigo-600 hover:text-indigo-800 transition"
                 id="auth-toggle-mode-btn"
               >
                 {mode === 'login' ? 'Create a free account' : 'Sign In instead'}

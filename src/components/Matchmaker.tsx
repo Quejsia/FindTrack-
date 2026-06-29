@@ -88,10 +88,10 @@ export default function Matchmaker({ item, allOppositeItems, onResolveItem, user
   const isOwner = item.userId === userUid;
 
   return (
-    <div className="rounded-xl border border-blue-100 bg-blue-50/60 p-4" id="matchmaker-section">
+    <div className="rounded-xl border border-indigo-100 bg-indigo-50/30 p-4" id="matchmaker-section">
       <div className="flex items-center justify-between gap-3 mb-3">
         <div className="flex items-center space-x-2">
-          <BrainCircuit className="h-5 w-5 text-[#0038A8]" />
+          <BrainCircuit className="h-5 w-5 text-indigo-600" />
           <h4 className="font-sans text-sm font-bold text-slate-900">Gemini AI Matchmaker</h4>
         </div>
 
@@ -99,7 +99,7 @@ export default function Matchmaker({ item, allOppositeItems, onResolveItem, user
           onClick={triggerAIMatch}
           disabled={loading || allOppositeItems.length === 0}
           title="Recalculate Matches"
-          className="rounded-lg p-1.5 text-[#0038A8] hover:bg-blue-50 disabled:opacity-40 transition-all shrink-0"
+          className="rounded-lg p-1.5 text-indigo-600 hover:bg-indigo-50 disabled:opacity-40 transition-all shrink-0"
         >
           <RefreshCw className={`h-4 w-4 ${loading ? 'animate-spin' : ''}`} />
         </button>
@@ -111,8 +111,8 @@ export default function Matchmaker({ item, allOppositeItems, onResolveItem, user
 
       {loading ? (
         <div className="flex flex-col items-center justify-center py-8 space-y-2">
-          <Sparkles className="h-6 w-6 text-[#0038A8] animate-spin" />
-          <p className="font-sans text-xs font-medium text-[#0038A8]">Generating cognitive similarity correlations...</p>
+          <Sparkles className="h-6 w-6 text-indigo-500 animate-spin" />
+          <p className="font-sans text-xs font-medium text-indigo-600">Generating cognitive similarity correlations...</p>
         </div>
       ) : error ? (
         <div className="flex items-start bg-red-50/85 p-3 rounded-lg border border-red-100 text-red-700 font-sans text-xs space-x-2">
@@ -136,12 +136,12 @@ export default function Matchmaker({ item, allOppositeItems, onResolveItem, user
               const scoreColor = 
                 match.confidenceScore >= 80 ? 'text-emerald-600 bg-emerald-50 border-emerald-100' :
                 match.confidenceScore >= 60 ? 'text-amber-600 bg-amber-50 border-amber-100' :
-                'text-[#0038A8] bg-blue-50 border-blue-100';
+                'text-indigo-600 bg-indigo-50 border-indigo-100';
 
               const progressColor = 
                 match.confidenceScore >= 80 ? 'bg-emerald-500' :
                 match.confidenceScore >= 60 ? 'bg-amber-400' :
-                'bg-[#0038A8]';
+                'bg-indigo-500';
 
               return (
                 <motion.div
@@ -149,15 +149,15 @@ export default function Matchmaker({ item, allOppositeItems, onResolveItem, user
                   initial={{ opacity: 0, x: -10 }}
                   animate={{ opacity: 1, x: 0 }}
                   exit={{ opacity: 0, x: 10 }}
-                  className="rounded-lg border border-slate-200 bg-white p-3 shadow-sm hover:border-[#FCD116] transition-all"
+                  className="rounded-lg border border-slate-200 bg-white p-3 shadow-sm hover:border-indigo-300 transition-all"
                   id={`ai-match-card-${match.item.id}`}
                 >
                   <div className="flex items-start justify-between gap-3 mb-2">
                     <div className="min-w-0">
-                      <h5 className="font-sans text-xs font-bold text-slate-900 group-hover:text-[#0038A8] truncate">
+                      <h5 className="font-sans text-xs font-bold text-slate-900 group-hover:text-indigo-600 truncate">
                         {match.item.title}
                       </h5>
-                      <span className="font-mono text-[9px] text-[#0038A8] uppercase font-bold">
+                      <span className="font-mono text-[9px] text-indigo-600 uppercase font-bold">
                         {match.item.category} • {match.item.location}
                       </span>
                     </div>
