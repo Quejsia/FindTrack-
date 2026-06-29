@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>FindTrack - My Items</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Dm+Sans:wght@400;500;700&amp;family=Inter:wght@400;600;700&amp;family=Poppins:wght@400;500;600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "surface": "#fffbff",
+                        "error-container": "#fa746f",
+                        "surface-container-lowest": "#ffffff",
+                        "surface-tint": "#01725a",
+                        "secondary-dim": "#2a6253",
+                        "on-secondary-fixed-variant": "#2e6556",
+                        "on-secondary-fixed": "#0a483a",
+                        "secondary-fixed": "#b5eedb",
+                        "primary-container": "#9af4d6",
+                        "secondary-container": "#b5eedb",
+                        "inverse-primary": "#a0fadc",
+                        "inverse-on-surface": "#9f9d90",
+                        "tertiary-dim": "#775100",
+                        "tertiary": "#865c00",
+                        "on-error": "#ffffff",
+                        "outline": "#82826c",
+                        "on-background": "#393927",
+                        "tertiary-container": "#fab83f",
+                        "on-primary-fixed": "#004939",
+                        "on-surface": "#393927",
+                        "on-tertiary-fixed-variant": "#614100",
+                        "background": "#fffbff",
+                        "primary-dim": "#00654f",
+                        "on-primary-fixed-variant": "#006852",
+                        "surface-container-high": "#f1efd8",
+                        "on-tertiary-container": "#553900",
+                        "surface-variant": "#ebe9cf",
+                        "error-dim": "#67040d",
+                        "on-primary": "#ffffff",
+                        "inverse-surface": "#0f0f07",
+                        "on-tertiary-fixed": "#3b2600",
+                        "primary-fixed-dim": "#8ce5c8",
+                        "on-tertiary": "#ffffff",
+                        "on-secondary-container": "#235b4c",
+                        "surface-bright": "#fffbff",
+                        "primary": "#01725a",
+                        "tertiary-fixed-dim": "#ebaa32",
+                        "on-surface-variant": "#666551",
+                        "on-primary-container": "#005d49",
+                        "surface-container-low": "#fdfae7",
+                        "surface-dim": "#e6e4ca",
+                        "secondary-fixed-dim": "#a7e0cd",
+                        "error": "#af3d3b",
+                        "on-secondary": "#ffffff",
+                        "on-error-container": "#6e0a12",
+                        "surface-container-highest": "#ebe9cf",
+                        "outline-variant": "#bcbaa2",
+                        "tertiary-fixed": "#fab83f",
+                        "surface-container": "#f7f4df",
+                        "primary-fixed": "#9af4d6",
+                        "secondary": "#376e5e"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "md": "16px",
+                        "margin-desktop": "32px",
+                        "margin-mobile": "16px",
+                        "lg": "24px",
+                        "sm": "12px",
+                        "gutter": "16px",
+                        "xl": "32px",
+                        "base": "8px",
+                        "xs": "4px"
+                    },
+                    "fontFamily": {
+                        "body-lg": ["Dm Sans"],
+                        "label-md": ["Poppins"],
+                        "headline-md": ["Inter"],
+                        "headline-lg": ["Inter"],
+                        "body-md": ["Dm Sans"]
+                    },
+                    "fontSize": {
+                        "body-lg": ["16px", { "lineHeight": "24px", "fontWeight": "400" }],
+                        "label-md": ["12px", { "lineHeight": "16px", "letterSpacing": "0.5px", "fontWeight": "500" }],
+                        "headline-md": ["24px", { "lineHeight": "32px", "fontWeight": "600" }],
+                        "headline-lg": ["32px", { "lineHeight": "40px", "fontWeight": "700" }],
+                        "body-md": ["14px", { "lineHeight": "20px", "fontWeight": "400" }]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        body { background-color: #fffbff; }
+        .ambient-shadow { box-shadow: 0 4px 24px rgba(1, 114, 90, 0.08); }
+        .ambient-shadow-hover:hover { box-shadow: 0 8px 32px rgba(1, 114, 90, 0.12); transform: translateY(-2px); transition: all 0.2s ease; }
+    </style>
+</head>
+<body class="font-body-md text-on-surface antialiased bg-background flex min-h-screen">
+<!-- SideNavBar (Shared Component) -->
+<nav class="hidden md:flex flex-col h-screen fixed left-0 top-0 py-6 px-4 bg-primary shadow-md docked left-0 h-full w-64 z-20">
+<div class="mb-8 px-4">
+<h1 class="font-headline-lg text-headline-lg font-bold text-on-primary">FindTrack</h1>
+<p class="font-body-md text-body-md text-on-primary opacity-80 mt-1">Community Lost &amp; Found</p>
+</div>
+<div class="flex-1 overflow-y-auto space-y-2">
+<a class="flex items-center space-x-3 px-4 py-3 rounded-lg text-on-primary hover:bg-primary-fixed-variant transition-colors group" href="#">
+<span class="material-symbols-outlined" data-icon="home">home</span>
+<span class="font-label-md text-label-md">Home</span>
+</a>
+<a class="flex items-center space-x-3 px-4 py-3 rounded-lg text-on-primary hover:bg-primary-fixed-variant transition-colors group" href="#">
+<span class="material-symbols-outlined" data-icon="add_circle">add_circle</span>
+<span class="font-label-md text-label-md">Report Item</span>
+</a>
+<a class="flex items-center space-x-3 px-4 py-3 rounded-lg text-on-primary hover:bg-primary-fixed-variant transition-colors group" href="#">
+<span class="material-symbols-outlined" data-icon="search">search</span>
+<span class="font-label-md text-label-md">Search</span>
+</a>
+<a class="flex items-center space-x-3 px-4 py-3 rounded-lg text-on-primary hover:bg-primary-fixed-variant transition-colors group" href="#">
+<span class="material-symbols-outlined" data-icon="notifications">notifications</span>
+<span class="font-label-md text-label-md">Alerts</span>
+</a>
+<a class="flex items-center space-x-3 px-4 py-3 rounded-lg text-on-primary hover:bg-primary-fixed-variant transition-colors group" href="#">
+<span class="material-symbols-outlined" data-icon="person">person</span>
+<span class="font-label-md text-label-md">Profile</span>
+</a>
+<!-- Active State -->
+<a class="flex items-center space-x-3 px-4 py-3 bg-primary-container text-on-primary-container rounded-lg font-bold hover:bg-primary-fixed-variant transition-colors scale-95 transition-transform shadow-sm" href="#">
+<span class="material-symbols-outlined" data-icon="inventory_2" data-weight="fill" style="font-variation-settings: 'FILL' 1;">inventory_2</span>
+<span class="font-label-md text-label-md">My Items</span>
+</a>
+<a class="flex items-center space-x-3 px-4 py-3 rounded-lg text-on-primary hover:bg-primary-fixed-variant transition-colors group" href="#">
+<span class="material-symbols-outlined" data-icon="push_pin">push_pin</span>
+<span class="font-label-md text-label-md">Pinned Items</span>
+</a>
+<a class="flex items-center space-x-3 px-4 py-3 rounded-lg text-on-primary hover:bg-primary-fixed-variant transition-colors group" href="#">
+<span class="material-symbols-outlined" data-icon="category">category</span>
+<span class="font-label-md text-label-md">Categories</span>
+</a>
+<a class="flex items-center space-x-3 px-4 py-3 rounded-lg text-on-primary hover:bg-primary-fixed-variant transition-colors group" href="#">
+<span class="material-symbols-outlined" data-icon="analytics">analytics</span>
+<span class="font-label-md text-label-md">Analytics</span>
+</a>
+<a class="flex items-center space-x-3 px-4 py-3 rounded-lg text-on-primary hover:bg-primary-fixed-variant transition-colors group" href="#">
+<span class="material-symbols-outlined" data-icon="volunteer_activism">volunteer_activism</span>
+<span class="font-label-md text-label-md">Recovery Tips</span>
+</a>
+<a class="flex items-center space-x-3 px-4 py-3 rounded-lg text-on-primary hover:bg-primary-fixed-variant transition-colors group" href="#">
+<span class="material-symbols-outlined" data-icon="package_2">package_2</span>
+<span class="font-label-md text-label-md">Packaging Tips</span>
+</a>
+<a class="flex items-center space-x-3 px-4 py-3 rounded-lg text-on-primary hover:bg-primary-fixed-variant transition-colors group" href="#">
+<span class="material-symbols-outlined" data-icon="help">help</span>
+<span class="font-label-md text-label-md">About / Help</span>
+</a>
+</div>
+</nav>
+<!-- Main Content Wrapper -->
+<div class="flex-1 flex flex-col min-w-0 md:ml-64">
+<!-- TopAppBar (Shared Component) -->
+<header class="hidden md:flex justify-between items-center h-16 px-8 bg-surface-container-lowest sticky top-0 z-10 w-full shadow-sm">
+<div class="flex-1"></div>
+<div class="flex items-center space-x-6">
+<div class="relative hidden lg:flex items-center">
+<span class="material-symbols-outlined absolute left-3 text-on-surface-variant pointer-events-none" data-icon="search">search</span>
+<input class="pl-10 pr-4 py-2 bg-surface-container rounded-full border-none focus:ring-2 focus:ring-primary text-body-md font-body-md w-64 transition-shadow" placeholder="Search items..." type="text"/>
+</div>
+<button class="bg-primary text-on-primary px-4 py-2 rounded-lg font-label-md text-label-md hover:bg-primary-dim transition-colors flex items-center space-x-2">
+<span class="material-symbols-outlined text-[18px]" data-icon="add_circle">add_circle</span>
+<span>Report Item</span>
+</button>
+<div class="flex items-center space-x-4">
+<button class="text-on-surface-variant hover:text-primary transition-colors opacity-80 hover:opacity-100">
+<span class="material-symbols-outlined" data-icon="notifications">notifications</span>
+</button>
+<button class="text-on-surface-variant hover:text-primary transition-colors opacity-80 hover:opacity-100 relative">
+<span class="material-symbols-outlined" data-icon="account_circle">account_circle</span>
+<div class="absolute top-0 right-0 w-2 h-2 bg-error rounded-full border border-surface-container-lowest"></div>
+</button>
+</div>
+</div>
+</header>
+<!-- Canvas -->
+<main class="flex-1 p-margin-mobile md:p-margin-desktop overflow-y-auto">
+<!-- Dashboard Header -->
+<div class="flex flex-col md:flex-row md:items-center justify-between mb-8 space-y-4 md:space-y-0">
+<div>
+<h2 class="font-headline-lg text-headline-lg text-on-background mb-1">My Items</h2>
+<p class="font-body-lg text-body-lg text-on-surface-variant">Manage and track your reported lost or found items.</p>
+</div>
+</div>
+<!-- Tabs -->
+<div class="flex space-x-8 border-b border-outline-variant mb-8 overflow-x-auto pb-px">
+<button class="font-label-md text-label-md text-primary border-b-2 border-primary pb-3 px-1 whitespace-nowrap">Active (3)</button>
+<button class="font-label-md text-label-md text-on-surface-variant hover:text-primary transition-colors pb-3 px-1 whitespace-nowrap">Resolved (12)</button>
+<button class="font-label-md text-label-md text-on-surface-variant hover:text-primary transition-colors pb-3 px-1 whitespace-nowrap">Drafts (1)</button>
+</div>
+<!-- Bento Grid List -->
+<div class="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-gutter">
+<!-- Card 1: Match Found -->
+<article class="bg-surface-container-lowest rounded-[16px] p-md ambient-shadow ambient-shadow-hover flex flex-col h-full border border-surface-variant">
+<div class="flex justify-between items-start mb-4">
+<div class="flex items-center space-x-2">
+<span class="bg-secondary-container text-on-secondary-container px-2 py-1 rounded-full font-label-md text-[10px] uppercase tracking-wider flex items-center space-x-1">
+<span class="material-symbols-outlined text-[14px]" data-icon="check_circle">check_circle</span>
+<span>Match Found</span>
+</span>
+<span class="text-on-surface-variant font-label-md text-label-md">Lost • 2 days ago</span>
+</div>
+<button class="text-on-surface-variant hover:text-primary transition-colors">
+<span class="material-symbols-outlined" data-icon="more_vert">more_vert</span>
+</button>
+</div>
+<div class="flex space-x-4 mb-4 flex-1">
+<div class="w-24 h-24 rounded-lg overflow-hidden flex-shrink-0 bg-surface-container">
+<img class="w-full h-full object-cover" data-alt="A close-up photograph of a sleek, modern silver laptop with a distinctive scratch on the left corner, resting on a wooden coffee table in a brightly lit, modern café setting. The style is clean, corporate-modern with a soft, warm natural light." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBoCAoQXpfp8RGt395R7L8h2KnCgXbJ1eL_VqsxbHdGOhEia0C7_GcO6w11bSPTeiOVU05CELBFJi3SKYQ6pysbbiitdF7zZbxfDobSOF1hmhPhI7kTTrYPdDjFGc6b73oxOAakLciga8isq--71cNg1_UB9sS1keeESeHMDxE-0dtLAcbrHW99ajKKuicbCvOonbLHBwTyU9gu6mQTzSZrod41mgl-bsnNakwL6QCkXJnpCyvyHZpIOA18ul_emdh59QvSsKpm5w"/>
+</div>
+<div>
+<h3 class="font-headline-md text-headline-md text-on-surface mb-1 leading-tight">Silver MacBook Pro M2</h3>
+<p class="font-body-md text-body-md text-on-surface-variant line-clamp-2">Left on a table near the window at Bean &amp; Leaf Cafe on Main St. Has a small dent on the corner.</p>
+<div class="flex items-center space-x-1 mt-2 text-primary">
+<span class="material-symbols-outlined text-[16px]" data-icon="location_on">location_on</span>
+<span class="font-label-md text-[11px]">Bean &amp; Leaf Cafe</span>
+</div>
+</div>
+</div>
+<div class="pt-4 border-t border-outline-variant flex space-x-3 mt-auto">
+<button class="flex-1 bg-primary text-on-primary py-2 rounded-lg font-label-md text-label-md hover:bg-primary-dim transition-colors flex items-center justify-center space-x-2">
+<span class="material-symbols-outlined text-[18px]" data-icon="chat">chat</span>
+<span>Message Finder</span>
+</button>
+<button class="px-4 py-2 rounded-lg border border-primary text-primary font-label-md text-label-md hover:bg-surface-container transition-colors">
+                            Edit
+                        </button>
+</div>
+</article>
+<!-- Card 2: Searching -->
+<article class="bg-surface-container-lowest rounded-[16px] p-md ambient-shadow ambient-shadow-hover flex flex-col h-full border border-surface-variant">
+<div class="flex justify-between items-start mb-4">
+<div class="flex items-center space-x-2">
+<span class="bg-tertiary-container text-on-tertiary-container px-2 py-1 rounded-full font-label-md text-[10px] uppercase tracking-wider flex items-center space-x-1">
+<span class="material-symbols-outlined text-[14px] animate-pulse" data-icon="search">search</span>
+<span>Searching</span>
+</span>
+<span class="text-on-surface-variant font-label-md text-label-md">Lost • 1 week ago</span>
+</div>
+<button class="text-on-surface-variant hover:text-primary transition-colors">
+<span class="material-symbols-outlined" data-icon="more_vert">more_vert</span>
+</button>
+</div>
+<div class="flex space-x-4 mb-4 flex-1">
+<div class="w-24 h-24 rounded-lg overflow-hidden flex-shrink-0 bg-surface-container">
+<img class="w-full h-full object-cover" data-alt="A macro photograph of a set of keys with a distinctive leather keychain attached, resting on a blurred background of a grassy park path. The image is brightly lit, evoking a clear, sunny day, with a focus on organic, verdant harmony." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBP8v1VkLw23F--d0wziQvkzqzzz1_v_rh5E_nLGy-DV--E4e5Wpe_Ko167J7diJIDli8MjCplhyC14tqgTs4QBDOKCa3cpEX1btmNjObYonAm-mmZl8_zG-aSEHJa5i5Dz5LR485q9z3PFo5nJzDrXNNRn49ZP-q39Iw0HIPpT946aNwgpT9XLzknWcw6p4IdD1TCxbft8bmXHHWRfw8r9qU-FdDFsOwEc8jdQWL2q3-cpZosBF_qPHAw9FXRkQq52I4JMWW-fXw"/>
+</div>
+<div>
+<h3 class="font-headline-md text-headline-md text-on-surface mb-1 leading-tight">Keys with Leather Fob</h3>
+<p class="font-body-md text-body-md text-on-surface-variant line-clamp-2">Set of 4 keys including a car key, attached to a brown leather 'FindTrack' branded keychain.</p>
+<div class="flex items-center space-x-1 mt-2 text-primary">
+<span class="material-symbols-outlined text-[16px]" data-icon="location_on">location_on</span>
+<span class="font-label-md text-[11px]">Centennial Park</span>
+</div>
+</div>
+</div>
+<div class="pt-4 border-t border-outline-variant flex space-x-3 mt-auto">
+<button class="flex-1 border border-primary text-primary py-2 rounded-lg font-label-md text-label-md hover:bg-surface-container transition-colors flex items-center justify-center space-x-2">
+<span class="material-symbols-outlined text-[18px]" data-icon="campaign">campaign</span>
+<span>Boost Post</span>
+</button>
+<button class="px-4 py-2 rounded-lg border border-primary text-primary font-label-md text-label-md hover:bg-surface-container transition-colors">
+                            Edit
+                        </button>
+</div>
+</article>
+<!-- Card 3: Found & Waiting -->
+<article class="bg-surface-container-lowest rounded-[16px] p-md ambient-shadow ambient-shadow-hover flex flex-col h-full border border-surface-variant">
+<div class="flex justify-between items-start mb-4">
+<div class="flex items-center space-x-2">
+<span class="bg-primary-container text-on-primary-container px-2 py-1 rounded-full font-label-md text-[10px] uppercase tracking-wider flex items-center space-x-1">
+<span class="material-symbols-outlined text-[14px]" data-icon="front_hand">front_hand</span>
+<span>Found</span>
+</span>
+<span class="text-on-surface-variant font-label-md text-label-md">Found • Yesterday</span>
+</div>
+<button class="text-on-surface-variant hover:text-primary transition-colors">
+<span class="material-symbols-outlined" data-icon="more_vert">more_vert</span>
+</button>
+</div>
+<div class="flex space-x-4 mb-4 flex-1">
+<div class="w-24 h-24 rounded-lg overflow-hidden flex-shrink-0 bg-surface-container flex items-center justify-center">
+<span class="material-symbols-outlined text-4xl text-outline-variant" data-icon="image">image</span>
+</div>
+<div>
+<h3 class="font-headline-md text-headline-md text-on-surface mb-1 leading-tight">Black Umbrella</h3>
+<p class="font-body-md text-body-md text-on-surface-variant line-clamp-2">Standard black folding umbrella left on the 42 bus. Handed it to the driver.</p>
+<div class="flex items-center space-x-1 mt-2 text-primary">
+<span class="material-symbols-outlined text-[16px]" data-icon="directions_bus">directions_bus</span>
+<span class="font-label-md text-[11px]">Bus Route 42</span>
+</div>
+</div>
+</div>
+<div class="pt-4 border-t border-outline-variant flex space-x-3 mt-auto">
+<button class="flex-1 bg-surface-container text-on-surface-variant py-2 rounded-lg font-label-md text-label-md hover:bg-surface-variant transition-colors flex items-center justify-center space-x-2">
+<span class="material-symbols-outlined text-[18px]" data-icon="handshake">handshake</span>
+<span>Mark Returned</span>
+</button>
+<button class="px-4 py-2 rounded-lg border border-primary text-primary font-label-md text-label-md hover:bg-surface-container transition-colors">
+                            Edit
+                        </button>
+</div>
+</article>
+</div>
+<!-- Pagination / Load More -->
+<div class="mt-8 flex justify-center">
+<button class="text-primary font-label-md text-label-md hover:underline flex items-center space-x-1">
+<span>View All Active Items</span>
+<span class="material-symbols-outlined text-[16px]" data-icon="arrow_forward">arrow_forward</span>
+</button>
+</div>
+</main>
+<!-- Footer (Shared Component) -->
+<footer class="bg-surface-container border-t border-outline-variant py-8 px-8 flex flex-col md:flex-row justify-between items-center w-full mt-auto">
+<div class="mb-4 md:mb-0 text-center md:text-left">
+<span class="font-label-md text-label-md font-bold text-primary block mb-2">FindTrack</span>
+<span class="font-body-md text-body-md text-on-surface">© 2024 FindTrack Philippines. All rights reserved.</span>
+</div>
+<div class="flex flex-wrap justify-center gap-6">
+<a class="font-label-md text-label-md text-on-surface-variant hover:underline text-secondary transition-colors" href="#">Privacy Policy</a>
+<a class="font-label-md text-label-md text-on-surface-variant hover:underline text-secondary transition-colors" href="#">Terms of Service</a>
+<a class="font-label-md text-label-md text-on-surface-variant hover:underline text-secondary transition-colors" href="#">Contact Us</a>
+</div>
+</footer>
+</div>
+</body></html>

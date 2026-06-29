@@ -1,0 +1,434 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>FindTrack - Pinned Items</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Dm+Sans:wght@400;500;700&amp;family=Inter:wght@400;600;700&amp;family=Poppins:wght@500;600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              "colors": {
+                      "surface": "#fffbff",
+                      "error-container": "#fa746f",
+                      "surface-container-lowest": "#ffffff",
+                      "surface-tint": "#01725a",
+                      "secondary-dim": "#2a6253",
+                      "on-secondary-fixed-variant": "#2e6556",
+                      "on-secondary-fixed": "#0a483a",
+                      "secondary-fixed": "#b5eedb",
+                      "primary-container": "#9af4d6",
+                      "secondary-container": "#b5eedb",
+                      "inverse-primary": "#a0fadc",
+                      "inverse-on-surface": "#9f9d90",
+                      "tertiary-dim": "#775100",
+                      "tertiary": "#865c00",
+                      "on-error": "#ffffff",
+                      "outline": "#82826c",
+                      "on-background": "#393927",
+                      "tertiary-container": "#fab83f",
+                      "on-primary-fixed": "#004939",
+                      "on-surface": "#393927",
+                      "on-tertiary-fixed-variant": "#614100",
+                      "background": "#fffbff",
+                      "primary-dim": "#00654f",
+                      "on-primary-fixed-variant": "#006852",
+                      "surface-container-high": "#f1efd8",
+                      "on-tertiary-container": "#553900",
+                      "surface-variant": "#ebe9cf",
+                      "error-dim": "#67040d",
+                      "on-primary": "#ffffff",
+                      "inverse-surface": "#0f0f07",
+                      "on-tertiary-fixed": "#3b2600",
+                      "primary-fixed-dim": "#8ce5c8",
+                      "on-tertiary": "#ffffff",
+                      "on-secondary-container": "#235b4c",
+                      "surface-bright": "#fffbff",
+                      "primary": "#01725a",
+                      "tertiary-fixed-dim": "#ebaa32",
+                      "on-surface-variant": "#666551",
+                      "on-primary-container": "#005d49",
+                      "surface-container-low": "#fdfae7",
+                      "surface-dim": "#e6e4ca",
+                      "secondary-fixed-dim": "#a7e0cd",
+                      "error": "#af3d3b",
+                      "on-secondary": "#ffffff",
+                      "on-error-container": "#6e0a12",
+                      "surface-container-highest": "#ebe9cf",
+                      "outline-variant": "#bcbaa2",
+                      "tertiary-fixed": "#fab83f",
+                      "surface-container": "#f7f4df",
+                      "primary-fixed": "#9af4d6",
+                      "secondary": "#376e5e"
+              },
+              "borderRadius": {
+                      "DEFAULT": "0.25rem",
+                      "lg": "0.5rem",
+                      "xl": "0.75rem",
+                      "full": "9999px"
+              },
+              "spacing": {
+                      "md": "16px",
+                      "margin-desktop": "32px",
+                      "margin-mobile": "16px",
+                      "lg": "24px",
+                      "sm": "12px",
+                      "gutter": "16px",
+                      "xl": "32px",
+                      "base": "8px",
+                      "xs": "4px"
+              },
+              "fontFamily": {
+                      "body-lg": [
+                              "Dm Sans"
+                      ],
+                      "label-md": [
+                              "Poppins"
+                      ],
+                      "headline-md": [
+                              "Inter"
+                      ],
+                      "headline-lg": [
+                              "Inter"
+                      ],
+                      "body-md": [
+                              "Dm Sans"
+                      ]
+              },
+              "fontSize": {
+                      "body-lg": [
+                              "16px",
+                              {
+                                      "lineHeight": "24px",
+                                      "fontWeight": "400"
+                              }
+                      ],
+                      "label-md": [
+                              "12px",
+                              {
+                                      "lineHeight": "16px",
+                                      "letterSpacing": "0.5px",
+                                      "fontWeight": "500"
+                              }
+                      ],
+                      "headline-md": [
+                              "24px",
+                              {
+                                      "lineHeight": "32px",
+                                      "fontWeight": "600"
+                              }
+                      ],
+                      "headline-lg": [
+                              "32px",
+                              {
+                                      "lineHeight": "40px",
+                                      "fontWeight": "700"
+                              }
+                      ],
+                      "body-md": [
+                              "14px",
+                              {
+                                      "lineHeight": "20px",
+                                      "fontWeight": "400"
+                              }
+                      ]
+              }
+      },
+          },
+        }
+      </script>
+<style>
+        .material-symbols-outlined {
+          font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .material-symbols-outlined.fill {
+            font-variation-settings: 'FILL' 1;
+        }
+      </style>
+</head>
+<body class="bg-surface text-on-surface font-body-md min-h-screen">
+<!-- SideNavBar -->
+<nav class="bg-primary dark:bg-primary-dim shadow-md docked left-0 h-full w-64 flex flex-col h-screen fixed left-0 top-0 py-6 px-4 z-50">
+<div class="mb-8 px-4">
+<h1 class="font-headline-lg text-headline-lg font-bold text-on-primary tracking-tight">FindTrack</h1>
+<p class="font-body-md text-body-md text-primary-container mt-1 opacity-90">Community Lost &amp; Found</p>
+</div>
+<ul class="flex-1 overflow-y-auto space-y-2">
+<li>
+<a class="flex items-center gap-3 px-4 py-3 text-on-primary hover:bg-primary-fixed-variant transition-colors rounded-lg group" href="#">
+<span class="material-symbols-outlined" data-icon="home">home</span>
+<span class="font-label-md text-label-md">Home</span>
+</a>
+</li>
+<li>
+<a class="flex items-center gap-3 px-4 py-3 text-on-primary hover:bg-primary-fixed-variant transition-colors rounded-lg group" href="#">
+<span class="material-symbols-outlined" data-icon="add_circle">add_circle</span>
+<span class="font-label-md text-label-md">Report Item</span>
+</a>
+</li>
+<li>
+<a class="flex items-center gap-3 px-4 py-3 text-on-primary hover:bg-primary-fixed-variant transition-colors rounded-lg group" href="#">
+<span class="material-symbols-outlined" data-icon="search">search</span>
+<span class="font-label-md text-label-md">Search</span>
+</a>
+</li>
+<li>
+<a class="flex items-center gap-3 px-4 py-3 text-on-primary hover:bg-primary-fixed-variant transition-colors rounded-lg group" href="#">
+<span class="material-symbols-outlined" data-icon="notifications">notifications</span>
+<span class="font-label-md text-label-md">Alerts</span>
+</a>
+</li>
+<li>
+<a class="flex items-center gap-3 px-4 py-3 text-on-primary hover:bg-primary-fixed-variant transition-colors rounded-lg group" href="#">
+<span class="material-symbols-outlined" data-icon="person">person</span>
+<span class="font-label-md text-label-md">Profile</span>
+</a>
+</li>
+<li>
+<a class="flex items-center gap-3 px-4 py-3 text-on-primary hover:bg-primary-fixed-variant transition-colors rounded-lg group" href="#">
+<span class="material-symbols-outlined" data-icon="inventory_2">inventory_2</span>
+<span class="font-label-md text-label-md">My Items</span>
+</a>
+</li>
+<li>
+<a class="flex items-center gap-3 px-4 py-3 bg-primary-container text-on-primary-container rounded-lg font-bold scale-95 transition-transform" href="#">
+<span class="material-symbols-outlined fill" data-icon="push_pin" data-weight="fill">push_pin</span>
+<span class="font-label-md text-label-md">Pinned Items</span>
+</a>
+</li>
+<li>
+<a class="flex items-center gap-3 px-4 py-3 text-on-primary hover:bg-primary-fixed-variant transition-colors rounded-lg group" href="#">
+<span class="material-symbols-outlined" data-icon="category">category</span>
+<span class="font-label-md text-label-md">Categories</span>
+</a>
+</li>
+<li>
+<a class="flex items-center gap-3 px-4 py-3 text-on-primary hover:bg-primary-fixed-variant transition-colors rounded-lg group" href="#">
+<span class="material-symbols-outlined" data-icon="analytics">analytics</span>
+<span class="font-label-md text-label-md">Analytics</span>
+</a>
+</li>
+<li>
+<a class="flex items-center gap-3 px-4 py-3 text-on-primary hover:bg-primary-fixed-variant transition-colors rounded-lg group" href="#">
+<span class="material-symbols-outlined" data-icon="volunteer_activism">volunteer_activism</span>
+<span class="font-label-md text-label-md">Recovery Tips</span>
+</a>
+</li>
+<li>
+<a class="flex items-center gap-3 px-4 py-3 text-on-primary hover:bg-primary-fixed-variant transition-colors rounded-lg group" href="#">
+<span class="material-symbols-outlined" data-icon="package_2">package_2</span>
+<span class="font-label-md text-label-md">Packaging Tips</span>
+</a>
+</li>
+<li>
+<a class="flex items-center gap-3 px-4 py-3 text-on-primary hover:bg-primary-fixed-variant transition-colors rounded-lg group" href="#">
+<span class="material-symbols-outlined" data-icon="help">help</span>
+<span class="font-label-md text-label-md">About / Help</span>
+</a>
+</li>
+</ul>
+<div class="mt-auto pt-6 border-t border-primary-fixed-variant flex items-center px-4 gap-3">
+<img alt="User profile avatar" class="w-10 h-10 rounded-full object-cover border-2 border-primary-container" data-alt="A small circular avatar showing a professional looking person in a light studio setting, soft lighting, calm expression." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAFJl3tgBDwStA2j54h7tZoBniHs1nqNF4GAkJnOgQ2iUxPUax_RXhyE2IbU0wXw6H1TYqk11tXU3uvPiNr-_8UN-jBcYz-keiD5WtvaqtzZYjilurj6oyU-GO7-HugnIKf-w-uw26OGWvQoxhdLTSYJ_IdYnPEiFbCL0q0qQCYkBLmVAGevqQOOU4Np4sgTF6nvH9jwSWpGtWgbDmwS6bCksRlOYDv3HgLJ7U-4bUaqL2wRyuv8l8TSdigRKBSIS2BFrI511KZ-w"/>
+<div>
+<p class="font-label-md text-label-md text-on-primary font-bold">Alex Rivera</p>
+<p class="font-label-md text-label-md text-primary-fixed-dim text-xs">alex@example.com</p>
+</div>
+</div>
+</nav>
+<!-- TopAppBar -->
+<header class="bg-surface-container-lowest dark:bg-surface-dim border-b border-outline-variant flat no shadows docked top-0 full-width flex justify-between items-center h-16 px-8 ml-64 w-[calc(100%-16rem)] fixed z-40">
+<div class="flex items-center">
+<!-- Mobile menu button (hidden on desktop) -->
+<button class="md:hidden mr-4 text-primary">
+<span class="material-symbols-outlined" data-icon="menu">menu</span>
+</button>
+<h2 class="font-headline-md text-headline-md font-bold text-primary hidden md:block">Pinned Items</h2>
+</div>
+<div class="flex items-center gap-4">
+<div class="relative hidden sm:block">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant" data-icon="search">search</span>
+<input class="bg-surface-container pl-10 pr-4 py-2 rounded-full border-none focus:ring-2 focus:ring-primary text-body-md w-64 placeholder-on-surface-variant transition-all" placeholder="Search pinned items..." type="text"/>
+</div>
+<button class="bg-primary text-on-primary px-4 py-2 rounded-lg font-label-md text-label-md hover:bg-primary-dim transition-colors opacity-80 click:opacity-100 flex items-center gap-2">
+<span class="material-symbols-outlined text-[18px]" data-icon="add">add</span>
+                Report Item
+            </button>
+<div class="flex items-center gap-2 border-l border-outline-variant pl-4 ml-2">
+<button class="text-primary dark:text-primary-fixed-dim p-2 rounded-full hover:bg-surface-variant transition-colors relative">
+<span class="material-symbols-outlined" data-icon="notifications">notifications</span>
+<span class="absolute top-1 right-1 w-2 h-2 bg-error rounded-full"></span>
+</button>
+<button class="text-primary dark:text-primary-fixed-dim p-2 rounded-full hover:bg-surface-variant transition-colors">
+<span class="material-symbols-outlined" data-icon="account_circle">account_circle</span>
+</button>
+</div>
+</div>
+</header>
+<!-- Main Content -->
+<main class="ml-64 pt-24 px-margin-desktop pb-32 min-h-screen">
+<div class="mb-8 flex justify-between items-end">
+<div>
+<p class="font-body-lg text-body-lg text-on-surface-variant max-w-2xl">Keep track of important community reports. Items you pin will appear here for quick access until they are resolved or you unpin them.</p>
+</div>
+<div class="flex gap-2">
+<button class="px-4 py-2 bg-surface-container rounded-lg font-label-md text-label-md text-on-surface flex items-center gap-2 hover:bg-surface-container-high transition-colors border border-outline-variant">
+<span class="material-symbols-outlined text-[18px]" data-icon="filter_list">filter_list</span>
+                    Filter
+                </button>
+<button class="px-4 py-2 bg-surface-container rounded-lg font-label-md text-label-md text-on-surface flex items-center gap-2 hover:bg-surface-container-high transition-colors border border-outline-variant">
+<span class="material-symbols-outlined text-[18px]" data-icon="sort">sort</span>
+                    Sort
+                </button>
+</div>
+</div>
+<!-- Bento Grid for Pinned Items -->
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-gutter">
+<!-- Card 1: High Priority / Found -->
+<div class="bg-surface-container-lowest rounded-xl shadow-[0_4px_20px_-4px_rgba(1,114,90,0.08)] border border-outline-variant/30 overflow-hidden flex flex-col group relative transition-transform hover:-translate-y-1 duration-300 col-span-1 md:col-span-2 lg:col-span-2 row-span-2">
+<div class="absolute top-4 right-4 z-10 flex gap-2">
+<span class="bg-primary-container text-on-primary-container px-3 py-1 rounded-full font-label-md text-[10px] font-bold tracking-wider uppercase shadow-sm">Found</span>
+<button class="bg-surface-container-lowest/80 backdrop-blur p-2 rounded-full text-primary hover:text-error transition-colors shadow-sm group/btn" title="Unpin Item">
+<span class="material-symbols-outlined fill group-hover/btn:hidden" data-icon="push_pin" data-weight="fill">push_pin</span>
+<span class="material-symbols-outlined hidden group-hover/btn:block text-error" data-icon="close">close</span>
+</button>
+</div>
+<div class="h-64 relative w-full overflow-hidden">
+<img class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" data-alt="A close up photograph of a slightly worn brown leather messenger bag sitting on a park bench. Soft afternoon sunlight, shallow depth of field focusing on the brass buckle. Natural colors, verdant background blur." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBppb3GHjJF-a_ypL5Q2iSXCurRVUMn4TaUtaZT60vpciG21HXHCt8HsPJHoyJDS6rngtUZuflf6Fg_0InR6QtON3agqbipyWNd55Slfq2WhmthMFapWXh3tPvleJSepoaCAFpYjWoTHw7e1tXm3IbTqd5I4drw72j22JdRe7Q5yVy65aCywZoGRrxq6AwjjALi9QeRT_1_BSiNtBEqWcelA79vl_5I-u6Vcd5UFtZfRrwJumkpoytaQ2nfnxInjel6ItxFouiWwg"/>
+<div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
+<div class="absolute bottom-4 left-4 right-4 text-white">
+<div class="flex items-center gap-2 mb-1 text-sm opacity-90">
+<span class="material-symbols-outlined text-[16px]" data-icon="location_on">location_on</span>
+<span>Central Park, Near Boathouse</span>
+</div>
+<h3 class="font-headline-md text-headline-md font-bold leading-tight">Vintage Leather Messenger Bag</h3>
+</div>
+</div>
+<div class="p-6 flex-1 flex flex-col">
+<div class="flex items-start gap-4 mb-4">
+<div class="flex-1">
+<p class="font-body-md text-body-md text-on-surface-variant line-clamp-2">Found this brown leather bag on a bench near the boathouse around 2 PM. It has a distinctive scratch near the front buckle. Left it with the park ranger station.</p>
+</div>
+<div class="flex flex-col items-end whitespace-nowrap">
+<span class="font-label-md text-label-md text-outline">Pinned 2h ago</span>
+<span class="font-label-md text-label-md text-primary mt-1">Ref: #FT-8492</span>
+</div>
+</div>
+<div class="mt-auto flex justify-between items-center pt-4 border-t border-surface-variant">
+<div class="flex items-center gap-2">
+<img class="w-8 h-8 rounded-full object-cover border border-outline-variant" data-alt="Small avatar of a smiling woman outdoors in a green park setting." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAL0XvscynPCmnrXs_cl06rMSJgb5CcbM5BDHjwEga-I7VDpULRAIrxY9Vsjl97z2Tz5hPcfz6quIlZygCKJVNWYUz5JUwvzCEQ7t5Q-mPez60xDLXtWBSppUWnJtJd39mYm9jUccH0AHnjzmtklXZgY3-FSOfZq3a-Hf9N9XlAxNm8vWfSsTRFhYOgk5PLqw_f4wgt7ihG2s9daeBZbYHQQdyd3PT08ZT14-Q4HkftNeaikwpHOubZ88uTCRp9V6ujPX12LwCyFw"/>
+<span class="font-label-md text-label-md text-on-surface">Reported by Sarah M.</span>
+</div>
+<button class="text-primary font-label-md text-label-md hover:underline flex items-center gap-1">
+                            View Details <span class="material-symbols-outlined text-[16px]" data-icon="arrow_forward">arrow_forward</span>
+</button>
+</div>
+</div>
+</div>
+<!-- Card 2: Lost -->
+<div class="bg-surface-container-lowest rounded-xl shadow-[0_4px_20px_-4px_rgba(1,114,90,0.08)] border border-outline-variant/30 overflow-hidden flex flex-col group relative transition-transform hover:-translate-y-1 duration-300">
+<div class="absolute top-4 right-4 z-10 flex gap-2">
+<span class="bg-tertiary-container text-on-tertiary-container px-3 py-1 rounded-full font-label-md text-[10px] font-bold tracking-wider uppercase shadow-sm">Lost</span>
+<button class="bg-surface-container-lowest/80 backdrop-blur p-2 rounded-full text-primary hover:text-error transition-colors shadow-sm" title="Unpin Item">
+<span class="material-symbols-outlined fill" data-icon="push_pin" data-weight="fill">push_pin</span>
+</button>
+</div>
+<div class="h-48 relative w-full bg-surface-variant flex items-center justify-center">
+<span class="material-symbols-outlined text-6xl text-outline opacity-20" data-icon="pets">pets</span>
+<img class="absolute inset-0 w-full h-full object-cover" data-alt="A clear photo of a Golden Retriever mix dog looking at the camera, wearing a red collar with a tag. Bright outdoor lighting, grassy background." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBVH0Ht8HERhp56NFU9cwZ8NqbP6-G0wuuKumGcEax-xif77qv26GkXtV3SUVzKkuj6XBlz98s8jeFK5SdnfN_0BdtIPKRAL27FqvFWMFAlAQ1BJW6GSf-SghyAzs_5Iw8AkT9xv9ZRH8grQlXI7aHJhZdUOC9dnl_kpNiGUGsYRZtKlXx3Scv_WS7ysi2wrgpLXXf0vFg0CXO9I6TIaaYfHZJZwLdmDl8VRaBIxo1GHJ5KPYwZlISjjSNVB9otKlfof_g2Ml5dzQ"/>
+</div>
+<div class="p-5 flex-1 flex flex-col">
+<h3 class="font-headline-sm text-headline-sm font-bold text-on-surface mb-1">Golden Retriever Mix "Buddy"</h3>
+<div class="flex items-center gap-1 text-on-surface-variant text-sm mb-3">
+<span class="material-symbols-outlined text-[14px]" data-icon="schedule">schedule</span>
+<span>Lost Oct 12, 09:00 AM</span>
+</div>
+<p class="font-body-md text-body-md text-on-surface-variant line-clamp-3 mb-4">Slipped out of the yard on Elm St. Very friendly but might be scared. Wearing a red collar with a blue bone-shaped tag.</p>
+<div class="mt-auto flex justify-between items-center">
+<span class="font-label-md text-label-md text-outline">Pinned 1d ago</span>
+<button class="px-4 py-2 bg-secondary text-on-secondary rounded-lg font-label-md text-label-md hover:bg-secondary-dim transition-colors text-sm">
+                            Contact Owner
+                        </button>
+</div>
+</div>
+</div>
+<!-- Card 3: Found - Electronics -->
+<div class="bg-surface-container-lowest rounded-xl shadow-[0_4px_20px_-4px_rgba(1,114,90,0.08)] border border-outline-variant/30 overflow-hidden flex flex-col group relative transition-transform hover:-translate-y-1 duration-300">
+<div class="absolute top-4 right-4 z-10 flex gap-2">
+<span class="bg-primary-container text-on-primary-container px-3 py-1 rounded-full font-label-md text-[10px] font-bold tracking-wider uppercase shadow-sm">Found</span>
+<button class="bg-surface-container-lowest/80 backdrop-blur p-2 rounded-full text-primary hover:text-error transition-colors shadow-sm" title="Unpin Item">
+<span class="material-symbols-outlined fill" data-icon="push_pin" data-weight="fill">push_pin</span>
+</button>
+</div>
+<div class="h-48 relative w-full bg-surface-variant flex items-center justify-center p-4">
+<div class="w-full h-full rounded-lg border-2 border-dashed border-outline-variant flex flex-col items-center justify-center text-outline-variant">
+<span class="material-symbols-outlined text-4xl mb-2" data-icon="smartphone">smartphone</span>
+<span class="font-label-md text-label-md">No Image Available</span>
+</div>
+</div>
+<div class="p-5 flex-1 flex flex-col">
+<h3 class="font-headline-sm text-headline-sm font-bold text-on-surface mb-1">Black Smartphone in Blue Case</h3>
+<div class="flex items-center gap-1 text-on-surface-variant text-sm mb-3">
+<span class="material-symbols-outlined text-[14px]" data-icon="location_on">location_on</span>
+<span>Downtown Metro Station</span>
+</div>
+<p class="font-body-md text-body-md text-on-surface-variant line-clamp-3 mb-4">Found on a bench near platform 2. Handed it over to the station manager office immediately.</p>
+<div class="mt-auto flex justify-between items-center">
+<span class="font-label-md text-label-md text-outline">Pinned 3d ago</span>
+<button class="text-primary font-label-md text-label-md hover:underline">
+                            Details
+                        </button>
+</div>
+</div>
+</div>
+<!-- Card 4: Lost - Keys -->
+<div class="bg-surface-container-lowest rounded-xl shadow-[0_4px_20px_-4px_rgba(1,114,90,0.08)] border border-outline-variant/30 overflow-hidden flex flex-col group relative transition-transform hover:-translate-y-1 duration-300">
+<div class="absolute top-4 right-4 z-10 flex gap-2">
+<span class="bg-tertiary-container text-on-tertiary-container px-3 py-1 rounded-full font-label-md text-[10px] font-bold tracking-wider uppercase shadow-sm">Lost</span>
+<button class="bg-surface-container-lowest/80 backdrop-blur p-2 rounded-full text-primary hover:text-error transition-colors shadow-sm" title="Unpin Item">
+<span class="material-symbols-outlined fill" data-icon="push_pin" data-weight="fill">push_pin</span>
+</button>
+</div>
+<div class="h-48 relative w-full overflow-hidden">
+<img class="w-full h-full object-cover" data-alt="A generic photo representing lost keys. A set of house keys with a distinctive green carabiner and a small leather tag, laying on grey asphalt. Soft, overcast lighting." src="https://lh3.googleusercontent.com/aida-public/AB6AXuD6S4QhMFL6MShRDEOTUn_OkQxk6R0wJjiK4KxkyA9y5dlU_bl3fYXBg-JFvbG-QvaM2Ji42Bu3JOpS4o_g2vGH21wNqtW21Ix84koneZjgbVKb4EwXVwqggo4PLo6yFpwtDFdm-j0oFeApVwxCT4ARa0sUt0NBKYOeejM-iWNcvTaZUxIxLZ4DCVltfX1d0ARkObmpUW7DCb0TtcfaUeOHul3-aPxD9xp4Al2pHSzub0kojvs-qWPoqeLlq86Xbt22EU1ALhHe0Q"/>
+</div>
+<div class="p-5 flex-1 flex flex-col">
+<h3 class="font-headline-sm text-headline-sm font-bold text-on-surface mb-1">Set of Keys with Green Carabiner</h3>
+<div class="flex items-center gap-1 text-on-surface-variant text-sm mb-3">
+<span class="material-symbols-outlined text-[14px]" data-icon="location_on">location_on</span>
+<span>Route 42 Bus / University Area</span>
+</div>
+<p class="font-body-md text-body-md text-on-surface-variant line-clamp-3 mb-4">Lost my keys this morning. 3 brass keys, 1 silver key, on a bright green carabiner clip.</p>
+<div class="mt-auto flex justify-between items-center">
+<span class="font-label-md text-label-md text-outline">Pinned 5d ago</span>
+<button class="text-primary font-label-md text-label-md hover:underline">
+                           Details
+                       </button>
+</div>
+</div>
+</div>
+</div>
+</main>
+<!-- Footer -->
+<footer class="bg-surface-container dark:bg-surface-container-highest border-t border-outline-variant flat no shadows full-width bottom flex flex-col md:flex-row justify-between items-center py-8 px-8 ml-64 w-[calc(100%-16rem)] mt-auto z-10 relative">
+<div class="mb-4 md:mb-0">
+<span class="font-label-md text-label-md font-bold text-primary">FindTrack</span>
+<p class="font-body-md text-body-md text-on-surface-variant mt-1 text-sm">© 2024 FindTrack Philippines. All rights reserved.</p>
+</div>
+<ul class="flex flex-wrap gap-6 items-center">
+<li>
+<a class="font-label-md text-label-md text-on-surface-variant hover:underline text-secondary transition-colors" href="#">Privacy Policy</a>
+</li>
+<li>
+<a class="font-label-md text-label-md text-on-surface-variant hover:underline text-secondary transition-colors" href="#">Terms of Service</a>
+</li>
+<li>
+<a class="font-label-md text-label-md text-on-surface-variant hover:underline text-secondary transition-colors" href="#">Contact Us</a>
+</li>
+</ul>
+</footer>
+</body></html>
