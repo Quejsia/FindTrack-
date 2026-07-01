@@ -121,17 +121,4 @@ export function handleFirestoreError(error: unknown, operationType: OperationTyp
   throw new Error(JSON.stringify(errInfo));
 }
 
-// System test connection on initial boot (Lazy testing)
-async function testConnection() {
-  try {
-    await getDocFromServer(doc(db, 'test', 'connection'));
-    console.log('Firebase connection test completed successfully.');
-  } catch (error) {
-    if (error instanceof Error && error.message.includes('the client is offline')) {
-      console.warn("Firebase connection test: Client is offline. This is normal in sandboxed environments.");
-    } else {
-      console.warn("Firebase connection test error: ", error);
-    }
-  }
-}
-testConnection();
+// No longer aggressively testing connection on boot to avoid "offline" errors in dev mode.
