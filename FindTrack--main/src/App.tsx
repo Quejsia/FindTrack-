@@ -16,7 +16,8 @@ import {
   updateDoc, 
   deleteDoc,
   serverTimestamp,
-  where
+  where,
+  orderBy
 } from 'firebase/firestore';
 import { 
   auth, 
@@ -102,6 +103,7 @@ export default function App() {
   
   // App alerts, loading states & real-time sync list
   const [items, setItems] = useState<ItemReport[]>([]);
+  const [testimonials, setTestimonials] = useState<any[]>([]);
   const [toasts, setToasts] = useState<{ id: string; msg: string; type: 'success' | 'error' }[]>([]);
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [showPass, setShowPass] = useState(false);
@@ -774,6 +776,52 @@ export default function App() {
     }
   };
 
+  const liveStats = useMemo(() => {
+    const itemsRecovered = items.filter(item => item.claimed).length;
+    const activeListings = items.filter(item => !item.claimed).length;
+    const communityMembers = new Set(
+      items
+        .map(item => item.userId)
+        .filter((userId): userId is string => Boolean(userId))
+    ).size;
+
+    return {
+      itemsRecovered,
+      activeListings,
+      communityMembers
+    };
+  }, [items]);
+
+  const featuredTestimonial = useMemo(() => {
+    return testimonials.find((testimonial: any) => typeof testimonial.quote === 'string' && testimonial.quote.trim()) || null;
+  }, [testimonials]);
+
+  const openAuthView = (mode: 'login' | 'signup') => {
+    if (user) {
+      setCurrentView('dashboard');
+      window.history.pushState(null, '', '/');
+      return;
+    }
+
+    setCurrentView(mode);
+    window.history.pushState(null, '', mode === 'login' ? '/login' : '/signup');
+  };
+
+  const handleStartReporting = () => {
+    if (user || profileName === 'Guest') {
+      setCurrentView('dashboard');
+      window.history.pushState(null, '', '/');
+      return;
+    }
+
+    setCurrentView('signup');
+    window.history.pushState(null, '', '/signup');
+  };
+
+  const handleHowItWorks = () => {
+    document.getElementById('how-it-works')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  };
+
   // Active counter statistics dynamic
   const stats = useMemo(() => {
     return {
@@ -857,8 +905,8 @@ export default function App() {
         ))}
       </div>
 
-      {/* ── IMMERSIVE BACKGROUND GRID (Only on landing or auth views) ── */}
-      {(currentView === 'landing' || currentView === 'login' || currentView === 'signup' || currentView === 'verify-email') && (
+      {/* ── IMMERSIVE BACKGROUND GRID (Only on auth views) ── */}
+      {(currentView === 'login' || currentView === 'signup' || currentView === 'verify-email') && (
         <div className="bg-scene">
           <div className="bg-orb"></div>
           <div className="bg-orb"></div>
@@ -869,105 +917,164 @@ export default function App() {
 
       {/* ── VIEW 1: LANDING PAGE ── */}
       {currentView === 'landing' && (
-        <div className="landing-page">
-          {/* Landing NAV */}
-          <nav className="landing-nav">
-            <div className="nav-logo">
-              <div className="nav-logo-icon"><Search className="h-6 w-6 text-white" /></div>
-              <span>FindTrack</span>
+        <div className="min-h-screen bg-surface text-on-surface">
+          <section id="top" className="relative isolate overflow-hidden bg-surface-container-highest">
+            <div className="absolute inset-0">
+              <img
+                src="https://lh3.googleusercontent.com/aida-public/AB6AXuCDC3YRMFuO-lEwm9bKTIguR-1belAnXoHIgeigQ3q4SUYgObcsSiNUjHnpR_ZfqvyDsqJKY7pe4fPQ9fAxiXPLcUxQOJOcX6tgsnNpBIFjznIY1JDEnT0amN_j0g91NAtN4xOqL_xe6gYYA1U5PBGH18oRD2F1fn_Z1eAqQ2CYzkwKBwB-0d16PaU0F6IfiXoXHmT6Txuseum5Be0PuKe26wtdeMNMjFB0UJczwaKK0iUeWAfbVmcG-yd4WQJ83LfWGXw7GPVkDQ"
+                alt="A vibrant cityscape with lush greenery and community warmth"
+                className="h-full w-full object-cover"
+              />
+              <div className="absolute inset-0 bg-surface/20 backdrop-blur-[2px]" />
+              <div className="absolute inset-0 bg-gradient-to-t from-surface via-transparent to-transparent" />
             </div>
-            <div className="nav-actions">
-              <button onClick={() => setCurrentView('login')} className="nav-btn nav-btn-ghost">Login</button>
-              <button onClick={() => setCurrentView('signup')} className="nav-btn nav-btn-solid">Sign Up</button>
-            </div>
-          </nav>
 
-          {/* Landing HERO */}
-          <div className="hero">
-            <div className="hero-badge">
-              <span className="badge-dot"></span>
-              FindTrack Lost &amp; Found Platform
-            </div>
-            <h1>Find What's Lost.<br /><span className="text-gradient">Reunite What Matters.</span></h1>
-            <p>Report missing items, browse found belongings, and reunite with your stuff — all in one smart platform built for your Things.</p>
+            <div className="relative mx-auto flex min-h-[100dvh] max-w-7xl flex-col px-4 py-6 sm:px-6 lg:px-8">
+              <header className="flex items-center justify-between rounded-full border border-white/50 bg-white/75 px-4 py-3 shadow-sm backdrop-blur-xl sm:px-6">
+                <button onClick={() => { setCurrentView('landing'); window.history.pushState(null, '', '/'); }} className="flex items-center gap-3 text-left">
+                  <div className="flex h-11 w-11 items-center justify-center rounded-full bg-primary text-on-primary shadow-lg shadow-primary/20">
+                    <Search className="h-5 w-5" />
+                  </div>
+                  <div>
+                    <div className="font-['Inter'] text-lg font-semibold tracking-tight text-primary-dim">FindTrack</div>
+                    <div className="text-[10px] font-medium uppercase tracking-[0.24em] text-on-surface-variant">Lost & found community</div>
+                  </div>
+                </button>
+                <nav className="hidden items-center gap-6 md:flex">
+                  <button onClick={() => { setCurrentView('landing'); window.history.pushState(null, '', '/'); }} className="text-sm font-semibold text-primary">Home</button>
+                  <button onClick={handleHowItWorks} className="text-sm font-semibold text-on-surface-variant transition hover:text-primary">How it Works</button>
+                  <button onClick={() => { setCurrentView('landing'); window.history.pushState(null, '', '/'); }} className="text-sm font-semibold text-on-surface-variant transition hover:text-primary">Community</button>
+                  <button onClick={() => { setCurrentView('privacy'); window.history.pushState(null, '', '/privacy'); }} className="text-sm font-semibold text-on-surface-variant transition hover:text-primary">Safety</button>
+                </nav>
+                <div className="flex items-center gap-3">
+                  <button onClick={() => openAuthView('login')} className="hidden rounded-full border border-primary/20 px-4 py-2 text-sm font-semibold text-primary transition hover:bg-primary/5 sm:inline-flex">
+                    Login
+                  </button>
+                  <button onClick={() => openAuthView('signup')} className="rounded-full bg-primary px-4 py-2 text-sm font-semibold text-on-primary shadow-md transition hover:bg-primary-dim">
+                    Get Started
+                  </button>
+                </div>
+              </header>
 
-            <div className="hero-actions">
-              <button onClick={() => setCurrentView('signup')} className="btn-hero-primary"><UserPlus className="h-5 w-5" /> Get Started Free</button>
-              <button onClick={() => setCurrentView('login')} className="btn-hero-secondary"><Lock className="h-5 w-5" /> Sign In</button>
+              <div className="flex flex-1 items-center justify-center py-14 sm:py-20">
+                <div className="max-w-3xl rounded-[28px] border border-white/50 bg-white/80 p-8 text-center shadow-2xl shadow-black/15 backdrop-blur-xl sm:p-10 lg:p-14">
+                  <p className="mb-4 inline-flex items-center rounded-full border border-primary/15 bg-primary/10 px-3 py-1 text-sm font-semibold text-primary">Trusted local recovery</p>
+                  <h1 className="font-['Inter'] text-4xl font-bold leading-tight text-primary-dim sm:text-5xl lg:text-6xl">
+                    Find what's lost.<br />Restore community trust.
+                  </h1>
+                  <p className="mx-auto mt-5 max-w-2xl text-lg leading-8 text-on-surface-variant">
+                    FindTrack helps Filipinos recover lost belongings through trusted community reporting and verified recovery workflows.
+                  </p>
+                  <div className="mt-8 flex flex-col justify-center gap-3 sm:flex-row">
+                    <button onClick={handleStartReporting} className="inline-flex items-center justify-center gap-2 rounded-full bg-tertiary-container px-6 py-3 text-sm font-semibold text-on-tertiary-container shadow-lg shadow-tertiary-container/20 transition hover:brightness-95">
+                      <PenTool className="h-4 w-4" />
+                      Start Reporting
+                    </button>
+                    <button onClick={handleHowItWorks} className="inline-flex items-center justify-center rounded-full border border-primary/20 px-6 py-3 text-sm font-semibold text-primary transition hover:bg-primary/5">
+                      How it Works
+                    </button>
+                  </div>
+                </div>
+              </div>
             </div>
-            <button onClick={handleGuestBrowse} className="guest-link" id="guestBtn">
-              or <span>browse as guest <ArrowRight className="h-4 w-4 inline" /></span>
-            </button>
-          </div>
+          </section>
 
-          {/* Landing STATS */}
-          <div className="stats-row">
-            <div className="stat-pill">
-              <div className="stat-num">{stats.claimed}</div>
-              <div className="stat-lbl">Items Recovered</div>
+          <section id="how-it-works" className="bg-surface-container-lowest py-20">
+            <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+              <div className="mx-auto max-w-2xl text-center">
+                <h2 className="font-['Inter'] text-3xl font-semibold tracking-tight text-primary-dim sm:text-4xl">Three Pillars of Recovery</h2>
+                <p className="mt-3 text-lg text-on-surface-variant">A seamless workflow designed to bring your items back home.</p>
+              </div>
+              <div className="mt-12 grid gap-6 lg:grid-cols-3">
+                <div className="rounded-[24px] border border-outline-variant/30 bg-surface-container p-8 shadow-sm transition hover:shadow-md">
+                  <div className="flex h-12 w-12 items-center justify-center rounded-full bg-primary-container text-on-primary-container">
+                    <PenTool className="h-6 w-6" />
+                  </div>
+                  <h3 className="mt-5 font-['Inter'] text-xl font-semibold text-primary-dim">Report</h3>
+                  <p className="mt-3 text-base leading-7 text-on-surface-variant">Quickly document lost or found items with AI-assisted details for precise matching.</p>
+                </div>
+                <div className="rounded-[24px] border border-outline-variant/30 bg-surface-container-low p-8 shadow-sm transition hover:shadow-md">
+                  <div className="flex h-12 w-12 items-center justify-center rounded-full bg-secondary-container text-on-surface">
+                    <MessageCircle className="h-6 w-6" />
+                  </div>
+                  <h3 className="mt-5 font-['Inter'] text-xl font-semibold text-primary-dim">Connect</h3>
+                  <p className="mt-3 text-base leading-7 text-on-surface-variant">Securely message community members when a match is found, protecting your privacy.</p>
+                </div>
+                <div className="rounded-[24px] border border-outline-variant/30 bg-surface-container p-8 shadow-sm transition hover:shadow-md">
+                  <div className="flex h-12 w-12 items-center justify-center rounded-full bg-tertiary-container text-on-tertiary-container">
+                    <Hand className="h-6 w-6" />
+                  </div>
+                  <h3 className="mt-5 font-['Inter'] text-xl font-semibold text-primary-dim">Recover</h3>
+                  <p className="mt-3 text-base leading-7 text-on-surface-variant">Follow verified hand-off protocols to ensure items return home safely and securely.</p>
+                </div>
+              </div>
             </div>
-            <div className="stat-divider"></div>
-            <div className="stat-pill">
-              <div className="stat-num">{items.length}</div>
-              <div className="stat-lbl">Active Listings</div>
-            </div>
-            <div className="stat-divider"></div>
-            <div className="stat-pill">
-              <div className="stat-num">Live</div>
-              <div className="stat-lbl">Platform Hub</div>
-            </div>
-            <div className="stat-divider"></div>
-            <div className="stat-pill">
-              <div className="stat-num">24h</div>
-              <div className="stat-lbl">Avg. Recovery</div>
-            </div>
-          </div>
+          </section>
 
-          {/* Landing FEATURES */}
-          <div className="features">
-            <div className="feat-card">
-              <div className="feat-icon sky"><Package className="h-6 w-6 text-white" /></div>
-              <div className="feat-title">Easy Reporting</div>
-              <div className="feat-desc">Submit lost or found items in seconds with photo uploads and location details.</div>
-            </div>
-            <div className="feat-card">
-              <div className="feat-icon mint"><Search className="h-6 w-6 text-slate-800" /></div>
-              <div className="feat-title">Smart Search</div>
-              <div className="feat-desc">Advanced filters by category, date, and location to find exactly what you need.</div>
-            </div>
-            <div className="feat-card">
-              <div className="feat-icon indigo"><PenTool className="h-6 w-6 text-white" /></div>
-              <div className="feat-title">Live Analytics</div>
-              <div className="feat-desc">Visual dashboards tracking trends, recovery stats, and item history.</div>
-            </div>
-            <div className="feat-card">
-              <div className="feat-icon amber"><Zap className="h-6 w-6 text-white" /></div>
-              <div className="feat-title">Instant Alerts</div>
-              <div className="feat-desc">Get notified immediately when a potential match is found for your item.</div>
-            </div>
-          </div>
+          <section className="bg-surface-container py-20">
+            <div className="mx-auto grid max-w-7xl gap-10 px-4 sm:px-6 lg:grid-cols-[1.05fr_0.95fr] lg:px-8">
+              <div>
+                <h2 className="font-['Inter'] text-3xl font-semibold tracking-tight text-primary-dim sm:text-4xl">By the Community,<br />For the Community.</h2>
+                <p className="mt-5 max-w-2xl text-lg leading-8 text-on-surface-variant">Built on the foundation of Bayanihan, FindTrack empowers everyday Filipinos to look out for one another.</p>
+                <div className="mt-8 grid gap-4 sm:grid-cols-2">
+                  <div className="rounded-[24px] border border-outline-variant/30 bg-surface p-6 shadow-sm">
+                    <div className="text-4xl font-semibold tracking-tight text-primary">{liveStats.itemsRecovered.toLocaleString()}</div>
+                    <div className="mt-2 text-sm font-semibold uppercase tracking-[0.24em] text-on-surface-variant">Items Recovered</div>
+                  </div>
+                  <div className="rounded-[24px] border border-outline-variant/30 bg-surface p-6 shadow-sm">
+                    <div className="text-4xl font-semibold tracking-tight text-primary">{liveStats.activeListings.toLocaleString()}</div>
+                    <div className="mt-2 text-sm font-semibold uppercase tracking-[0.24em] text-on-surface-variant">Active Listings</div>
+                  </div>
+                </div>
+                <p className="mt-4 text-sm text-on-surface-variant">Community members currently participating: {liveStats.communityMembers.toLocaleString()}</p>
+              </div>
 
-          <footer className="landing-footer flex flex-col sm:flex-row justify-between items-center gap-4">
-            <p>Built with ❤️ for Things · FindTrack v2.0</p>
-            <div className="flex gap-4">
-              <button 
-                onClick={() => {
-                  setCurrentView('privacy');
-                  window.history.pushState(null, '', '/privacy');
-                }} 
-                className="hover:text-white transition cursor-pointer text-slate-400 font-medium"
-              >
-                Privacy Policy
-              </button>
-              <button 
-                onClick={() => {
-                  setCurrentView('terms');
-                  window.history.pushState(null, '', '/terms');
-                }} 
-                className="hover:text-white transition cursor-pointer text-slate-400 font-medium"
-              >
-                Terms of Service
-              </button>
+              <div className="rounded-[28px] border border-outline-variant/30 bg-surface p-6 shadow-sm sm:p-8">
+                <div className="flex items-center justify-between">
+                  <p className="text-sm font-semibold uppercase tracking-[0.24em] text-on-surface-variant">Community voice</p>
+                  <div className="rounded-full bg-primary/10 px-3 py-1 text-xs font-semibold uppercase tracking-[0.24em] text-primary">Live</div>
+                </div>
+                {featuredTestimonial ? (
+                  <>
+                    <p className="mt-6 text-xl leading-8 text-on-surface">“{featuredTestimonial.quote}”</p>
+                    <div className="mt-6 flex items-center gap-3">
+                      <div className="flex h-12 w-12 items-center justify-center rounded-full bg-primary-container font-semibold text-primary-dim">
+                        {(featuredTestimonial.author || 'Community').charAt(0).toUpperCase()}
+                      </div>
+                      <div>
+                        <div className="font-semibold text-on-surface">{featuredTestimonial.author || 'Community member'}</div>
+                        <div className="text-sm text-on-surface-variant">{featuredTestimonial.role || 'Community testimonial'}</div>
+                      </div>
+                    </div>
+                  </>
+                ) : (
+                  <>
+                    <p className="mt-6 text-xl leading-8 text-on-surface">A testimonial will appear here once the content team adds one to the live database.</p>
+                    <p className="mt-4 text-sm leading-6 text-on-surface-variant">No placeholder quote or name is being fabricated for this homepage.</p>
+                  </>
+                )}
+              </div>
+            </div>
+          </section>
+
+          <footer className="border-t border-outline-variant/30 bg-surface-container-highest">
+            <div className="mx-auto grid max-w-7xl gap-8 px-4 py-12 sm:px-6 md:grid-cols-2 lg:px-8">
+              <div>
+                <div className="font-['Inter'] text-xl font-semibold text-on-surface">FindTrack</div>
+                <p className="mt-3 max-w-sm text-sm leading-7 text-on-surface-variant">© 2026 FindTrack Philippines. Empowering communities through trust and recovery.</p>
+              </div>
+              <div className="grid gap-4 sm:grid-cols-2">
+                <div className="flex flex-col gap-3">
+                  <button onClick={() => { setCurrentView('landing'); window.history.pushState(null, '', '/'); }} className="text-left text-sm font-medium text-on-surface-variant transition hover:text-primary">About Us</button>
+                  <button onClick={() => { setCurrentView('privacy'); window.history.pushState(null, '', '/privacy'); }} className="text-left text-sm font-medium text-on-surface-variant transition hover:text-primary">Privacy Policy</button>
+                  <button onClick={() => { setCurrentView('terms'); window.history.pushState(null, '', '/terms'); }} className="text-left text-sm font-medium text-on-surface-variant transition hover:text-primary">Terms of Service</button>
+                </div>
+                <div className="flex flex-col gap-3">
+                  <button onClick={() => { setCurrentView('privacy'); window.history.pushState(null, '', '/privacy'); }} className="text-left text-sm font-medium text-on-surface-variant transition hover:text-primary">Safety Guidelines</button>
+                  <button onClick={() => { setCurrentView('landing'); window.history.pushState(null, '', '/'); }} className="text-left text-sm font-medium text-on-surface-variant transition hover:text-primary">Help Center</button>
+                  <button onClick={() => { setCurrentView('landing'); window.history.pushState(null, '', '/'); }} className="text-left text-sm font-medium text-on-surface-variant transition hover:text-primary">Contact Us</button>
+                </div>
+              </div>
             </div>
           </footer>
         </div>

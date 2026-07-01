@@ -1,27 +1,27 @@
 /* FindTrack v2 — Complete App Stylesheet combined with Landing, Login and Signup layouts */
-@import url('https://fonts.googleapis.com/css2?family=Sora:wght@300;450;600;700;800&family=DM+Sans:wght@400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Poppins:wght@500;600&family=DM+Sans:wght@400;500;700&display=swap');
 @import "tailwindcss";
 
 @theme {
-  --color-teal-50: #e6ecf6;
-  --color-teal-100: #ccdaee;
-  --color-teal-200: #99b6de;
-  --color-teal-300: #6691ce;
-  --color-teal-400: #336dbe;
-  --color-teal-500: #0038A8;
-  --color-teal-600: #003297;
-  --color-teal-700: #002a7e;
-  --color-teal-800: #002265;
-  --color-teal-850: #001a4c;
-  --color-teal-900: #001133;
-  --color-teal-950: #00091a;
-  
-  --color-sky-500: #0038A8;
-  --color-cyan-500: #0038A8;
-  
-  --color-red-500: #CE1126;
-  --color-red-600: #a50e1e;
-  --color-red-700: #7c0a17;
+  --color-primary: #01725a;
+  --color-primary-dim: #00654f;
+  --color-primary-container: #9af4d6;
+  --color-on-primary: #ffffff;
+  --color-on-primary-container: #005d49;
+  --color-secondary: #376e5e;
+  --color-secondary-container: #b5eedb;
+  --color-on-secondary: #ffffff;
+  --color-tertiary: #865c00;
+  --color-tertiary-container: #fab83f;
+  --color-on-tertiary-container: #553900;
+  --color-surface: #fffbff;
+  --color-surface-container-lowest: #ffffff;
+  --color-surface-container: #f7f4df;
+  --color-surface-container-low: #fdfae7;
+  --color-surface-container-highest: #ebe9cf;
+  --color-on-surface: #393927;
+  --color-on-surface-variant: #666551;
+  --color-outline-variant: #bcbaa2;
 }
 
 :root {

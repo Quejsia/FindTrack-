@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>FindTrack - Restore Community Trust</title>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&amp;family=Poppins:wght@500&amp;family=Dm+Sans:wght@400;500;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "surface-container-lowest": "#ffffff",
+                        "primary-dim": "#00654f",
+                        "secondary-dim": "#2a6253",
+                        "surface-dim": "#e6e4ca",
+                        "on-error-container": "#6e0a12",
+                        "surface-container": "#f7f4df",
+                        "on-surface": "#393927",
+                        "tertiary-container": "#fab83f",
+                        "surface-container-low": "#fdfae7",
+                        "primary-fixed": "#9af4d6",
+                        "outline-variant": "#bcbaa2",
+                        "on-primary-fixed-variant": "#006852",
+                        "on-background": "#393927",
+                        "on-primary-container": "#005d49",
+                        "primary": "#01725a",
+                        "on-tertiary-fixed-variant": "#614100",
+                        "on-primary": "#ffffff",
+                        "on-secondary-container": "#235b4c",
+                        "outline": "#82826c",
+                        "error-dim": "#67040d",
+                        "error": "#af3d3b",
+                        "primary-fixed-dim": "#8ce5c8",
+                        "inverse-on-surface": "#9f9d90",
+                        "inverse-primary": "#a0fadc",
+                        "on-secondary-fixed": "#0a483a",
+                        "background": "#fffbff",
+                        "on-secondary": "#ffffff",
+                        "on-primary-fixed": "#004939",
+                        "surface-container-high": "#f1efd8",
+                        "on-secondary-fixed-variant": "#2e6556",
+                        "primary-container": "#9af4d6",
+                        "on-tertiary": "#ffffff",
+                        "tertiary-dim": "#775100",
+                        "inverse-surface": "#0f0f07",
+                        "surface-tint": "#01725a",
+                        "error-container": "#fa746f",
+                        "secondary-container": "#b5eedb",
+                        "tertiary": "#865c00",
+                        "surface": "#fffbff",
+                        "on-error": "#ffffff",
+                        "tertiary-fixed-dim": "#ebaa32",
+                        "on-surface-variant": "#666551",
+                        "on-tertiary-container": "#553900",
+                        "on-tertiary-fixed": "#3b2600",
+                        "secondary-fixed": "#b5eedb",
+                        "tertiary-fixed": "#fab83f",
+                        "surface-container-highest": "#ebe9cf",
+                        "secondary": "#376e5e",
+                        "surface-variant": "#ebe9cf",
+                        "surface-bright": "#fffbff",
+                        "secondary-fixed-dim": "#a7e0cd"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "xs": "4px",
+                        "xl": "32px",
+                        "sm": "12px",
+                        "margin-mobile": "16px",
+                        "md": "16px",
+                        "gutter": "16px",
+                        "base": "8px",
+                        "margin-desktop": "32px",
+                        "lg": "24px"
+                    },
+                    "fontFamily": {
+                        "headline-md": ["Inter", "sans-serif"],
+                        "headline-lg": ["Inter", "sans-serif"],
+                        "label-md": ["Poppins", "sans-serif"],
+                        "body-md": ["Dm Sans", "sans-serif"],
+                        "body-lg": ["Dm Sans", "sans-serif"]
+                    },
+                    "fontSize": {
+                        "headline-md": ["24px", { "lineHeight": "32px", "fontWeight": "600" }],
+                        "headline-lg": ["32px", { "lineHeight": "40px", "fontWeight": "700" }],
+                        "label-md": ["12px", { "lineHeight": "16px", "letterSpacing": "0.5px", "fontWeight": "500" }],
+                        "body-md": ["14px", { "lineHeight": "20px", "fontWeight": "400" }],
+                        "body-lg": ["16px", { "lineHeight": "24px", "fontWeight": "400" }]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+    </style>
+</head>
+<body class="bg-surface text-on-surface font-body-md antialiased overflow-x-hidden">
+<!-- TopNavBar -->
+<header class="docked full-width top-0 z-50 bg-surface shadow-sm sticky">
+<div class="flex justify-between items-center h-16 px-margin-mobile md:px-margin-desktop max-w-7xl mx-auto">
+<div class="font-headline-md text-headline-md font-bold text-primary tracking-tight">FindTrack</div>
+<nav class="hidden md:flex items-center gap-6">
+<a class="text-primary border-b-2 border-primary pb-1 font-label-md text-label-md hover:text-primary transition-colors duration-200" href="#">Home</a>
+<a class="text-on-surface-variant font-label-md text-label-md hover:text-primary transition-colors duration-200" href="#">How it Works</a>
+<a class="text-on-surface-variant font-label-md text-label-md hover:text-primary transition-colors duration-200" href="#">Community</a>
+<a class="text-on-surface-variant font-label-md text-label-md hover:text-primary transition-colors duration-200" href="#">Safety</a>
+</nav>
+<div class="flex items-center gap-4">
+<button class="hidden md:block text-on-surface-variant font-label-md text-label-md hover:text-primary transition-colors duration-200 scale-95 active:scale-90">Login</button>
+<button class="bg-primary text-on-primary px-4 py-2 rounded-lg font-label-md text-label-md hover:bg-primary-dim transition-colors scale-95 active:scale-90">Get Started</button>
+</div>
+</div>
+</header>
+<main>
+<!-- Hero Section -->
+<section class="relative min-h-[921px] flex items-center justify-center overflow-hidden">
+<div class="absolute inset-0 z-0">
+<img class="w-full h-full object-cover object-center" data-alt="A sweeping, cinematic view of a modern Philippine city integrated with lush, vibrant green tropical foliage. Warm morning sunlight bathes the scene in golden hour lighting, highlighting the balance between urban architecture and nature. The mood is optimistic, hopeful, and grounded in community trust. High-resolution photography, Verdant Harmony aesthetic." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCDC3YRMFuO-lEwm9bKTIguR-1belAnXoHIgeigQ3q4SUYgObcsSiNUjHnpR_ZfqvyDsqJKY7pe4fPQ9fAxiXPLcUxQOJOcX6tgsnNpBIFjznIY1JDEnT0amN_j0g91NAtN4xOqL_xe6gYYA1U5PBGH18oRD2F1fn_Z1eAqQ2CYzkwKBwB-0d16PaU0F6IfiXoXHmT6Txuseum5Be0PuKe26wtdeMNMjFB0UJczwaKK0iUeWAfbVmcG-yd4WQJ83LfWGXw7GPVkDQ"/>
+<div class="absolute inset-0 bg-surface/30 backdrop-blur-[2px]"></div>
+<div class="absolute inset-0 bg-gradient-to-t from-surface via-transparent to-transparent"></div>
+</div>
+<div class="relative z-10 max-w-7xl mx-auto px-margin-mobile md:px-margin-desktop text-center mt-xl">
+<div class="glass-panel p-xl md:p-[48px] rounded-xl inline-block max-w-3xl shadow-lg border border-white/40">
+<h1 class="font-headline-lg text-headline-lg md:text-[48px] md:leading-[56px] text-primary-dim mb-md">Find what's lost.<br/>Restore community trust.</h1>
+<p class="font-body-lg text-body-lg text-on-surface-variant mb-xl max-w-2xl mx-auto">FindTrack helps Filipinos recover lost belongings through trusted community reporting and verified recovery workflows.</p>
+<div class="flex flex-col sm:flex-row items-center justify-center gap-md">
+<button class="w-full sm:w-auto bg-tertiary-container text-on-tertiary-container px-lg py-sm rounded-lg font-label-md text-label-md shadow-md hover:bg-tertiary transition-colors flex items-center justify-center gap-sm">
+<span class="material-symbols-outlined text-[20px]" data-icon="add_circle">add_circle</span>
+                            Start Reporting
+                        </button>
+<button class="w-full sm:w-auto border-2 border-primary text-primary px-lg py-sm rounded-lg font-label-md text-label-md hover:bg-primary/5 transition-colors">
+                            How it Works
+                        </button>
+</div>
+</div>
+</div>
+</section>
+<!-- Value Propositions (Bento Grid) -->
+<section class="py-24 bg-surface-container-lowest">
+<div class="max-w-7xl mx-auto px-margin-mobile md:px-margin-desktop">
+<div class="text-center mb-16">
+<h2 class="font-headline-lg text-headline-lg text-primary-dim mb-xs">Three Pillars of Recovery</h2>
+<p class="font-body-md text-body-md text-on-surface-variant max-w-xl mx-auto">A seamless workflow designed to bring your items back home.</p>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-3 gap-gutter">
+<!-- Pillar 1 -->
+<div class="bg-surface-container rounded-xl p-lg flex flex-col items-start border border-outline-variant/30 hover:shadow-md transition-shadow">
+<div class="w-12 h-12 bg-primary-container text-on-primary-container rounded-full flex items-center justify-center mb-md">
+<span class="material-symbols-outlined" data-icon="edit_document">edit_document</span>
+</div>
+<h3 class="font-headline-md text-[20px] leading-[28px] text-primary-dim mb-xs">Report</h3>
+<p class="font-body-md text-body-md text-on-surface-variant">Quickly document lost or found items with AI-assisted details for precise matching.</p>
+</div>
+<!-- Pillar 2 -->
+<div class="bg-surface-container-low rounded-xl p-lg flex flex-col items-start border border-outline-variant/30 hover:shadow-md transition-shadow">
+<div class="w-12 h-12 bg-secondary-container text-on-secondary-container rounded-full flex items-center justify-center mb-md">
+<span class="material-symbols-outlined" data-icon="forum">forum</span>
+</div>
+<h3 class="font-headline-md text-[20px] leading-[28px] text-primary-dim mb-xs">Connect</h3>
+<p class="font-body-md text-body-md text-on-surface-variant">Securely message community members when a match is found, protecting your privacy.</p>
+</div>
+<!-- Pillar 3 -->
+<div class="bg-surface-container rounded-xl p-lg flex flex-col items-start border border-outline-variant/30 hover:shadow-md transition-shadow">
+<div class="w-12 h-12 bg-tertiary-container text-on-tertiary-container rounded-full flex items-center justify-center mb-md">
+<span class="material-symbols-outlined" data-icon="handshake">handshake</span>
+</div>
+<h3 class="font-headline-md text-[20px] leading-[28px] text-primary-dim mb-xs">Recover</h3>
+<p class="font-body-md text-body-md text-on-surface-variant">Follow verified hand-off protocols to ensure items return home safely and securely.</p>
+</div>
+</div>
+</div>
+</section>
+<!-- Community Section -->
+<section class="py-24 bg-surface-container">
+<div class="max-w-7xl mx-auto px-margin-mobile md:px-margin-desktop">
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-xl items-center">
+<div>
+<h2 class="font-headline-lg text-headline-lg text-primary-dim mb-md">By the Community,<br/>For the Community.</h2>
+<p class="font-body-lg text-body-lg text-on-surface-variant mb-lg">Built on the foundation of Bayanihan, FindTrack empowers everyday Filipinos to look out for one another.</p>
+<div class="flex gap-lg mb-xl">
+<div>
+<div class="font-headline-lg text-headline-lg text-primary">250+</div>
+<div class="font-label-md text-label-md text-on-surface-variant">Community Members</div>
+</div>
+<div class="w-px bg-outline-variant/50"></div>
+<div>
+<div class="font-headline-lg text-headline-lg text-tertiary-container">50+</div>
+<div class="font-label-md text-label-md text-on-surface-variant">Successful Recoveries</div>
+</div>
+</div>
+<!-- Testimonial Card -->
+<div class="bg-surface rounded-xl p-md border border-outline-variant/30 shadow-sm relative">
+<span class="material-symbols-outlined absolute top-md right-md text-outline-variant/30 text-[40px]" data-icon="format_quote">format_quote</span>
+<p class="font-body-md text-body-md text-on-surface mb-md italic relative z-10">"I lost my wallet in a busy market. Thanks to FindTrack and an honest neighbor, I had it back the same afternoon. It restored my faith in our community."</p>
+<div class="flex items-center gap-sm">
+<div class="w-10 h-10 rounded-full bg-primary-container overflow-hidden">
+<img class="w-full h-full object-cover" data-alt="A portrait of a smiling, friendly Filipino woman in her 30s, illuminated by soft, natural daylight. She is standing outdoors with subtle greenery blurred in the background, conveying approachability and community spirit. Verdant Harmony color palette, high-quality photography." src="https://lh3.googleusercontent.com/aida-public/AB6AXuD4mp2UcZ07sn0BvHPG_RPg-hm024ejxE91EzNfW7s6xnoXilpmLSUCtN6C2AYZXy-sR48N-w6_fvSH6QTbyzwMF6pl6wQ0-q2sIpEbMcgabPHHSf6Hx4aWsTviC8m4oK3scWANYbOv5zGDk1Q9vgQlRCObKfm-llTTArNahdDKtHc-BpKPyk4Xs1s5hebPDg9iOVdsghGdWA289RnCHnFDxECJFzpBFfVUE3knb29DlyxCKcoAIQzhH4cjKPYfo8_OrOuOrrjiRw"/>
+</div>
+<div>
+<div class="font-label-md text-label-md text-on-surface font-bold">Maria S.</div>
+<div class="font-label-md text-[10px] text-on-surface-variant">Community Hero</div>
+</div>
+</div>
+</div>
+</div>
+<div class="relative h-[400px] lg:h-[500px] rounded-xl overflow-hidden shadow-lg border border-outline-variant/20">
+<img class="w-full h-full object-cover" data-alt="A candid, heartwarming shot of two Filipinos interacting in a bright, modern neighborhood park. One person is handing a lost notebook back to the other, both smiling warmly. The setting features lush tropical greenery and warm natural light. Clean, optimistic, and deeply rooted in the Bayanihan spirit. Professional photography." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBxlGOvC8tUv_qZ8mbCzoTfeO2pcAAWluudEQ74nJYhDiM6dKFkJnXAMN2tK4YBhxIv0KPww3WsGnpb6KywmxGohTQ6i90nv7w2u0RVCecjGnzgkXMAWIJCDNduz3N6uzUJzOO2X6hUbk8TdWW4cPEa870HJ5Ah1QvAKbwvSknJT3Vri6FIhh8Mm_4iOGeknwaECR9sIKas-PM3QZqG2o9wpOSp-eQc4Fnpoc0yWIHqiDg4zXr3mFK3NE8g9xXChlUOf26yIrPeeg"/>
+</div>
+</div>
+</div>
+</section>
+</main>
+<!-- Footer -->
+<footer class="bg-surface-container-highest border-t border-outline-variant/30 full-width bottom-0">
+<div class="grid grid-cols-1 md:grid-cols-2 gap-8 py-xl px-margin-mobile md:px-margin-desktop max-w-7xl mx-auto">
+<div>
+<div class="font-headline-md text-headline-md font-bold text-on-surface mb-md">FindTrack</div>
+<p class="font-body-md text-body-md text-on-surface-variant max-w-sm mb-md">© 2024 FindTrack Philippines. Empowering communities through trust and recovery.</p>
+</div>
+<div class="grid grid-cols-2 gap-4">
+<nav class="flex flex-col gap-sm">
+<a class="font-label-md text-label-md text-on-surface-variant hover:text-primary hover:underline transition-all opacity-80 hover:opacity-100" href="#">About Us</a>
+<a class="font-label-md text-label-md text-on-surface-variant hover:text-primary hover:underline transition-all opacity-80 hover:opacity-100" href="#">Privacy Policy</a>
+<a class="font-label-md text-label-md text-on-surface-variant hover:text-primary hover:underline transition-all opacity-80 hover:opacity-100" href="#">Terms of Service</a>
+</nav>
+<nav class="flex flex-col gap-sm">
+<a class="font-label-md text-label-md text-on-surface-variant hover:text-primary hover:underline transition-all opacity-80 hover:opacity-100" href="#">Safety Guidelines</a>
+<a class="font-label-md text-label-md text-on-surface-variant hover:text-primary hover:underline transition-all opacity-80 hover:opacity-100" href="#">Help Center</a>
+<a class="font-label-md text-label-md text-on-surface-variant hover:text-primary hover:underline transition-all opacity-80 hover:opacity-100" href="#">Contact Us</a>
+</nav>
+</div>
+</div>
+</footer>
+</body></html>
