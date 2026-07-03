@@ -4,7 +4,8 @@ import {
   onAuthStateChanged,
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
-  sendEmailVerification
+  sendEmailVerification,
+  sendPasswordResetEmail
 } from 'firebase/auth';
 import { 
   collection, 
@@ -19,52 +20,98 @@ import {
   where,
   orderBy
 } from 'firebase/firestore';
-import { auth, db, loginWithGoogle, registerWithEmail, loginWithEmail, logOut, OperationType, handleFirestoreError } from './firebase';
+import { 
+  auth, 
+  db, 
+  loginWithGoogle, 
+  registerWithEmail, 
+  loginWithEmail, 
+  logOut, 
+  OperationType, 
+  handleFirestoreError 
+} from './firebase';
+import ItemDetail from './components/ItemDetail';
+import ChatInterface, { ChatInboxList } from './components/ChatInterface';
+import { uploadToCloudinary } from './lib/cloudinary';
+import { Item, Claim } from './types';
+import {
+  Search,
+  PenTool,
+  MessageCircle,
+  Hand,
+  Home,
+  Package,
+  Bell,
+  User as UserIcon,
+  Inbox,
+  MapPin,
+  Tag,
+  Info,
+  CheckCircle2,
+  Lightbulb,
+  Mail,
+  Smartphone,
+  Lock,
+  EyeOff,
+  Eye,
+  UserPlus,
+  Send,
+  Key,
+  ShieldCheck,
+  Dices,
+  Save,
+  LogOut,
+  Camera,
+  Navigation,
+  ExternalLink
+} from 'lucide-react';
 
-                    <div className="mt-2">
-                      <input id="last" name="last" type="text" required className="block w-full rounded-lg border-0 py-3 px-4 text-on-surface bg-surface-container-low shadow-sm ring-1 ring-inset ring-outline-variant placeholder:text-outline focus:ring-2 focus:ring-inset focus:ring-primary sm:text-body-md font-body-md" placeholder="Last name" value={signupLast} onChange={(e) => setSignupLast(e.target.value)} />
-                    </div>
-                  </div>
+type ItemReport = Item & { createdAt: any };
 
-                  <div>
-                    <label className="block font-label-md text-label-md text-on-surface" htmlFor="email-signup">Email address</label>
-                    <div className="mt-2">
-                      <input id="email-signup" name="email" type="email" required className="block w-full rounded-lg border-0 py-3 px-4 text-on-surface bg-surface-container-low shadow-sm ring-1 ring-inset ring-outline-variant placeholder:text-outline focus:ring-2 focus:ring-inset focus:ring-primary sm:text-body-md font-body-md" placeholder="you@example.com" value={authEmail} onChange={(e) => setAuthEmail(e.target.value)} />
-                    </div>
-                  </div>
+const ONBOARD_STEPS = [
+  {
+    icon: <Search className="h-6 w-6" />,
+    label: 'Find items',
+    title: 'Search smarter',
+    desc: 'Browse lost and found reports with precise filtering and AI-backed matching.',
+  },
+  {
+    icon: <Package className="h-6 w-6" />,
+    label: 'Report quickly',
+    title: 'Report lost or found',
+    desc: 'Submit a new report with photo, location, and verification details in seconds.',
+  },
+  {
+    icon: <Bell className="h-6 w-6" />,
+    label: 'Stay notified',
+    title: 'Get instant alerts',
+    desc: 'Receive claim updates and match notifications as soon as someone responds.',
+  },
+  {
+    icon: <Lightbulb className="h-6 w-6" />,
+    label: 'Resolve safely',
+    title: 'Manage claims securely',
+    desc: 'Approve ownership claims only after verifying users and item details.',
+  },
+];
 
-                  <div>
-                    <label className="block font-label-md text-label-md text-on-surface" htmlFor="contact">Contact (optional)</label>
-                    <div className="mt-2">
-                      <input id="contact" name="contact" type="text" className="block w-full rounded-lg border-0 py-3 px-4 text-on-surface bg-surface-container-low shadow-sm ring-1 ring-inset ring-outline-variant placeholder:text-outline focus:ring-2 focus:ring-inset focus:ring-primary sm:text-body-md font-body-md" placeholder="+63 912 345 6789" value={signupContact} onChange={(e) => setSignupContact(e.target.value)} />
-                    </div>
-                  </div>
-
-                  <div>
-                    <label className="block font-label-md text-label-md text-on-surface" htmlFor="password-signup">Password</label>
-                    <div className="mt-2">
-                      <input id="password-signup" name="password" type={showPass ? 'text' : 'password'} required className="block w-full rounded-lg border-0 py-3 px-4 text-on-surface bg-surface-container-low shadow-sm ring-1 ring-inset ring-outline-variant placeholder:text-outline focus:ring-2 focus:ring-inset focus:ring-primary sm:text-body-md font-body-md" placeholder="Create a secure password" value={authPassword} onChange={(e) => setAuthPass(e.target.value)} />
-                    </div>
-                  </div>
-
-                  <div className="flex items-center">
-                    <input id="terms" name="terms" type="checkbox" required className="h-4 w-4 rounded border-outline-variant text-primary focus:ring-primary bg-surface-container-low" />
-                    <label htmlFor="terms" className="ml-3 block font-body-md text-body-md text-on-surface-variant">I agree to the <button type="button" className="text-primary hover:underline">Terms of Service</button> and <button type="button" className="text-primary hover:underline">Privacy Policy</button>.</label>
-                  </div>
-
-                  <div>
-                    <button type="submit" className="flex w-full justify-center rounded-lg bg-primary-container px-3 py-3 font-label-md text-label-md font-semibold text-on-primary-container shadow-sm hover:bg-primary-fixed">Create Account</button>
-                  </div>
-                </form>
-              </div>
-
-  useEffect(() => {
-    if (resendCooldown > 0) {
-      const timer = setTimeout(() => setResendCooldown(resendCooldown - 1), 1000);
-      return () => clearTimeout(timer);
-    }
-  }, [resendCooldown]);
-
+export default function App() {
+  const [user, setUser] = useState<User | null>(null);
+  const [currentView, setCurrentView] = useState<'landing' | 'login' | 'signup' | 'dashboard' | 'verify-email' | 'privacy' | 'terms'>('landing');
+  const [loadingAuth, setLoadingAuth] = useState(false);
+  const [authEmail, setAuthEmail] = useState('');
+  const [authPassword, setAuthPass] = useState('');
+  const [signupFirst, setSignupFirst] = useState('');
+  const [signupLast, setSignupLast] = useState('');
+  const [signupContact, setSignupContact] = useState('');
+  const [showPass, setShowPass] = useState(false);
+  const [resendCooldown, setResendCooldown] = useState(0);
+  const [items, setItems] = useState<Item[]>([]);
+  const [selectedItemId, setSelectedItemId] = useState<string | null>(null);
+  const [activeTab, setActiveTab] = useState<string>('home');
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [toasts, setToasts] = useState<Array<{ id: string; msg: string; type: 'success' | 'error' }>>([]);
+  const [testimonials, setTestimonials] = useState<any[]>([]);
   const [showOnboarding, setShowOnboarding] = useState(false);
   const [onboardStep, setOnboardStep] = useState(0);
   const [zoomImg, setZoomImg] = useState<string | null>(null);
@@ -117,7 +164,14 @@ import { auth, db, loginWithGoogle, registerWithEmail, loginWithEmail, logOut, O
     setTimeout(() => {
       setToasts(prev => prev.filter(t => t.id !== id));
     }, 3300);
-  };
+  }; 
+
+  useEffect(() => {
+    if (resendCooldown > 0) {
+      const timer = setTimeout(() => setResendCooldown(resendCooldown - 1), 1000);
+      return () => clearTimeout(timer);
+    }
+  }, [resendCooldown]);
 
   const handleBackToSafety = () => {
     if (auth.currentUser) {
@@ -272,11 +326,14 @@ import { auth, db, loginWithGoogle, registerWithEmail, loginWithEmail, logOut, O
         list.push({ id: docSnap.id, ...docSnap.data() } as ItemReport);
       });
       // Sort in-memory descending creation date
-      list.sort((a, b) => {
-        const aTime = a.createdAt?.seconds ? a.createdAt.seconds * 1000 : new Date(a.createdAt || 0).getTime();
-        const bTime = b.createdAt?.seconds ? b.createdAt.seconds * 1000 : new Date(b.createdAt || 0).getTime();
-        return bTime - aTime;
-      });
+      const timestampFor = (item: ItemReport) => {
+        const createdAt = item.createdAt;
+        if (createdAt?.seconds) {
+          return createdAt.seconds * 1000;
+        }
+        return new Date(createdAt || 0).getTime();
+      };
+      list.sort((a, b) => timestampFor(b) - timestampFor(a));
       setItems(list);
       setHomeShimmer(false);
     }, (error) => {
@@ -370,7 +427,7 @@ import { auth, db, loginWithGoogle, registerWithEmail, loginWithEmail, logOut, O
 
   const handleSendPasswordReset = async () => {
     if (!authEmail || !authEmail.trim()) {
-      triggerToast('Please enter the email address to send reset link.', 'info');
+      triggerToast('Please enter the email address to send reset link.', 'error');
       return;
     }
     try {
