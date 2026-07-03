@@ -19,25 +19,8 @@ import {
   where,
   orderBy
 } from 'firebase/firestore';
-import { 
-  auth, 
-            <div className="auth-card bg-surface relative p-6 rounded-xl">
-              <div>
-                <h2 className="mt-0 font-headline-lg text-headline-lg text-on-surface">Create an account</h2>
-                <p className="mt-2 font-body-md text-body-md text-on-surface-variant">Already a member? <button onClick={() => setCurrentView('login')} className="font-label-md text-label-md font-semibold text-primary hover:text-primary-dim transition-colors">Login here</button></p>
-              </div>
+import { auth, db, loginWithGoogle, registerWithEmail, loginWithEmail, logOut, OperationType, handleFirestoreError } from './firebase';
 
-              <div className="mt-6">
-                <form onSubmit={handleSignupSubmit} className="space-y-6">
-                  <div>
-                    <label className="block font-label-md text-label-md text-on-surface" htmlFor="first">First Name</label>
-                    <div className="mt-2">
-                      <input id="first" name="first" type="text" required className="block w-full rounded-lg border-0 py-3 px-4 text-on-surface bg-surface-container-low shadow-sm ring-1 ring-inset ring-outline-variant placeholder:text-outline focus:ring-2 focus:ring-inset focus:ring-primary sm:text-body-md font-body-md" placeholder="First name" value={signupFirst} onChange={(e) => setSignupFirst(e.target.value)} />
-                    </div>
-                  </div>
-
-                  <div>
-                    <label className="block font-label-md text-label-md text-on-surface" htmlFor="last">Last Name</label>
                     <div className="mt-2">
                       <input id="last" name="last" type="text" required className="block w-full rounded-lg border-0 py-3 px-4 text-on-surface bg-surface-container-low shadow-sm ring-1 ring-inset ring-outline-variant placeholder:text-outline focus:ring-2 focus:ring-inset focus:ring-primary sm:text-body-md font-body-md" placeholder="Last name" value={signupLast} onChange={(e) => setSignupLast(e.target.value)} />
                     </div>
@@ -74,15 +57,6 @@ import {
                   </div>
                 </form>
               </div>
-  const [signupContact, setSignupContact] = useState('');
-  
-  // App alerts, loading states & real-time sync list
-  const [items, setItems] = useState<ItemReport[]>([]);
-  const [testimonials, setTestimonials] = useState<any[]>([]);
-  const [toasts, setToasts] = useState<{ id: string; msg: string; type: 'success' | 'error' }[]>([]);
-  const [sidebarOpen, setSidebarOpen] = useState(false);
-  const [showPass, setShowPass] = useState(false);
-  const [resendCooldown, setResendCooldown] = useState(0);
 
   useEffect(() => {
     if (resendCooldown > 0) {
